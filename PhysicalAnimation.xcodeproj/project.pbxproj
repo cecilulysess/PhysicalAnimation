@@ -26,7 +26,7 @@
 
 /* Begin PBXFileReference section */
 		B99FCB9415E71FD10048BBBA /* PhysicalAnimation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhysicalAnimation; sourceTree = BUILT_PRODUCTS_DIR; };
-		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PhysicalAnimation.1; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
