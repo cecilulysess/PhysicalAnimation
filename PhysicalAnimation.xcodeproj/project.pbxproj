@@ -1,0 +1,213 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B99FCB9915E71FD10048BBBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99FCB9815E71FD10048BBBA /* main.cpp */; };
+		B99FCB9B15E71FD10048BBBA /* PhysicalAnimation.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B99FCB9215E71FD10048BBBA /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				B99FCB9B15E71FD10048BBBA /* PhysicalAnimation.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B99FCB9415E71FD10048BBBA /* PhysicalAnimation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhysicalAnimation; sourceTree = BUILT_PRODUCTS_DIR; };
+		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PhysicalAnimation.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B99FCB9115E71FD10048BBBA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B99FCB8915E71FD10048BBBA = {
+			isa = PBXGroup;
+			children = (
+				B99FCB9715E71FD10048BBBA /* PhysicalAnimation */,
+				B99FCB9515E71FD10048BBBA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B99FCB9515E71FD10048BBBA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B99FCB9415E71FD10048BBBA /* PhysicalAnimation */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B99FCB9715E71FD10048BBBA /* PhysicalAnimation */ = {
+			isa = PBXGroup;
+			children = (
+				B99FCB9815E71FD10048BBBA /* main.cpp */,
+				B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */,
+			);
+			path = PhysicalAnimation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B99FCB9315E71FD10048BBBA /* PhysicalAnimation */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B99FCB9E15E71FD10048BBBA /* Build configuration list for PBXNativeTarget "PhysicalAnimation" */;
+			buildPhases = (
+				B99FCB9015E71FD10048BBBA /* Sources */,
+				B99FCB9115E71FD10048BBBA /* Frameworks */,
+				B99FCB9215E71FD10048BBBA /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = PhysicalAnimation;
+			productName = PhysicalAnimation;
+			productReference = B99FCB9415E71FD10048BBBA /* PhysicalAnimation */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B99FCB8B15E71FD10048BBBA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = "Julian Wu";
+			};
+			buildConfigurationList = B99FCB8E15E71FD10048BBBA /* Build configuration list for PBXProject "PhysicalAnimation" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = B99FCB8915E71FD10048BBBA;
+			productRefGroup = B99FCB9515E71FD10048BBBA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B99FCB9315E71FD10048BBBA /* PhysicalAnimation */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B99FCB9015E71FD10048BBBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B99FCB9915E71FD10048BBBA /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		B99FCB9C15E71FD10048BBBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		B99FCB9D15E71FD10048BBBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		B99FCB9F15E71FD10048BBBA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		B99FCBA015E71FD10048BBBA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B99FCB8E15E71FD10048BBBA /* Build configuration list for PBXProject "PhysicalAnimation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B99FCB9C15E71FD10048BBBA /* Debug */,
+				B99FCB9D15E71FD10048BBBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B99FCB9E15E71FD10048BBBA /* Build configuration list for PBXNativeTarget "PhysicalAnimation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B99FCB9F15E71FD10048BBBA /* Debug */,
+				B99FCBA015E71FD10048BBBA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B99FCB8B15E71FD10048BBBA /* Project object */;
+}
