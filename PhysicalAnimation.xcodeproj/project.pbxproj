@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		B99FCB9915E71FD10048BBBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99FCB9815E71FD10048BBBA /* main.cpp */; };
 		B99FCB9B15E71FD10048BBBA /* PhysicalAnimation.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */; };
+		B99FCBA615E726C60048BBBA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B99FCBA515E726C60048BBBA /* GLUT.framework */; };
+		B99FCBA915E726D10048BBBA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B99FCBA815E726D10048BBBA /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +30,8 @@
 		B99FCB9415E71FD10048BBBA /* PhysicalAnimation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhysicalAnimation; sourceTree = BUILT_PRODUCTS_DIR; };
 		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PhysicalAnimation.1; sourceTree = "<group>"; };
+		B99FCBA515E726C60048BBBA /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		B99FCBA815E726D10048BBBA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +39,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B99FCBA915E726D10048BBBA /* OpenGL.framework in Frameworks */,
+				B99FCBA615E726C60048BBBA /* GLUT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,10 +50,13 @@
 		B99FCB8915E71FD10048BBBA = {
 			isa = PBXGroup;
 			children = (
+				B99FCBA815E726D10048BBBA /* OpenGL.framework */,
+				B99FCBA515E726C60048BBBA /* GLUT.framework */,
 				B99FCB9715E71FD10048BBBA /* PhysicalAnimation */,
 				B99FCB9515E71FD10048BBBA /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		B99FCB9515E71FD10048BBBA /* Products */ = {
 			isa = PBXGroup;
@@ -206,6 +215,7 @@
 				B99FCBA015E71FD10048BBBA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
