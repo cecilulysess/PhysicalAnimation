@@ -19,10 +19,10 @@ namespace motion_strategies {
   
   // strategy that responsible for movement, I avoid the approach that using
   // template as strategy so that avoid the additional complex
-  template <class MotionVector>
+  template <class MotionVector, class DoFVector>
   class IMovementStrategy {
   public:
-    virtual void moving(physical_world::World world,
+    virtual void moving(physical_world::World<DoFVector> world,
                         physical_objects::Object object2move,
                         DrawObjectIfCollision display,
                         float start_time,
@@ -34,13 +34,17 @@ namespace motion_strategies {
     virtual physical_world::Air<MotionVector> medium() = 0;
   };
   
-  template <class MotionVector>
+  
+  //-----------------------------------------------------------------------
+  // class for spherical movement
+  
+  template <class MotionVector, class DoFVector>
   class StandardSphericalMovement {
   public:
     StandardSphericalMovement(MotionVector V_obj_init,
                               MotionVector A_obj_init, MotionVector X_obj_init,
                               physical_world::Air<MotionVector> medium );
-    void moving(physical_world::World world,
+    void moving(physical_world::World<DoFVector> world,
                 physical_objects::Object object2move,
                 DrawObjectIfCollision display,
                 float start_time,

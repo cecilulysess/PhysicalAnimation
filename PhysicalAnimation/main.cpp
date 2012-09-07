@@ -64,7 +64,7 @@ void Circlef(float x, float y, float rad){
 void DrawBall(int collision, physical_objects::SphericalObject& obj) {
   int i;
   
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
 //  if(Trace){
 //    for(i = 0; i < NSteps && i < MAXSTEPS; i++){
@@ -88,7 +88,6 @@ void DrawBall(int collision, physical_objects::SphericalObject& obj) {
     glColor3f(RGBYELLOW);
   
   Circlef(Ball.x, Ball.y, obj.radius());
-  cout<<Ball.y<<" ballx"<<endl;
   glutSwapBuffers();
   
   if(NSteps < MAXSTEPS){
@@ -103,37 +102,6 @@ void DrawBall(int collision, physical_objects::SphericalObject& obj) {
   }
 
 }
-
-
-
-///*
-// Display Callback Routine: clear the screen and draw a square
-// This routine is called every time the window on the screen needs
-// to be redrawn, like if the window is iconized and then reopened
-// by the user, and when the window is first created. It is also
-// called whenever the program calls glutPostRedisplay()
-// */
-//void drawSquare(){
-//  // red, yellow, green, cyan, blue, magenta
-//  float colors[6][3] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0},
-//    {0, 1, 1}, {0, 0, 1}, {1, 0, 1}};
-//  
-//  glClear(GL_COLOR_BUFFER_BIT);  // clear window to background color
-//  
-//  // set the drawing color to the currently selected color
-//  glColor3f(colors[icolor][0], colors[icolor][1], colors[icolor][2]);
-//  
-//  // draw the square
-//  glBegin(GL_POLYGON);
-//  glVertex2i(100, 100);
-//  glVertex2i(100, 500);
-//  glVertex2i(500, 500);
-//  glVertex2i(500, 100);
-//  glEnd();
-//  
-//  // flush the OpenGL pipeline to the viewport
-//  glutSwapBuffers();
-//}
 
 /*
  Keyboard Callback Routine: 'c' cycle through colors, 'q' or ESC quit
@@ -238,31 +206,8 @@ void handleButton(int button, int state, int x, int y){
 void RenderScene(){
  
   glLoadIdentity();
-  int icolor = 2;
   DrawBall(0, ball);
-//  float colors[6][3] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0},
-//    {0, 1, 1}, {0, 0, 1}, {1, 0, 1}};
-//
-//  glClear(GL_COLOR_BUFFER_BIT);  // clear window to background color
-//
-//  // set the drawing color to the currently selected color
-//  glColor3f(colors[icolor][0], colors[icolor][1], colors[icolor][2]);
-//
-//  // draw the square
-//  glBegin(GL_POLYGON);
-//  glVertex2i(100, 100);
-//  glVertex2i(100, 500);
-//  glVertex2i(500, 500);
-//  glVertex2i(500, 100);
-//  glEnd();
 
-  // flush the OpenGL pipeline to the viewport
-//  glutSwapBuffers();
-//
-  
-//  glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
-//  Circlef(500.0, 300.0, 10.0f);
-//  glutSwapBuffers();
 }
 
 /*
@@ -284,9 +229,9 @@ int main(int argc, char* argv[]){
   // an event
   glutReshapeFunc(doReshape);
   glutDisplayFunc(RenderScene);
-//  glutKeyboardFunc(handleKey);	  // keyboard callback
-//  
-//  glutMouseFunc(handleButton);
+  glutKeyboardFunc(handleKey);	  // keyboard callback
+//
+  glutMouseFunc(handleButton);
   //glutReshapeFunc(..) // when window size changed
   
 //  // define the drawing coordinate system on the viewport
@@ -296,10 +241,10 @@ int main(int argc, char* argv[]){
 //  gluOrtho2D(0, WIDTH, 0, HEIGHT);
   
   /* Set up to clear screen to black */
-//  glClearColor(RGBBLACK, 0);
+  glClearColor(RGBBLACK, 0);
   
   /* Set shading to flat shading */
-//  glShadeModel(GL_FLAT);
+  glShadeModel(GL_FLAT);
 
   
   

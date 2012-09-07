@@ -10,8 +10,8 @@
 #include "MovementStrategy.h"
 
 namespace motion_strategies {
-  template <class MotionVector>
-  StandardSphericalMovement<MotionVector>::StandardSphericalMovement(
+  template <class MotionVector, class DoFVector>
+  StandardSphericalMovement<MotionVector, DoFVector>::StandardSphericalMovement(
     MotionVector V_obj_init, MotionVector A_obj_init, MotionVector X_obj_init,
     physical_world::Air<MotionVector> medium ) :
     V_obj_(V_obj_init),A_obj_(A_obj_init),
@@ -20,9 +20,9 @@ namespace motion_strategies {
     
   }
   
-  template <class MotionVector>
-  void StandardSphericalMovement<MotionVector>::moving(
-    physical_world::World world,
+  template <class MotionVector, class DoFVector>
+  void StandardSphericalMovement<MotionVector, DoFVector>::moving(
+    physical_world::World<DoFVector> world,
     physical_objects::Object object2move,
     DrawObjectIfCollision display,
     float start_time,

@@ -11,11 +11,16 @@
 namespace physical_world {
 
 // world detail of Standard World
+template <class DoFVector>
+StandardWorld<DoFVector>* StandardWorld<DoFVector>::unique_instance_ = 0;
+  template <class DoFVector>
+const float StandardWorld<DoFVector>::g_ = 9.8;
+  template <class DoFVector>
+const  std::map<physical_objects::Object, DoFVector>
+  StandardWorld<DoFVector>::objects_;
   
-StandardWorld* StandardWorld::unique_instance_ = 0;
-const float StandardWorld::g_ = 9.8;
-
-StandardWorld* StandardWorld::Instance() {
+template <class DoFVector>
+StandardWorld<DoFVector>* StandardWorld<DoFVector>::Instance() {
   if (unique_instance_ == 0 ) {
     unique_instance_ = new StandardWorld();
   }
