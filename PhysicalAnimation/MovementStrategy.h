@@ -15,7 +15,7 @@
 namespace motion_strategies {
   //  define a func pointer that used for call back with parameter that
   //  tells whether collison
-  typedef void (*DrawObjectIfCollision) (int);
+  typedef void (*DrawObjectIfCollision) (int,  physical_objects::SphericalObject& obj);
   
   // strategy that responsible for movement, I avoid the approach that using
   // template as strategy so that avoid the additional complex

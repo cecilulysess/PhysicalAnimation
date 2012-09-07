@@ -15,6 +15,7 @@
 namespace physical_objects {
 
 //  Object abstract class that represent all objects in the physical world
+//  the elasticity coeffcient should between (0.0, 1.0)
 class Object {
 public:
   virtual float mass() = 0;
@@ -31,7 +32,7 @@ public:
 };
 
 // An abstract class that represent shperical object with radius
-class SphericalObject : Object {
+class SphericalObject : public Object {
 public:
   virtual float mass() = 0;
   virtual float elasticity() = 0;
@@ -40,7 +41,8 @@ public:
 
 
 // A 2D ball
-class Ball2D: Object {
+class Ball2D: public SphericalObject {
+public:
   Ball2D(float mass, float elasticity, float radius ) ;
   
   float mass() {

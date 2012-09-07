@@ -39,6 +39,30 @@
 #define MEDIUM		2
 #define HEAVY		3
 
+//---------for test -------
+#define Trace true
+#define WINDOW_WIDTH	1000	/* window dimensions */
+#define WINDOW_HEIGHT	740
+#define STARTX		(WINDOW_WIDTH / 20)
+#define STARTY		(WINDOW_HEIGHT - WINDOW_HEIGHT / 20)
+#define CIRC_INC	(2 * PI / 30)	/* fineness of circle drawing */
+
+static Vector2d Ball(STARTX, STARTY);
+static int NSteps = 0;
+static int NTimeSteps = -1;
+static Vector2d OldBall[MAXSTEPS];
+
+static double WinWidth = WINDOW_WIDTH;
+static double WinHeight = WINDOW_HEIGHT;
+static int Step = true;
+static int Start = true;
+static int Stopped = true;
+static int MiddleButton = false;
+static int Throw = false;
+static int WeightMatters = 0;
+static int HaveWind = false;
+static int Floor = false;
 
 
+static physical_objects::Ball2D ball(1.0f, 0.5f, 0.1f);
 #endif

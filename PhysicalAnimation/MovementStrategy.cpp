@@ -34,7 +34,7 @@ namespace motion_strategies {
     while (t < end_time) {
       tmp_a = world.g() - medium().drag_coefficient() / object2move.mass() *
                (medium().speed() - V_obj_) ;
-      display(0);
+      display(0, (physical_objects::SphericalObject&)object2move);
       
       tmp_v = V_obj_ + A_obj_ * time_step;
       tmp_x = X_obj_ + V_obj_ * time_step;
