@@ -64,5 +64,5 @@ static int HaveWind = false;
 static int Floor = false;
 
 
-static physical_objects::Ball2D ball(1.0f, 0.5f, 0.1f);
+static physical_objects::Ball2D ball(1.0f, 0.5f, 10.1f);
 #endif

@@ -66,16 +66,16 @@ void DrawBall(int collision, physical_objects::SphericalObject& obj) {
   
   glClear(GL_COLOR_BUFFER_BIT);
   
-  if(Trace){
-    for(i = 0; i < NSteps && i < MAXSTEPS; i++){
-//      if(Collision[i])
-//        glColor3f(RGBRED);
-//      else
-        glColor3f(RGBYELLOW);
-      
-      OutlineCirclef(OldBall[i].x, OldBall[i].y, obj.radius());
-    }
-  }
+//  if(Trace){
+//    for(i = 0; i < NSteps && i < MAXSTEPS; i++){
+////      if(Collision[i])
+////        glColor3f(RGBRED);
+////      else
+//        glColor3f(RGBYELLOW);
+//      
+//      OutlineCirclef(OldBall[i].x, OldBall[i].y, obj.radius());
+//    }
+//  }
   
 //  if(Floor)
 //    DrawFloor();
@@ -102,31 +102,9 @@ void DrawBall(int collision, physical_objects::SphericalObject& obj) {
     NSteps = 0;
   }
 
-  int icolor = 0;
-  //red, yellow, green, cyan, blue, magenta
-  float colors[6][3] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0},
-    {0, 1, 1}, {0, 0, 1}, {1, 0, 1}};
-
-  glClear(GL_COLOR_BUFFER_BIT);  // clear window to background color
-
-  // set the drawing color to the currently selected color
-  glColor3f(colors[icolor][0], colors[icolor][1], colors[icolor][2]);
-
-  // draw the square
-  glBegin(GL_POLYGON);
-  glVertex2i(100, 100);
-  glVertex2i(100, 500);
-  glVertex2i(500, 500);
-  glVertex2i(500, 100);
-  glEnd();
-
-  // flush the OpenGL pipeline to the viewport
-  glutSwapBuffers();
 }
 
 
-
-static int icolor = 0;
 
 ///*
 // Display Callback Routine: clear the screen and draw a square
@@ -254,21 +232,38 @@ void handleButton(int button, int state, int x, int y){
 }
 
 
-
-
 /*
  On Redraw request, erase the window and redraw everything
  */
-void drawDisplay(){
-  
+void RenderScene(){
+ 
   glLoadIdentity();
+  int icolor = 2;
+  DrawBall(0, ball);
+//  float colors[6][3] = {{1, 0, 0}, {1, 1, 0}, {0, 1, 0},
+//    {0, 1, 1}, {0, 0, 1}, {1, 0, 1}};
+//
+//  glClear(GL_COLOR_BUFFER_BIT);  // clear window to background color
+//
+//  // set the drawing color to the currently selected color
+//  glColor3f(colors[icolor][0], colors[icolor][1], colors[icolor][2]);
+//
+//  // draw the square
+//  glBegin(GL_POLYGON);
+//  glVertex2i(100, 100);
+//  glVertex2i(100, 500);
+//  glVertex2i(500, 500);
+//  glVertex2i(500, 100);
+//  glEnd();
+
+  // flush the OpenGL pipeline to the viewport
+//  glutSwapBuffers();
+//
   
-//  DrawBall(0, ball);
-  Circlef(500.0, 300.0, 1.0f);
-  glutSwapBuffers();
+//  glClear(GL_COLOR_BUFFER_BIT /*| GL_DEPTH_BUFFER_BIT*/);
+//  Circlef(500.0, 300.0, 10.0f);
+//  glutSwapBuffers();
 }
-
-
 
 /*
  Main program to draw the square, change colors, and wait for quit
@@ -282,14 +277,13 @@ int main(int argc, char* argv[]){
   // Julian: Add GLUT_DEPTH when in 3D program so that 3D objects drawed
   // correctly regardless the order they draw
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA |GLUT_DEPTH);
-  
-  
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-  glutCreateWindow("Bouncing Ball Demo");
+  glutCreateWindow("Ball on the air");
   
   // set up the callback routines to be called when glutMainLoop() detects
   // an event
-  glutDisplayFunc(drawDisplay);	  // display callback
+  glutReshapeFunc(doReshape);
+  glutDisplayFunc(RenderScene);
 //  glutKeyboardFunc(handleKey);	  // keyboard callback
 //  
 //  glutMouseFunc(handleButton);
@@ -307,6 +301,7 @@ int main(int argc, char* argv[]){
   /* Set shading to flat shading */
 //  glShadeModel(GL_FLAT);
 
+  
   
   // Routine that loops forever looking for events. It calls the registered
   // callback routine to handle each event that is detected
