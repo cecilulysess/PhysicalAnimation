@@ -9,6 +9,9 @@
 #ifndef PhysicalAnimation_definitions_h
 #define PhysicalAnimation_definitions_h
 
+
+#include "Vector.h"
+
 // colors in RGB
 #define RGBBLACK	0, 0, 0
 #define RGBRED		1, 0, 0
@@ -62,7 +65,7 @@ static int Throw = false;
 static int WeightMatters = 0;
 static int HaveWind = false;
 static int Floor = false;
-
-static physical_world::StandardWorld<Vector2d> world;
+//
+static physical_world::StandardWorld<Vector2d> world2d;
 static physical_objects::Ball2D ball(1.0f, 0.5f, 10.1f);
 #endif

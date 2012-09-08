@@ -9,10 +9,17 @@
 
 #include "objects.h"
 
+#include<time.h>
 #include<stdexcept>
 namespace physical_objects {
+  inline long get_random () {
+    srand(time(NULL));
+    return rand();
+  }
   
-  Ball2D::Ball2D(float mass, float elasticity, float radius ) :
+  Object::Object():identifier_(get_random()){
+  }
+    Ball2D::Ball2D(float mass, float elasticity, float radius ) :
     mass_(mass), elasticity_(elasticity), radius_(radius) {
       if (elasticity <= 0.0f) {
         throw std::invalid_argument("elasticity should larger than 0.0");

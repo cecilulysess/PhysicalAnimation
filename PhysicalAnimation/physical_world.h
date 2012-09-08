@@ -10,6 +10,7 @@
 #define PhysicalAnimation_physical_world_h
 
 #include<map>
+#include<stdexcept>
 
 #include"objects.h"
 
@@ -23,7 +24,25 @@ class World {
 public:
   // return the g value in this world
   virtual float g() = 0;
-  virtual const std::map<physical_objects::Object, DoFVector> objects() = 0;
+  // a map of objects that store it's identifier() and location in the world
+  const std::map<long, DoFVector>& objects() { return this->objects_ ; }
+  
+  void add_object_location(long identifier, DoFVector dof_vector) {
+    this->objects_[identifier] = dof_vector;
+  }
+  
+  DoFVector& get_object_location(long identifier) {
+    typename std::map<long, DoFVector>::iterator it =
+      this->objects_.find(identifier);
+    
+    if (it == objects_.end() ){
+      throw std::invalid_argument("Object not found in this world");
+    } else {
+      return it->second;
+    }
+  }
+private:
+  std::map<long, DoFVector> objects_;
 };
   
 //  Standard World is the stand world that in the earth with g = 9.8
@@ -32,15 +51,11 @@ class StandardWorld : public World<DoFVector>{
 public:
   static StandardWorld* Instance();
   float g() {
-    return this->g_;
-  }
-  const std::map<physical_objects::Object, DoFVector> objects() {
-    return objects_;
+    return g_;
   }
 private:
   static StandardWorld* unique_instance_;
-  static const float g_;
-  static const std::map<physical_objects::Object, DoFVector> objects_;
+  static const float g_ = 9.8f;
 };
   
 // An abstract class represent the medium that filling some part of the world

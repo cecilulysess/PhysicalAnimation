@@ -18,9 +18,19 @@ namespace physical_objects {
 //  the elasticity coeffcient should between (0.0, 1.0)
 class Object {
 public:
+  Object();
+  
+  // a const identifier number of the object, every object should have one
+  // permenant identifier 
+  const long identifier() {
+    return this->identifier_;
+  }
   virtual float mass() = 0;
   // elasticity coeffieicnt 
   virtual float elasticity() = 0;
+  
+private:
+  const long identifier_;
 };
 
 

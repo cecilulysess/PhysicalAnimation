@@ -32,7 +32,7 @@ using namespace std;
 #define WIDTH	    1024	/* window dimensions */
 #define HEIGHT		768
 
-//---------------------Including and definitions------------------------
+//----------------------Including and definitions end-----------------------
 /*
  Draw an outlined circle with center at position (x, y) and radius rad
  */
@@ -61,8 +61,35 @@ void Circlef(float x, float y, float rad){
   glEnd();
 }
 
+
+// initilize the world with setting the position of each object
+void init_the_world(){
+  world2d.add_object_location( ball.identifier() , Vector2d(10, 500));
+  
+}
+
+
+
+void DrawABall(int collision, physical_objects::SphericalObject& obj) {
+  
+  
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  Vector2d& obj_loc = world2d.get_object_location(obj.identifier() );
+  glColor3f(RGBYELLOW);
+  Circlef( obj_loc.x, obj_loc.y, obj.radius());
+  
+  
+  //-----------------------draw end---------------------
+  glutSwapBuffers();
+}
+
+void Simulate(){
+  
+}
+
+
 void DrawBall(int collision, physical_objects::SphericalObject& obj) {
-  int i;
+  
   
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   
@@ -204,9 +231,9 @@ void handleButton(int button, int state, int x, int y){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
- 
+  
   glLoadIdentity();
-  DrawBall(0, ball);
+  DrawABall(0, ball);
 
 }
 
@@ -214,6 +241,7 @@ void RenderScene(){
  Main program to draw the square, change colors, and wait for quit
  */
 int main(int argc, char* argv[]){
+  init_the_world();
   
   // start up the glut utilities
   glutInit(&argc, argv);
