@@ -9,14 +9,11 @@
 /* Begin PBXBuildFile section */
 		B94E7AE415F5AB0900BEEB53 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE015F5AB0800BEEB53 /* Utility.cpp */; };
 		B94E7AE515F5AB0900BEEB53 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE215F5AB0800BEEB53 /* Vector.cpp */; };
-		B94E7AED15F5BC0200BEEB53 /* physical_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AEC15F5BC0200BEEB53 /* physical_world.cpp */; };
-		B99588C415FC709100A41403 /* physical_world_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99588C215FC709000A41403 /* physical_world_controller.cpp */; };
+		B99588C815FCE56B00A41403 /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99588C615FCE56B00A41403 /* object.cpp */; };
 		B99FCB9915E71FD10048BBBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99FCB9815E71FD10048BBBA /* main.cpp */; };
 		B99FCB9B15E71FD10048BBBA /* PhysicalAnimation.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */; };
 		B99FCBA615E726C60048BBBA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B99FCBA515E726C60048BBBA /* GLUT.framework */; };
 		B99FCBA915E726D10048BBBA /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B99FCBA815E726D10048BBBA /* OpenGL.framework */; };
-		B9EDEAC315F9AAAB00B655F8 /* objects.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9EDEAC215F9AAAB00B655F8 /* objects.cpp */; };
-		B9EDEAC915F9B30200B655F8 /* MovementStrategy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9EDEAC815F9B30200B655F8 /* MovementStrategy.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,20 +35,13 @@
 		B94E7AE215F5AB0800BEEB53 /* Vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
 		B94E7AE315F5AB0800BEEB53 /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
 		B94E7AE715F5ADFF00BEEB53 /* definitions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = definitions.h; sourceTree = "<group>"; };
-		B94E7AE815F5AEB900BEEB53 /* animation_math-inl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "animation_math-inl.h"; sourceTree = "<group>"; };
-		B94E7AEB15F5B79200BEEB53 /* physical_world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = physical_world.h; sourceTree = "<group>"; };
-		B94E7AEC15F5BC0200BEEB53 /* physical_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = physical_world.cpp; sourceTree = "<group>"; };
-		B99588C215FC709000A41403 /* physical_world_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = physical_world_controller.cpp; sourceTree = "<group>"; };
-		B99588C315FC709100A41403 /* physical_world_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physical_world_controller.h; sourceTree = "<group>"; };
+		B99588C615FCE56B00A41403 /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object.cpp; sourceTree = "<group>"; };
+		B99588C715FCE56B00A41403 /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = object.h; sourceTree = "<group>"; };
 		B99FCB9415E71FD10048BBBA /* PhysicalAnimation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhysicalAnimation; sourceTree = BUILT_PRODUCTS_DIR; };
 		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PhysicalAnimation.1; sourceTree = "<group>"; };
 		B99FCBA515E726C60048BBBA /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
 		B99FCBA815E726D10048BBBA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		B9EDEAC015F5C42A00B655F8 /* objects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = objects.h; sourceTree = "<group>"; };
-		B9EDEAC215F9AAAB00B655F8 /* objects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = objects.cpp; sourceTree = "<group>"; };
-		B9EDEAC615F9B28900B655F8 /* MovementStrategy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MovementStrategy.h; sourceTree = "<group>"; };
-		B9EDEAC815F9B30200B655F8 /* MovementStrategy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MovementStrategy.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,15 +86,8 @@
 				B99FCB9815E71FD10048BBBA /* main.cpp */,
 				B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */,
 				B94E7AE715F5ADFF00BEEB53 /* definitions.h */,
-				B94E7AE815F5AEB900BEEB53 /* animation_math-inl.h */,
-				B94E7AEB15F5B79200BEEB53 /* physical_world.h */,
-				B94E7AEC15F5BC0200BEEB53 /* physical_world.cpp */,
-				B9EDEAC015F5C42A00B655F8 /* objects.h */,
-				B9EDEAC215F9AAAB00B655F8 /* objects.cpp */,
-				B9EDEAC615F9B28900B655F8 /* MovementStrategy.h */,
-				B9EDEAC815F9B30200B655F8 /* MovementStrategy.cpp */,
-				B99588C215FC709000A41403 /* physical_world_controller.cpp */,
-				B99588C315FC709100A41403 /* physical_world_controller.h */,
+				B99588C615FCE56B00A41403 /* object.cpp */,
+				B99588C715FCE56B00A41403 /* object.h */,
 			);
 			path = PhysicalAnimation;
 			sourceTree = "<group>";
@@ -163,10 +146,7 @@
 				B99FCB9915E71FD10048BBBA /* main.cpp in Sources */,
 				B94E7AE415F5AB0900BEEB53 /* Utility.cpp in Sources */,
 				B94E7AE515F5AB0900BEEB53 /* Vector.cpp in Sources */,
-				B94E7AED15F5BC0200BEEB53 /* physical_world.cpp in Sources */,
-				B9EDEAC315F9AAAB00B655F8 /* objects.cpp in Sources */,
-				B9EDEAC915F9B30200B655F8 /* MovementStrategy.cpp in Sources */,
-				B99588C415FC709100A41403 /* physical_world_controller.cpp in Sources */,
+				B99588C815FCE56B00A41403 /* object.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
