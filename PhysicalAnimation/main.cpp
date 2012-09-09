@@ -24,7 +24,7 @@
 #endif
 
 //  project header here
-#include "physical_world_controller.h"
+
 //  Definitions and namespace
 #include"definitions.h"
 using namespace std;
@@ -33,7 +33,7 @@ using namespace std;
 #define HEIGHT		768
 
 void DrawABall(int collision,
-               physical_objects::SphericalObject<Vector2d, Vector2d>& obj);
+               void* obj);
 //----------------------Including and definitions end-----------------------
 /*
  Draw an outlined circle with center at position (x, y) and radius rad
@@ -66,8 +66,8 @@ void Circlef(float x, float y, float rad){
 
 // initilize the world with setting the position of each object
 void init_the_world(){
-  world2d.add_object_location( ball.identifier() , Vector2d(10, 500));
-  
+//  world2d.add_object_location( ball.identifier() , Vector2d(10, 500));
+//  
 }
 
 
@@ -80,30 +80,33 @@ void DrawWorld(){
   // XYZ axis of length 1, it starts at z=0, x from [-1, 1] and y from [-1, 1]
   glLoadIdentity();
   
-  DrawABall(1, ball);
+  DrawABall(1, &ball2d);
   
 }
 
 static int outline_cnt = 0;
 
-void DrawABall(int collision, physical_objects::SphericalObject<Vector2d, Vector2d>& obj) {
-  
+void DrawABall(int collision, void* ball) {
+  physical_objects::ball<Vector2d>* obj =
+    (physical_objects::ball<Vector2d>*)ball;
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  Vector2d& obj_loc = world2d.get_object_location(obj.identifier() );
+  Vector2d& obj_loc = obj->location();
   glColor3f(RGBYELLOW);
-  Circlef( obj_loc.x, obj_loc.y, obj.radius());
+  Circlef( obj_loc.x, obj_loc.y, obj->radius());
   OldBall[outline_cnt++] = obj_loc;
   for (int i = 0 ; i < outline_cnt; ++i) {
-    OutlineCirclef(OldBall[i].x, OldBall[i].y, obj.radius());
+    OutlineCirclef(OldBall[i].x, OldBall[i].y, obj->radius());
   }
   //-----------------------draw end---------------------
   glutSwapBuffers();
+  
 }
 
 // simulation function that called in glIdle loop
 void Simulate(){
-  world2d.get_object_location(ball.identifier())[0] += 2;
-  glutPostRedisplay(); 
+  ball2d.move(DrawABall, 1.0f);
+  glutPostRedisplay();
+  //sleep(1);
 }
 
 /*
@@ -188,7 +191,7 @@ void handleButton(int button, int state, int x, int y){
       Start = false;
       Stopped = false;
       Ball.set(STARTX, STARTY);
-      DrawABall(0, ball);
+      DrawABall(0, &ball2d);
       //glutIdleFunc(Simulate);
     }
     else if(Stopped){

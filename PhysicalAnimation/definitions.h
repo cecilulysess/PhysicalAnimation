@@ -9,7 +9,7 @@
 #ifndef PhysicalAnimation_definitions_h
 #define PhysicalAnimation_definitions_h
 
-
+#include "object.h"
 #include "Vector.h"
 
 // colors in RGB
@@ -42,6 +42,7 @@
 #define MEDIUM		2
 #define HEAVY		3
 
+
 //---------for test -------
 #define Trace true
 #define WINDOW_WIDTH	1000	/* window dimensions */
@@ -66,7 +67,18 @@ static int WeightMatters = 0;
 static int HaveWind = false;
 static int Floor = false;
 //
-static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
-static physical_world::StandardWorld<Vector2d, Vector2d> world2d;
-static physical_objects::Ball2D<Vector2d, Vector2d> ball(1.0f, 0.5f, 10.1f, Vector2d(10,10), Vector2d(0,0), Vector2d(0,0), air);
+//static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
+//static physical_world::StandardWorld<Vector2d, Vector2d> world2d;
+//static physical_objects::Ball2D<Vector2d, Vector2d> ball(1.0f, 0.5f, 10.1f, Vector2d(10,10), Vector2d(0,0), Vector2d(0,0), air);
+static physical_objects::ball<Vector2d>
+  ball2d(
+         20.0f, // radius
+         30.0f, // mass
+         0.5f, // elasticity
+         0.8f, // drag_coeef
+         Vector2d(10.0f, 0.0f), //init_v
+         Vector2d(0.0f, 0.0f),  //init_a
+         Vector2d(0.0f, -9.86f), //g MotionVector g,
+         Vector2d(100, 600), //init loc
+         Vector2d(100.0f, 0.0f)); // medium_speed
 #endif
