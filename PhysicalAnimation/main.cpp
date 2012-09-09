@@ -24,7 +24,7 @@
 #endif
 
 //  project header here
-#include "MovementStrategy.h"
+#include "physical_world_controller.h"
 //  Definitions and namespace
 #include"definitions.h"
 using namespace std;
@@ -32,6 +32,7 @@ using namespace std;
 #define WIDTH	    1024	/* window dimensions */
 #define HEIGHT		768
 
+void DrawABall(int collision, physical_objects::SphericalObject& obj);
 //----------------------Including and definitions end-----------------------
 /*
  Draw an outlined circle with center at position (x, y) and radius rad
@@ -69,22 +70,39 @@ void init_the_world(){
 }
 
 
+void DrawWorld(){
+  // when rendering a new frame, we told the video card that we need
+  //  clear the bolor and deph information
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  
+  // loading the identity matrix means reset the screen corrdinate system to
+  // XYZ axis of length 1, it starts at z=0, x from [-1, 1] and y from [-1, 1]
+  glLoadIdentity();
+  
+  DrawABall(1, ball);
+  
+}
+
+static int outline_cnt = 0;
 
 void DrawABall(int collision, physical_objects::SphericalObject& obj) {
-  
   
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   Vector2d& obj_loc = world2d.get_object_location(obj.identifier() );
   glColor3f(RGBYELLOW);
   Circlef( obj_loc.x, obj_loc.y, obj.radius());
-  
-  
+  OldBall[outline_cnt++] = obj_loc;
+  for (int i = 0 ; i < outline_cnt; ++i) {
+    OutlineCirclef(OldBall[i].x, OldBall[i].y, obj.radius());
+  }
   //-----------------------draw end---------------------
   glutSwapBuffers();
 }
 
+// simulation function that called in glIdle loop
 void Simulate(){
-  
+  world2d.get_object_location(ball.identifier())[0] += 2;
+  glutPostRedisplay(); 
 }
 
 
@@ -233,8 +251,9 @@ void handleButton(int button, int state, int x, int y){
 void RenderScene(){
   
   glLoadIdentity();
-  DrawABall(0, ball);
-
+//  DrawABall(0, ball);
+  DrawWorld();
+  
 }
 
 /*
@@ -258,7 +277,7 @@ int main(int argc, char* argv[]){
   glutReshapeFunc(doReshape);
   glutDisplayFunc(RenderScene);
   glutKeyboardFunc(handleKey);	  // keyboard callback
-//
+  glutIdleFunc(Simulate);
   glutMouseFunc(handleButton);
   //glutReshapeFunc(..) // when window size changed
   

@@ -10,6 +10,7 @@
 		B94E7AE415F5AB0900BEEB53 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE015F5AB0800BEEB53 /* Utility.cpp */; };
 		B94E7AE515F5AB0900BEEB53 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE215F5AB0800BEEB53 /* Vector.cpp */; };
 		B94E7AED15F5BC0200BEEB53 /* physical_world.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AEC15F5BC0200BEEB53 /* physical_world.cpp */; };
+		B99588C415FC709100A41403 /* physical_world_controller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99588C215FC709000A41403 /* physical_world_controller.cpp */; };
 		B99FCB9915E71FD10048BBBA /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99FCB9815E71FD10048BBBA /* main.cpp */; };
 		B99FCB9B15E71FD10048BBBA /* PhysicalAnimation.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */; };
 		B99FCBA615E726C60048BBBA /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B99FCBA515E726C60048BBBA /* GLUT.framework */; };
@@ -40,6 +41,8 @@
 		B94E7AE815F5AEB900BEEB53 /* animation_math-inl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "animation_math-inl.h"; sourceTree = "<group>"; };
 		B94E7AEB15F5B79200BEEB53 /* physical_world.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = physical_world.h; sourceTree = "<group>"; };
 		B94E7AEC15F5BC0200BEEB53 /* physical_world.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = physical_world.cpp; sourceTree = "<group>"; };
+		B99588C215FC709000A41403 /* physical_world_controller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = physical_world_controller.cpp; sourceTree = "<group>"; };
+		B99588C315FC709100A41403 /* physical_world_controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physical_world_controller.h; sourceTree = "<group>"; };
 		B99FCB9415E71FD10048BBBA /* PhysicalAnimation */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PhysicalAnimation; sourceTree = BUILT_PRODUCTS_DIR; };
 		B99FCB9815E71FD10048BBBA /* main.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = PhysicalAnimation.1; sourceTree = "<group>"; };
@@ -100,6 +103,8 @@
 				B9EDEAC215F9AAAB00B655F8 /* objects.cpp */,
 				B9EDEAC615F9B28900B655F8 /* MovementStrategy.h */,
 				B9EDEAC815F9B30200B655F8 /* MovementStrategy.cpp */,
+				B99588C215FC709000A41403 /* physical_world_controller.cpp */,
+				B99588C315FC709100A41403 /* physical_world_controller.h */,
 			);
 			path = PhysicalAnimation;
 			sourceTree = "<group>";
@@ -161,6 +166,7 @@
 				B94E7AED15F5BC0200BEEB53 /* physical_world.cpp in Sources */,
 				B9EDEAC315F9AAAB00B655F8 /* objects.cpp in Sources */,
 				B9EDEAC915F9B30200B655F8 /* MovementStrategy.cpp in Sources */,
+				B99588C415FC709100A41403 /* physical_world_controller.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
