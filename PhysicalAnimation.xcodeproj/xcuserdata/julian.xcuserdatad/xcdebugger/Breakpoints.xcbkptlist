@@ -16,18 +16,5 @@
          landmarkName = "add_object_location(long identifier, DoFVector dof_vector)"
          landmarkType = "5">
       </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "Yes"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "PhysicalAnimation/physical_world_controller.h"
-         timestampString = "368866141.922071"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "21"
-         endingLineNumber = "21"
-         landmarkName = "BallMovementController(LocationVector init_loc, MotionVector init_speed, MotionVector init_accel, Medium&lt;MotionVector&gt; medium, float time_step)"
-         landmarkType = "5">
-      </FileBreakpoint>
    </FileBreakpoints>
 </Bucket>

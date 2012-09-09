@@ -22,9 +22,10 @@ namespace motion_strategies {
   template <class MotionVector, class DoFVector>
   class IMovementStrategy {
   public:
-    virtual void moving(physical_world::World<DoFVector> world,
+    // moving is a movement that move for one step
+    virtual DoFVector moving(physical_world::World<DoFVector> world,
                         physical_objects::Object object2move,
-                        DrawObjectIfCollision display,
+                        DoFVector& location,
                         float start_time,
                         float time_step, float end_time) = 0;
     

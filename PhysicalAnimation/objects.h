@@ -14,10 +14,13 @@
 
 namespace physical_objects {
 
+
 //  Object abstract class that represent all objects in the physical world
 //  the elasticity coeffcient should between (0.0, 1.0)
 class Object {
 public:
+  enum ObjectType { UnAccess = 0, SphericalObject = 11, };
+  
   Object();
   
   // a const identifier number of the object, every object should have one
@@ -25,10 +28,12 @@ public:
   const long identifier() {
     return this->identifier_;
   }
+  
   virtual float mass() = 0;
   // elasticity coeffieicnt 
   virtual float elasticity() = 0;
   
+  static const ObjectType object_type_id_;
 private:
   const long identifier_;
 };
@@ -65,8 +70,12 @@ public:
   float radius() {
     return this->radius_;
   }
+  
+  
+  static const ObjectType object_type_id_;
 private:
   float mass_, elasticity_, radius_;
+  
 };
   
 //  An immortal object

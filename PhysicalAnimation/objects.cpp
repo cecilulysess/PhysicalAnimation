@@ -17,6 +17,9 @@ namespace physical_objects {
     return rand();
   }
   
+  const Object::ObjectType Object::object_type_id_ =
+    Object::ObjectType::UnAccess;
+  
   Object::Object():identifier_(get_random()){
   }
     Ball2D::Ball2D(float mass, float elasticity, float radius ) :
@@ -28,5 +31,7 @@ namespace physical_objects {
         throw std::invalid_argument("radius should larger than 0.0");
       }
   }
-
+  
+  const Ball2D::ObjectType Ball2D::object_type_id_ =
+    Object::ObjectType::SphericalObject;
 }

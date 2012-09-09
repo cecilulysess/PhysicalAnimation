@@ -10,6 +10,7 @@
 #define PhysicalAnimation_physical_world_h
 
 #include<map>
+#include<vector>
 #include<stdexcept>
 
 #include"objects.h"
@@ -25,24 +26,34 @@ public:
   // return the g value in this world
   virtual float g() = 0;
   // a map of objects that store it's identifier() and location in the world
-  const std::map<long, DoFVector>& objects() { return this->objects_ ; }
+  const std::map<long, DoFVector>& objects_location() {
+    return this->objects_location_ ;
+  }
+  std::vector<physical_objects::Object>& active_objects() {
+    return this->active_objects_;
+  }
+  const std::vector<physical_objects::Object>& immortal_objects() {
+    return this->immortal_objects_;
+  }
+  
   
   void add_object_location(long identifier, DoFVector dof_vector) {
-    this->objects_[identifier] = dof_vector;
+    this->objects_location_[identifier] = dof_vector;
   }
   
   DoFVector& get_object_location(long identifier) {
     typename std::map<long, DoFVector>::iterator it =
-      this->objects_.find(identifier);
+      this->objects_location_.find(identifier);
     
-    if (it == objects_.end() ){
+    if (it == objects_location_.end() ){
       throw std::invalid_argument("Object not found in this world");
     } else {
       return it->second;
     }
   }
 private:
-  std::map<long, DoFVector> objects_;
+  std::map<long, DoFVector> objects_location_;
+  std::vector<physical_objects::Object> active_objects_, immortal_objects_;
 };
   
 //  Standard World is the stand world that in the earth with g = 9.8

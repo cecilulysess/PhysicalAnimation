@@ -17,27 +17,34 @@
 
 namespace physical_world {
   
-  template <class LocationVector, class MotionVector>
-  class BallMovementController {
+  template <class DoFVector, class MotionVector>
+  class StandardWorldController {
   public:
-    BallMovementController(World<LocationVector> world,
-                           LocationVector init_loc,
+    StandardWorldController(World<DoFVector> world,
+                           DoFVector init_loc,
                            MotionVector init_speed,
                            MotionVector init_accel,
                            Medium<MotionVector> medium,
                            float time_step) :
-        movement_strategy(init_speed, init_accel, init_loc, medium),
+    //movement_strategy(init_speed, init_accel, init_loc, medium),
         time_step(time_step),
         world(world)
     {
       time = 0.0f;
+//      typename std::map<long, DoFVector>::iterator itr =
+//        world.objects().begin();
+//      for (; itr != world.objects().end; itr++ ) {
+//        if (<#condition#>) {
+//          <#statements#>
+//        }
+//        strategies[itr->first] = 
+//      }
     }
     // get the next step of all objects in this world
     void next_step();
+    void ball_moving(physical_objects::SphericalObject& ball);
   private:
-    physical_world::World<LocationVector> world;
-    motion_strategies::StandardSphericalMovement<MotionVector, LocationVector>
-      movement_strategy;
+    physical_world::World<DoFVector> world;
     float time, time_step;
   };
 } // ns physical_world
