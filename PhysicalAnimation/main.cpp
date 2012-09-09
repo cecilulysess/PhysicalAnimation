@@ -67,11 +67,40 @@ void Circlef(float x, float y, float rad){
 // initilize the world with setting the position of each object
 void init_the_world(){
 //  world2d.add_object_location( ball.identifier() , Vector2d(10, 500));
-//  
+//
+  Vector2d a(30, 30), b(700, 30), c(700, 700), d(30, 700);
+  obbox.push_back(a);
+  obbox.push_back(b);
+  obbox.push_back(b);
+  obbox.push_back(c);
+  obbox.push_back(c);
+  obbox.push_back(d);
+  physical_objects::box<Vector2d> box2d(obbox);
 }
 
 
+void DrawLine() {
+  float ctx = 400.0f, cty = 400.0f;
+  for ( int i = 0; i < obbox.size(); i+=2 ) {
+    glBegin( GL_LINES );
+    //    glVertex3f(ctx + -100.0f,cty + -100.0f, 0.0f);
+    //    glVertex3f(ctx +-100.0f, cty +100.0f, 0.0f);
+    //    glVertex3f(ctx +100.0f, cty +100.0f, 0.0f);
+    //    glVertex3f(ctx +100.0f, cty + -100.0f, 0.0f);
+    glVertex3f(obbox[i].x, obbox[i].y, 0.0f);
+    glVertex3f(obbox[i+1].x, obbox[i+1].y, 0.0f);
+    glEnd();
+  }
+  glBegin( GL_LINES );
+  glVertex3f(obbox[obbox.size()-1].x, obbox[obbox.size()-1].y, 0.0f);
+  glVertex3f(obbox[0].x, obbox[0].y, 0.0f);
+  glEnd();
+
+  
+}
+
 void DrawWorld(){
+  
   // when rendering a new frame, we told the video card that we need
   //  clear the bolor and deph information
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -81,7 +110,11 @@ void DrawWorld(){
   glLoadIdentity();
   
   DrawABall(1, &ball2d);
+//  glTranslatef(0.0f, 0.0f, -5.0f);
+  glColor3f(RGBBLUE);
+  DrawLine();
   
+  glutSwapBuffers();
 }
 
 static int outline_cnt = 0;
@@ -93,20 +126,23 @@ void DrawABall(int collision, void* ball) {
   Vector2d& obj_loc = obj->location();
   glColor3f(RGBYELLOW);
   Circlef( obj_loc.x, obj_loc.y, obj->radius());
-  OldBall[outline_cnt++] = obj_loc;
-  for (int i = 0 ; i < outline_cnt; ++i) {
-    OutlineCirclef(OldBall[i].x, OldBall[i].y, obj->radius());
-  }
+//  OldBall[outline_cnt++] = obj_loc;
+//  for (int i = 0 ; i < outline_cnt; ++i) {
+//    OutlineCirclef(OldBall[i].x, OldBall[i].y, obj->radius());
+//  }
   //-----------------------draw end---------------------
-  glutSwapBuffers();
+//  glutSwapBuffers();
   
 }
 
+
+
 // simulation function that called in glIdle loop
 void Simulate(){
-  ball2d.move(DrawABall, 1.0f);
+  ball2d.move(DrawABall, 0.1f, obbox);
+  
   glutPostRedisplay();
-  //sleep(1);
+//  sleep(1);
 }
 
 /*
@@ -210,11 +246,7 @@ void handleButton(int button, int state, int x, int y){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
-  
-  glLoadIdentity();
-//  DrawABall(0, ball);
   DrawWorld();
-  
 }
 
 /*

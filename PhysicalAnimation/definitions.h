@@ -11,6 +11,7 @@
 
 #include "object.h"
 #include "Vector.h"
+#include <vector>
 
 // colors in RGB
 #define RGBBLACK	0, 0, 0
@@ -52,8 +53,8 @@
 #define CIRC_INC	(2 * PI / 30)	/* fineness of circle drawing */
 
 static Vector2d Ball(STARTX, STARTY);
-static int NSteps = 0;
-static int NTimeSteps = -1;
+//static int NSteps = 0;
+//static int NTimeSteps = -1;
 static Vector2d OldBall[MAXSTEPS];
 
 static double WinWidth = WINDOW_WIDTH;
@@ -63,7 +64,7 @@ static int Start = true;
 static int Stopped = true;
 static int MiddleButton = false;
 static int Throw = false;
-static int WeightMatters = 0;
+//static int WeightMatters = 0;
 static int HaveWind = false;
 static int Floor = false;
 //
@@ -80,5 +81,7 @@ static physical_objects::ball<Vector2d>
          Vector2d(0.0f, 0.0f),  //init_a
          Vector2d(0.0f, -9.86f), //g MotionVector g,
          Vector2d(100, 600), //init loc
-         Vector2d(100.0f, 0.0f)); // medium_speed
+         Vector2d(10.0f, 0.0f)); // medium_speed
+
+static std::vector<Vector2d> obbox;
 #endif

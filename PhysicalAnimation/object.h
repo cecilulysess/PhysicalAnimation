@@ -12,9 +12,27 @@
 
 // debug
 #include<stdio.h>
+#include<vector>
 //----------
 namespace physical_objects{
+  // a box that is the obstacle in this scene
+  template<class VerticeVector>
+  class box {
+  public:
+    box(std::vector<VerticeVector>& vertices):vertices_(vertices) {}
+    
+    const std::vector<VerticeVector>& vertices() {
+      return this->vertices_;
+    }
+    
+    
+  private:
+    std::vector<VerticeVector>& vertices_;
+  };
+
   
+  
+  //----------------------------------------------------------------
   typedef void (*DrawObject_collision)(int, void*);
   
   template<class MotionVector>
@@ -33,29 +51,48 @@ namespace physical_objects{
          medium_speed_(medium_speed) {
            current_time_ = 0.0f;
            time_step_ = 0.1f;
+           rest = false;
     }
     
-    void move(DrawObject_collision disp_func, float time_step) {
-      if (location_.x < 0 || location_.x > 1000
-          || location_.y < 0 || location_.y > 1000 )
-        return;
+    // responsible for the motion of this ball
+    void move(DrawObject_collision disp_func, float time_step,
+              box<MotionVector> in_box) {
+//      if (location_.x < 0 || location_.x > 1000
+//          || location_.y < 0 || location_.y > 1000 )
+//        return;
+      if (rest) return;
       this->time_step_ = time_step;
       
-      MotionVector tmp_a, tmp_v, tmp_x;
+      MotionVector tmp_a, tmp_v, tmp_x, norm;
       
       MotionVector tmp_f = (mass_ * g_ - drag_coeff_ * (velocity_ - medium_speed_));
       
-      printf("\tRelative Speed: %f, %f \n",
-             tmp_f.x, tmp_f.y);
       
       tmp_a =  tmp_f / mass_;
-      printf("\ttmp_a: (%f, %f)\n", tmp_a.x, tmp_a.y);
-      disp_func(0, this);
-      
       tmp_v = velocity_ + accel_ * time_step;
       tmp_x = location_ + velocity_ * time_step;
-      // if collison do sth
-      
+      if (is_collision(location_, tmp_x, in_box, norm)) {
+        // if the time_step is small enough, then there is no need to
+        // calculate the collision time fraction
+        
+        velocity_ = reflect(velocity_, norm, elasticity_);
+        tmp_f = (mass_ * g_ - drag_coeff_ * (velocity_ - medium_speed_));
+        tmp_a = tmp_f /mass_;
+        location_ = location_ + velocity_ * time_step;
+        if ( velocity_.norm() < 1 ){
+          velocity_.x = 0.0f;
+          velocity_.y = 0.0f;
+          rest = true;
+        }
+        disp_func(1, this);
+      } else {
+        velocity_ = tmp_v;
+        location_ = tmp_x;
+        accel_ = tmp_a;
+        current_time_ += time_step;
+        disp_func(0, this);
+      }
+            
       
       
       printf("current time: %f, location: (%f, %f), V: (%f, %f), A: (%f, %f) \n",
@@ -64,11 +101,69 @@ namespace physical_objects{
              velocity_.x, velocity_.y,
              accel_.x, accel_.y);
       
-      velocity_ = tmp_v;
-      location_ = tmp_x;
-      accel_ = tmp_a;
-      current_time_ += time_step;
+      
     }
+    
+    // return whether the movement result in collison with the in_box
+    bool is_collision(MotionVector& from, MotionVector& to,
+                      box<MotionVector> in_box , MotionVector& collision_plane_norm) {
+      //fake it to static box
+      float max_x = 0.0f, min_x = 98654321.0f,
+            max_y = 0.0f, min_y = 98654321.0f;
+      for ( int i = 0 ; i < in_box.vertices().size() ; ++i ) {
+        if ( in_box.vertices()[i].x > max_x ) {
+          max_x = in_box.vertices()[i].x;
+        }
+        if ( in_box.vertices()[i].y > max_y ) {
+          max_y = in_box.vertices()[i].y;
+        }
+        if ( in_box.vertices()[i].x < min_x ) {
+          min_x = in_box.vertices()[i].x;
+        }
+        if ( in_box.vertices()[i].y < min_y ) {
+          min_y = in_box.vertices()[i].y;
+        }
+      }
+      max_x -= radius_;
+      max_y -= radius_;
+      min_x += radius_;
+      min_y += radius_;
+      
+      if ( to.x < max_x && to.x > min_x && to.y <max_y && to.y > min_y ){
+        return false;
+      } else {
+        if (to.x < min_x) {
+          collision_plane_norm.x = 1;
+          collision_plane_norm.y = 0;
+        }
+        if (to.x > max_x) {
+          collision_plane_norm.x = -1;
+          collision_plane_norm.y = 0;
+          
+        }
+        if (to.y < min_y) {
+          collision_plane_norm.x = 0;
+          collision_plane_norm.y = 1;
+          
+        }
+        if (to.y > max_y) {
+          collision_plane_norm.x = 0;
+          collision_plane_norm.y = -1;
+        }
+        return true;
+      }
+    }
+    
+    MotionVector reflect(MotionVector speed,
+                         MotionVector plane_norm,
+                         float elasticity_coefficient) {
+      //printf("\t test: (%f, %f)", (speed%plane_norm).x, (speed%plane_norm).y);
+      MotionVector b = - (speed * plane_norm) * plane_norm;
+      printf( "\t Reflect: speed(%f, %f), norm(%f, %f), b(%f, %f)\n",
+             speed.x, speed.y, plane_norm.x, plane_norm.y, b.x, b.y);
+      return speed + (1 + elasticity()) * b;
+    }
+    
     
     float radius() {return this->radius_;}
     float mass() {return this->mass_;}
@@ -83,9 +178,10 @@ namespace physical_objects{
     float radius_, mass_, elasticity_, drag_coeff_;
     MotionVector g_, velocity_, accel_, location_, medium_speed_;
     float current_time_, time_step_;
-    
+    bool rest;
     
   };
-}//ns pobj
+  
+  }//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */
