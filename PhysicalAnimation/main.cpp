@@ -32,7 +32,8 @@ using namespace std;
 #define WIDTH	    1024	/* window dimensions */
 #define HEIGHT		768
 
-void DrawABall(int collision, physical_objects::SphericalObject& obj);
+void DrawABall(int collision,
+               physical_objects::SphericalObject<Vector2d, Vector2d>& obj);
 //----------------------Including and definitions end-----------------------
 /*
  Draw an outlined circle with center at position (x, y) and radius rad
@@ -85,7 +86,7 @@ void DrawWorld(){
 
 static int outline_cnt = 0;
 
-void DrawABall(int collision, physical_objects::SphericalObject& obj) {
+void DrawABall(int collision, physical_objects::SphericalObject<Vector2d, Vector2d>& obj) {
   
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   Vector2d& obj_loc = world2d.get_object_location(obj.identifier() );
@@ -103,49 +104,6 @@ void DrawABall(int collision, physical_objects::SphericalObject& obj) {
 void Simulate(){
   world2d.get_object_location(ball.identifier())[0] += 2;
   glutPostRedisplay(); 
-}
-
-
-void DrawBall(int collision, physical_objects::SphericalObject& obj) {
-  
-  
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  
-//  if(Trace){
-//    for(i = 0; i < NSteps && i < MAXSTEPS; i++){
-////      if(Collision[i])
-////        glColor3f(RGBRED);
-////      else
-//        glColor3f(RGBYELLOW);
-//      
-//      OutlineCirclef(OldBall[i].x, OldBall[i].y, obj.radius());
-//    }
-//  }
-  
-//  if(Floor)
-//    DrawFloor();
-//  else
-//    EraseFloor();
-  
-  if(collision)
-    glColor3f(RGBRED);
-  else
-    glColor3f(RGBYELLOW);
-  
-  Circlef(Ball.x, Ball.y, obj.radius());
-  glutSwapBuffers();
-  
-  if(NSteps < MAXSTEPS){
-    OldBall[NSteps] = Ball;
-//    Collision[NSteps] = collision;
-    NSteps++;
-  }
-  else{
-    cerr << "Ball position table overflow, restarting!!" << endl;
-//    Time = 0;
-    NSteps = 0;
-  }
-
 }
 
 /*
@@ -230,7 +188,7 @@ void handleButton(int button, int state, int x, int y){
       Start = false;
       Stopped = false;
       Ball.set(STARTX, STARTY);
-      DrawBall(0, ball);
+      DrawABall(0, ball);
       //glutIdleFunc(Simulate);
     }
     else if(Stopped){

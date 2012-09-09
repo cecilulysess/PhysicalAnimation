@@ -16,22 +16,33 @@ namespace physical_objects {
     srand(time(NULL));
     return rand();
   }
-  
-  const Object::ObjectType Object::object_type_id_ =
+  template<class MotionVector, class DoFVector>
+  const typename Object<MotionVector,DoFVector>::ObjectType
+    Object<MotionVector,DoFVector>::object_type_id_ =
     Object::ObjectType::UnAccess;
   
-  Object::Object():identifier_(get_random()){
-  }
-    Ball2D::Ball2D(float mass, float elasticity, float radius ) :
-    mass_(mass), elasticity_(elasticity), radius_(radius) {
+  template<class MotionVector, class DoFVector>
+  Object<MotionVector,DoFVector>::Object():identifier_(get_random()){}
+  
+  template<class MotionVector, class DoFVector>
+  Ball2D<MotionVector,DoFVector>::Ball2D(float mass, float elasticity, float radius,
+                                               MotionVector init_loc,
+                                               MotionVector init_A,
+                                               MotionVector init_V,
+                                               physical_world::Medium<MotionVector> & medium) :
+    SphericalObject<MotionVector, DoFVector>(mass,elasticity,radius),
+    motion_strategy_(init_V, init_A, init_loc, NULL, medium){
       if (elasticity <= 0.0f) {
         throw std::invalid_argument("elasticity should larger than 0.0");
       }
       if (radius <= 0.0f ) {
         throw std::invalid_argument("radius should larger than 0.0");
       }
+      
   }
   
-  const Ball2D::ObjectType Ball2D::object_type_id_ =
-    Object::ObjectType::SphericalObject;
+  template<class MotionVector, class DoFVector>
+  const typename Object<MotionVector,DoFVector>::ObjectType
+    Ball2D<MotionVector,DoFVector>::object_type_id_ =
+    Object<MotionVector,DoFVector>::ObjectType::SphericalObject;
 }

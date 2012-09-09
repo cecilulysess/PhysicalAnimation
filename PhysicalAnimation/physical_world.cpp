@@ -11,12 +11,12 @@
 namespace physical_world {
 
 // world detail of Standard World
-template <class DoFVector>
-StandardWorld<DoFVector>* StandardWorld<DoFVector>::unique_instance_ = 0;
+template <class MotionVector, class DoFVector>
+StandardWorld<MotionVector,DoFVector>* StandardWorld<MotionVector, DoFVector>::unique_instance_ = 0;
   
   
-template <class DoFVector>
-StandardWorld<DoFVector>* StandardWorld<DoFVector>::Instance() {
+template <class MotionVector,class DoFVector>
+StandardWorld<MotionVector,DoFVector>* StandardWorld<MotionVector, DoFVector>::Instance() {
   if (unique_instance_ == 0 ) {
     unique_instance_ = new StandardWorld();
   }
@@ -25,11 +25,11 @@ StandardWorld<DoFVector>* StandardWorld<DoFVector>::Instance() {
 }
 
 // ------------------------------
-template<class MotionVector>
-Air<MotionVector>::Air(float drag_coefficient, MotionVector speed) :
-  drag_coefficient_(drag_coefficient), speed_(speed) {
-    //do nothing
-}
+//template<class MotionVector>
+//Air<MotionVector>::Air(float drag_coefficient, MotionVector speed) :
+//  drag_coefficient_(drag_coefficient), speed_(speed) {
+//    //do nothing
+//}
   
 
 } //ns physical_world

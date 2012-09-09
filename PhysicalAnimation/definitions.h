@@ -66,6 +66,7 @@ static int WeightMatters = 0;
 static int HaveWind = false;
 static int Floor = false;
 //
-static physical_world::StandardWorld<Vector2d> world2d;
-static physical_objects::Ball2D ball(1.0f, 0.5f, 10.1f);
+static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
+static physical_world::StandardWorld<Vector2d, Vector2d> world2d;
+static physical_objects::Ball2D<Vector2d, Vector2d> ball(1.0f, 0.5f, 10.1f, Vector2d(10,10), Vector2d(0,0), Vector2d(0,0), air);
 #endif

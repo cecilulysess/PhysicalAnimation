@@ -9,30 +9,46 @@
 #ifndef PhysicalAnimation_IMovementStrategy_h
 #define PhysicalAnimation_IMovementStrategy_h
 
-#include "physical_world.h"
-#include "objects.h"
+namespace physical_world {
+  template<class MotionVector>
+  class Medium;
+  
+  template <class MotionVector,class DoFVector>
+  class World;
+  
+
+}
+
+//forward declaration
+namespace physical_objects {
+  template<class MotionVector, class DoFVector>
+  class Object;
+  template<class MotionVector, class DoFVector>
+  class SphericalObject;
+}
 
 namespace motion_strategies {
   //  define a func pointer that used for call back with parameter that
   //  tells whether collison
-  typedef void (*DrawObjectIfCollision) (int,  physical_objects::SphericalObject& obj);
-  
+//  typedef void (*DrawObjectIfCollision)
+//    (int,  typename physical_objects::SphericalObject<MotionVector, DoFVector>& obj);
+//  
   // strategy that responsible for movement, I avoid the approach that using
   // template as strategy so that avoid the additional complex
   template <class MotionVector, class DoFVector>
   class IMovementStrategy {
   public:
     // moving is a movement that move for one step
-    virtual DoFVector moving(physical_world::World<DoFVector> world,
-                        physical_objects::Object object2move,
-                        DoFVector& location,
+    virtual void moving(physical_world::World<MotionVector, DoFVector>&
+                             world,
                         float start_time,
-                        float time_step, float end_time) = 0;
+                        float time_step) = 0;
     
     virtual MotionVector V_obj() = 0;
     virtual MotionVector A_obj() = 0;
     virtual MotionVector X_obj() = 0;
-    virtual physical_world::Air<MotionVector> medium() = 0;
+    virtual physical_world::Medium<MotionVector>& medium() = 0;
+    
   };
   
   
@@ -40,25 +56,27 @@ namespace motion_strategies {
   // class for spherical movement
   
   template <class MotionVector, class DoFVector>
-  class StandardSphericalMovement {
+  class StandardSphericalMovement :
+    public IMovementStrategy<MotionVector, DoFVector>{
   public:
     StandardSphericalMovement(MotionVector V_obj_init,
                               MotionVector A_obj_init, MotionVector X_obj_init,
-                              physical_world::Air<MotionVector> medium );
-    void moving(physical_world::World<DoFVector> world,
-                physical_objects::Object object2move,
-                DrawObjectIfCollision display,
+                              physical_objects::SphericalObject
+                                <MotionVector, DoFVector>* object,
+                              physical_world::Medium<MotionVector>& medium );
+    void moving(physical_world::World<MotionVector, DoFVector>& world,
                 float start_time,
-                float time_step, float end_time);
+                float time_step);
     
     MotionVector V_obj() { return this->V_obj_; }
     MotionVector A_obj() { return this->A_obj_; }
     MotionVector X_obj() { return this->X_obj_; }
-    physical_world::Air<MotionVector> medium() { return this->medium_; }
+    physical_world::Medium<MotionVector>& medium() { return this->medium_; }
     
   private:
+    physical_objects::SphericalObject<MotionVector, DoFVector>* object_;
     MotionVector V_obj_, A_obj_, X_obj_;
-    physical_world::Air<MotionVector> medium_;
+    physical_world::Medium<MotionVector>& medium_;
   };
 }// ns motion_strategies
 

@@ -17,10 +17,10 @@
 
 namespace physical_world {
   
-  template <class DoFVector, class MotionVector>
+  template <class MotionVector, class DoFVector>
   class StandardWorldController {
   public:
-    StandardWorldController(World<DoFVector> world,
+    StandardWorldController(World<MotionVector, DoFVector> world,
                            DoFVector init_loc,
                            MotionVector init_speed,
                            MotionVector init_accel,
@@ -42,9 +42,10 @@ namespace physical_world {
     }
     // get the next step of all objects in this world
     void next_step();
-    void ball_moving(physical_objects::SphericalObject& ball);
+    void ball_moving(
+         physical_objects::SphericalObject<MotionVector, DoFVector>& ball);
   private:
-    physical_world::World<DoFVector> world;
+    physical_world::World<MotionVector, DoFVector> world;
     float time, time_step;
   };
 } // ns physical_world

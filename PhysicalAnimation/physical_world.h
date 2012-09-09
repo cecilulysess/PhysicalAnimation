@@ -20,7 +20,7 @@ namespace physical_world {
 //  The abstract class represent the world, DoFVector
 //  is the vector used to store the Degree of Freedom of objects
 //  in this world. In this stage, it would be Vector3D
-template <class DoFVector>
+template <class MotionVector,class DoFVector>
 class World {
 public:
   // return the g value in this world
@@ -29,10 +29,12 @@ public:
   const std::map<long, DoFVector>& objects_location() {
     return this->objects_location_ ;
   }
-  std::vector<physical_objects::Object>& active_objects() {
+  std::vector<physical_objects::Object<MotionVector, DoFVector>>&
+    active_objects() {
     return this->active_objects_;
   }
-  const std::vector<physical_objects::Object>& immortal_objects() {
+  const std::vector<physical_objects::Object<MotionVector, DoFVector>>&
+     immortal_objects() {
     return this->immortal_objects_;
   }
   
@@ -53,12 +55,13 @@ public:
   }
 private:
   std::map<long, DoFVector> objects_location_;
-  std::vector<physical_objects::Object> active_objects_, immortal_objects_;
+  std::vector<physical_objects::Object<MotionVector, DoFVector>>
+    active_objects_, immortal_objects_;
 };
   
 //  Standard World is the stand world that in the earth with g = 9.8
-template <class DoFVector>
-class StandardWorld : public World<DoFVector>{
+template <class MotionVector,class DoFVector>
+class StandardWorld : public World<MotionVector, DoFVector>{
 public:
   static StandardWorld* Instance();
   float g() {
@@ -79,11 +82,14 @@ public:
 
   // Normal Air with drag_coefficient and speed that represent wind
 template <class MotionVector>
-class Air : Medium<MotionVector> {
+class Air : public Medium<MotionVector> {
 public:
-  Air(float drag_coefficient, MotionVector speed);
-  float drag_coefficient() = 0;
-  MotionVector speed() = 0;
+  Air(float drag_coefficient, MotionVector speed) :
+    drag_coefficient_(drag_coefficient), speed_(speed) {
+    //do nothing
+  }
+  float drag_coefficient() {return this->drag_coefficient_;}
+  MotionVector speed() {return this->speed_;}
 private:
   float drag_coefficient_;
   MotionVector speed_;
