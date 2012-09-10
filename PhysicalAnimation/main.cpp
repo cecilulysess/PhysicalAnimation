@@ -161,7 +161,7 @@ void DrawPlanes() {
     if (i == 20 ) {
       alpha = 0.5f;
     }
-    glBegin( GL_QUADS );
+    glBegin( GL_QUADS ); 
     
       glColor4f(0.0f + 0.12*i/4, 1.0f - 0.12*i/4, 0.5 - 0.03*i/4, alpha);
       glVertex3f(obbox3d[i].x, obbox3d[i].y, obbox3d[i].z);
@@ -182,7 +182,7 @@ void DrawSphere(int collison, void* ball) {
   Vector3d& obj_loc = obj->location();
   glPushMatrix();
   glTranslated(obj_loc.x, obj_loc.y, obj_loc.z);
-  glutWireSphere(ball3d.radius(), 30, 30);
+  glutSolidSphere(ball3d.radius(), 30, 30);
   glPopMatrix();
 //  GLUquadricObj* qdj = NULL;
 //  qdj = gluNewQuadric();
@@ -216,7 +216,7 @@ void Draw3DWorld(){
 // simulation function that called in glIdle loop
 void Simulate(){
 //  ball2d.move(DrawABall, 0.1f, obbox);
-  ball3d.move(DrawSphere, 0.1f, obbox3d);
+  ball3d.move(DrawSphere, 0.05f, obbox3d);
   glutPostRedisplay();
 //  sleep(1);
 }

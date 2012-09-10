@@ -79,7 +79,8 @@ namespace physical_objects{
         tmp_f = (mass_ * g_ - drag_coeff_ * (velocity_ - medium_speed_));
         tmp_a = tmp_f /mass_;
         location_ = location_ + velocity_ * time_step;
-        if ( velocity_.norm() < 1 ){
+        if ( velocity_.norm() < 0.9 && location_.y + 1 - radius_< 0.01){
+          
           velocity_.x = 0.0f;
           velocity_.y = 0.0f;
           rest = true;
@@ -109,7 +110,9 @@ namespace physical_objects{
                       box<MotionVector> in_box , MotionVector& collision_plane_norm) {
       //fake it to static box
       float max_x = 0.0f, min_x = 98654321.0f,
-            max_y = 0.0f, min_y = 98654321.0f;
+            max_y = 0.0f, min_y = 98654321.0f,
+            max_z = 0.0f, min_z = 98654321.0f;
+      
       for ( int i = 0 ; i < in_box.vertices().size() ; ++i ) {
         if ( in_box.vertices()[i].x > max_x ) {
           max_x = in_box.vertices()[i].x;
@@ -117,38 +120,59 @@ namespace physical_objects{
         if ( in_box.vertices()[i].y > max_y ) {
           max_y = in_box.vertices()[i].y;
         }
+        if ( in_box.vertices()[i].z > max_z ) {
+          max_z = in_box.vertices()[i].z;
+        }
         if ( in_box.vertices()[i].x < min_x ) {
           min_x = in_box.vertices()[i].x;
         }
         if ( in_box.vertices()[i].y < min_y ) {
           min_y = in_box.vertices()[i].y;
         }
+        if ( in_box.vertices()[i].z < min_z ) {
+          min_z = in_box.vertices()[i].z;
+        }
       }
       max_x -= radius_;
       max_y -= radius_;
+      max_z -= radius_;
       min_x += radius_;
       min_y += radius_;
+      min_z += radius_;
       
-      if ( to.x < max_x && to.x > min_x && to.y <max_y && to.y > min_y ){
+      if ( to.x < max_x && to.x > min_x && to.y <max_y && to.y > min_y &&
+          to.z > min_x && to.z < max_x ){
         return false;
       } else {
         if (to.x < min_x) {
           collision_plane_norm.x = 1;
           collision_plane_norm.y = 0;
+          collision_plane_norm.z = 0;
         }
         if (to.x > max_x) {
           collision_plane_norm.x = -1;
           collision_plane_norm.y = 0;
-          
+          collision_plane_norm.z = 0;
         }
         if (to.y < min_y) {
           collision_plane_norm.x = 0;
           collision_plane_norm.y = 1;
-          
+          collision_plane_norm.z = 0;
         }
         if (to.y > max_y) {
           collision_plane_norm.x = 0;
           collision_plane_norm.y = -1;
+          collision_plane_norm.z = 0;
+        }
+        if (to.z < min_z ) {
+          collision_plane_norm.x = 0;
+          collision_plane_norm.y = 0;
+          collision_plane_norm.z = 1;
+        }
+        if (to.z > max_y ) {
+          collision_plane_norm.x = 0;
+          collision_plane_norm.y = 0;
+          collision_plane_norm.z = -1.0;
         }
         return true;
       }
@@ -159,8 +183,8 @@ namespace physical_objects{
                          float elasticity_coefficient) {
       //printf("\t test: (%f, %f)", (speed%plane_norm).x, (speed%plane_norm).y);
       MotionVector b = - (speed * plane_norm) * plane_norm;
-      printf( "\t Reflect: speed(%f, %f), norm(%f, %f), b(%f, %f)\n",
-             speed.x, speed.y, plane_norm.x, plane_norm.y, b.x, b.y);
+      printf( "\t Reflect: speed(%f, %f, %f), norm(%f, %f, %f), b(%f, %f, %f)\n",
+             speed.x, speed.y, plane_norm.x, plane_norm.y, plane_norm.z, b.x, b.y, b.z);
       return speed + (1 + elasticity()) * b;
     }
     
