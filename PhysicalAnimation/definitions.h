@@ -82,9 +82,23 @@ static physical_objects::ball<Vector2d>
          Vector2d(0.0f, -9.86f), //g MotionVector g,
          Vector2d(100, 600), //init loc
          Vector2d(10.0f, 0.0f)); // medium_speed
+static physical_objects::ball<Vector3d>
+  ball3d(
+        0.2f,
+         30.0f,
+         0.5f,
+         0.8f,
+         Vector3d(0.0, 0.0, 0.0),
+         Vector3d(0.0, 0.0, 0.0),
+         Vector3d(0.0f, -9.86f, 0.0f),
+         Vector3d(0.0, 0.0, 0.0),
+         Vector3d(0.0, 0.0, 0.0));
+
 
 static std::vector<Vector2d> obbox;
 
 static char *ParamFilename = NULL;
+
+static std::vector<Vector3d> obbox3d;
 
 #endif

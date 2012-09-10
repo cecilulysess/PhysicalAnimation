@@ -76,28 +76,51 @@ void init_the_world(){
   obbox.push_back(c);
   obbox.push_back(d);
   physical_objects::box<Vector2d> box2d(obbox);
-}
-
-
-void DrawLine() {
-  float ctx = 400.0f, cty = 400.0f;
-  for ( int i = 0; i < obbox.size(); i+=2 ) {
-    glBegin( GL_LINES );
-    //    glVertex3f(ctx + -100.0f,cty + -100.0f, 0.0f);
-    //    glVertex3f(ctx +-100.0f, cty +100.0f, 0.0f);
-    //    glVertex3f(ctx +100.0f, cty +100.0f, 0.0f);
-    //    glVertex3f(ctx +100.0f, cty + -100.0f, 0.0f);
-    glVertex3f(obbox[i].x, obbox[i].y, 0.0f);
-    glVertex3f(obbox[i+1].x, obbox[i+1].y, 0.0f);
-    glEnd();
-  }
-  glBegin( GL_LINES );
-  glVertex3f(obbox[obbox.size()-1].x, obbox[obbox.size()-1].y, 0.0f);
-  glVertex3f(obbox[0].x, obbox[0].y, 0.0f);
-  glEnd();
-
   
+  Vector3d a3(-1.0f, -1.0f, -1.0f),
+    b3(-1.0f, 1.0f, -1.0f),
+    c3(1.0f, 1.0f, -1.0f),
+    d3(1.0f, -1.0f, -1.0f),
+    e3(-1.0f, -1.0f, 1.0f),
+    f3(-1.0f, 1.0f, 1.0f),
+    g3(1.0f, 1.0f, 1.0f),
+    h3 (1.0f, -1.0f, 1.0f);  
+  
+  obbox3d.push_back(a3);
+  obbox3d.push_back(b3);
+  obbox3d.push_back(c3);
+  obbox3d.push_back(d3);
+  // second plane
+  obbox3d.push_back(a3);
+  obbox3d.push_back(e3);
+  obbox3d.push_back(f3);
+  obbox3d.push_back(b3);
+  // third plane
+  obbox3d.push_back(f3);
+  obbox3d.push_back(b3);
+  obbox3d.push_back(c3);
+  obbox3d.push_back(g3);
+  // forth plane
+  obbox3d.push_back(h3);
+  obbox3d.push_back(g3);
+  obbox3d.push_back(c3);
+  obbox3d.push_back(d3);
+  // fifth plane
+  obbox3d.push_back(h3);
+  obbox3d.push_back(e3);
+  obbox3d.push_back(a3);
+  obbox3d.push_back(d3);
+  // facing plane
+  obbox3d.push_back(e3);
+  obbox3d.push_back(f3);
+  obbox3d.push_back(g3);
+  obbox3d.push_back(h3);
+  
+  physical_objects::box<Vector3d> box3d(obbox3d);
+  
+
 }
+
 
 void DrawWorld(){
   
@@ -110,14 +133,11 @@ void DrawWorld(){
   glLoadIdentity();
   
   DrawABall(1, &ball2d);
-//  glTranslatef(0.0f, 0.0f, -5.0f);
+  glTranslatef(0.0f, 0.0f, -5.0f);
   glColor3f(RGBBLUE);
-  DrawLine();
   
   glutSwapBuffers();
 }
-
-static int outline_cnt = 0;
 
 void DrawABall(int collision, void* ball) {
   physical_objects::ball<Vector2d>* obj =
@@ -135,12 +155,59 @@ void DrawABall(int collision, void* ball) {
   
 }
 
+void DrawPlanes() {
+  float alpha = 1.0f;
+  for ( int i = 0; i < obbox3d.size(); i += 4 ) {
+    if (i == 20 ) {
+      alpha = 0.5f;
+    }
+    glBegin( GL_QUADS );
+    
+      glColor4f(0.0f + 0.12*i/4, 1.0f - 0.12*i/4, 0.5 - 0.03*i/4, alpha);
+      glVertex3f(obbox3d[i].x, obbox3d[i].y, obbox3d[i].z);
+      glVertex3f(obbox3d[i+1].x, obbox3d[i+1].y, obbox3d[i+1].z);
+      glVertex3f(obbox3d[i+2].x, obbox3d[i+2].y, obbox3d[i+2].z);
+      glVertex3f(obbox3d[i+3].x, obbox3d[i+3].y, obbox3d[i+3].z);
+    glEnd();
+  }
+  
+}
 
+void DrawSphere(int collison, void* ball) {
+  glColor3f(RGBYELLOW);
+  glutSolidSphere(ball3d.radius(), 50, 50);
+//  GLUquadricObj* qdj = NULL;
+//  qdj = gluNewQuadric();
+//  gluQuadricDrawStyle(qdj, GLU_FILL);
+//  gluQuadricNormals(qdj, GLU_SMOOTH);
+//  gluQuadricOrientation(qdj, GLU_OUTSIDE);
+//  
+//  gluSphere(gluNewQuadric(), ball3d.radius(), 50, 50 );
+//  gluDeleteQuadric(qdj);
+}
+void Draw3DWorld(){
+  // when rendering a new frame, we told the video card that we need
+  //  clear the bolor and deph information
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glEnable( GL_BLEND );
+  
+  // loading the identity matrix means reset the screen corrdinate system to
+  // XYZ axis of length 1, it starts at z=0, x from [-1, 1] and y from [-1, 1]
+  glLoadIdentity();
+  glTranslatef(0.0f, 0.0f, -3.0f);
+  glColor3f(RGBBLUE);
+  DrawPlanes();
+  DrawSphere(0, NULL);
+//  glutWireCube(2.0f);
+  
+  glutSwapBuffers();
+}
 
 // simulation function that called in glIdle loop
 void Simulate(){
-  ball2d.move(DrawABall, 0.1f, obbox);
-  
+//  ball2d.move(DrawABall, 0.1f, obbox);
+  ball3d.move(DrawSphere, 0.1f, obbox3d);
   glutPostRedisplay();
 //  sleep(1);
 }
@@ -173,27 +240,11 @@ void handleKey(unsigned char key, int x, int y){
  to the original window proportions and to keep the window coordinates fixed
  */
 void doReshape(int w, int h){
-  int vpw, vph;
-  
-  float aspect = float(WINDOW_WIDTH) / float(WINDOW_HEIGHT);
-  if(float(w) / float(h) > aspect){
-    vph = h;
-    vpw = int(aspect * h + 0.5);
-  }
-  else{
-    vpw = w;
-    vph = int(w / aspect + 0.5);
-  }
-  
-  glViewport(0, 0, vpw, vph);
-  WinWidth = w;
-  WinHeight = h;
-  
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluOrtho2D(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT);
-  
-  glMatrixMode(GL_MODELVIEW);
+  glViewport(0, 0, (GLsizei)WIDTH, (GLsizei)HEIGHT); // Set our viewport to the size of our window
+  glMatrixMode(GL_PROJECTION); // Switch to the projection matrix so that we can manipulate how our scene is viewed
+  glLoadIdentity(); // Reset the projection matrix to the identity matrix so that we don't get any artifacts (cleaning up)
+  gluPerspective(60, (GLfloat)WIDTH / (GLfloat)HEIGHT, 1.0, 100.0); // Set the Field of view angle (in degrees), the aspect ratio of our window, and the new and far planes
+  glMatrixMode(GL_MODELVIEW); // Switch back to the model view matrix, so that we can start drawing shapes correctly
 }
 
 /*
@@ -246,7 +297,7 @@ void handleButton(int button, int state, int x, int y){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
-  DrawWorld();
+  Draw3DWorld();
 }
 
 
@@ -329,10 +380,12 @@ int main(int argc, char* argv[]){
   // start up the glut utilities
   glutInit(&argc, argv);
   
+//  glEnable(GL_DEPTH_TEST);
+  
   // make GLUT select a double buffered display that uses RGBA colors
   // Julian: Add GLUT_DEPTH when in 3D program so that 3D objects drawed
   // correctly regardless the order they draw
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA |GLUT_DEPTH);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
   glutCreateWindow("Ball on the air");
   
@@ -355,7 +408,7 @@ int main(int argc, char* argv[]){
   glClearColor(RGBBLACK, 0);
   
   /* Set shading to flat shading */
-  glShadeModel(GL_FLAT);
+//  glShadeModel(GL_FLAT);
 
   MakeMenu();
   
