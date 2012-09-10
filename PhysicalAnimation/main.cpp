@@ -249,10 +249,81 @@ void RenderScene(){
   DrawWorld();
 }
 
+
+/*
+ Load parameter file and reinitialize global parameters
+ */
+void LoadParameters(char *filename){
+  
+  FILE *paramfile;
+  
+  if((paramfile = fopen(filename, "r")) == NULL){
+    fprintf(stderr, "error opening parameter file %s\n", filename);
+    exit(1);
+  }
+  
+  ParamFilename = filename;
+  double Mass, v0x, v0y, drag, elastic, time_step, vwx, vwy, disp_time;
+  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf",
+            &Mass, &v0x, &v0y, &drag, &elastic,
+            &time_step, &disp_time, &vwx, &vwy) != 9){
+    fprintf(stderr, "error reading parameter file %s\n", filename);
+    fclose(paramfile);
+    exit(1);
+  }
+  ball2d = *(new physical_objects::ball<Vector2d>(
+    20.0f, // radius
+    Mass, // mass
+    elastic, // elasticity
+    drag, // drag_coeef
+    Vector2d(v0x, v0y), //init_v
+    Vector2d(0.0f, 0.0f),  //init_a
+    Vector2d(0.0f, -9.86f), //g MotionVector g,
+    Vector2d(100, 600), //init loc
+    Vector2d(vwx, vwy))); // medium_speed
+
+}
+
+static char* parafile;
+void Reset(){
+  LoadParameters(parafile);
+}
+
+void HandleMenu(int index){
+  switch(index){
+    case MenuReset:
+      Reset();
+      break;
+    case MenuQuit:
+      exit(0);
+      
+  }
+}
+/*
+ Set up pop-up menu on right mouse button
+ */
+void MakeMenu(){
+  
+  int id = glutCreateMenu(HandleMenu);
+  
+
+  glutAddMenuEntry("Reset", MenuReset);
+  glutAddMenuEntry("Quit", MenuQuit);
+  
+  glutSetMenu(id);
+  glutAttachMenu(GLUT_RIGHT_BUTTON);
+}
+
 /*
  Main program to draw the square, change colors, and wait for quit
  */
 int main(int argc, char* argv[]){
+  if(argc != 2){
+    fprintf(stderr, "usage: bounce paramfile\n");
+    exit(1);
+  }
+  LoadParameters(argv[1]);
+  parafile = argv[1];
   init_the_world();
   
   // start up the glut utilities
@@ -286,7 +357,7 @@ int main(int argc, char* argv[]){
   /* Set shading to flat shading */
   glShadeModel(GL_FLAT);
 
-  
+  MakeMenu();
   
   // Routine that loops forever looking for events. It calls the registered
   // callback routine to handle each event that is detected

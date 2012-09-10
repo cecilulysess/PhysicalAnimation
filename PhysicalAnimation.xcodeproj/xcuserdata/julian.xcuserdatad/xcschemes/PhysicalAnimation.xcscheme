@@ -57,6 +57,12 @@
             ReferencedContainer = "container:PhysicalAnimation.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "/Users/julian/Programming/cs619/PhysicalAnimation/parameters "
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
