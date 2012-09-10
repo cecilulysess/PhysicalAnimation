@@ -174,8 +174,16 @@ void DrawPlanes() {
 }
 
 void DrawSphere(int collison, void* ball) {
+  physical_objects::ball<Vector3d>* obj =
+    (physical_objects::ball<Vector3d>*)ball;
+  glClear(GL_DEPTH_BUFFER_BIT);
   glColor3f(RGBYELLOW);
-  glutSolidSphere(ball3d.radius(), 50, 50);
+  
+  Vector3d& obj_loc = obj->location();
+  glPushMatrix();
+  glTranslated(obj_loc.x, obj_loc.y, obj_loc.z);
+  glutWireSphere(ball3d.radius(), 30, 30);
+  glPopMatrix();
 //  GLUquadricObj* qdj = NULL;
 //  qdj = gluNewQuadric();
 //  gluQuadricDrawStyle(qdj, GLU_FILL);
@@ -191,6 +199,7 @@ void Draw3DWorld(){
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable( GL_BLEND );
+  glEnable(GL_DEPTH_TEST);
   
   // loading the identity matrix means reset the screen corrdinate system to
   // XYZ axis of length 1, it starts at z=0, x from [-1, 1] and y from [-1, 1]
@@ -198,7 +207,7 @@ void Draw3DWorld(){
   glTranslatef(0.0f, 0.0f, -3.0f);
   glColor3f(RGBBLUE);
   DrawPlanes();
-  DrawSphere(0, NULL);
+  DrawSphere(0, &ball3d);
 //  glutWireCube(2.0f);
   
   glutSwapBuffers();
