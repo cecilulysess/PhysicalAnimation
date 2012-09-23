@@ -92,7 +92,7 @@ static physical_objects::ball<Vector3d>
          Vector3d(0.0, 0.0, 0.0),
          Vector3d(0.0f, -9.86f, 0.0f),
          Vector3d(0.0, 0.0, 0.0),
-         Vector3d(0.0, 0.0, 100.0));
+         Vector3d(0.0, 0.0, 0.0));
 
 
 static std::vector<Vector2d> obbox;

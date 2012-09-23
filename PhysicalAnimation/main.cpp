@@ -16,6 +16,7 @@
 
 //  3rt party header here
 #include "Vector.h"
+#include "Camera.h"
 
 #ifdef __APPLE__
 #  include <GLUT/glut.h>
@@ -32,23 +33,104 @@ using namespace std;
 #define WIDTH	    1024	/* window dimensions */
 #define HEIGHT		768
 
+Camera *camera;
+bool showGrid = true;
+int persp_win;
+
 void DrawABall(int collision,
                void* obj);
 //----------------------Including and definitions end-----------------------
-/*
- Draw an outlined circle with center at position (x, y) and radius rad
- */
-void OutlineCirclef(float x, float y, float rad){
+// draws a simple grid
+void makeGrid() {
+  glColor3f(0.0, 0.0, 0.0);
   
-  float theta;
+  glLineWidth(1.0);
   
-  glLineWidth(1);
+  for (float i=-12; i<12; i++) {
+    for (float j=-12; j<12; j++) {
+      glBegin(GL_LINES);
+      glVertex3f(i, 0, j);
+      glVertex3f(i, 0, j+1);
+      glEnd();
+      glBegin(GL_LINES);
+      glVertex3f(i, 0, j);
+      glVertex3f(i+1, 0, j);
+      glEnd();
+      
+      if (j == 11){
+        glBegin(GL_LINES);
+        glVertex3f(i, 0, j+1);
+        glVertex3f(i+1, 0, j+1);
+        glEnd();
+      }
+      if (i == 11){
+        glBegin(GL_LINES);
+        glVertex3f(i+1, 0, j);
+        glVertex3f(i+1, 0, j+1);
+        glEnd();
+      }
+    }
+  }
   
-  glBegin(GL_LINE_LOOP);
-  for(theta=0.0; theta < 2 * PI; theta += CIRC_INC)
-    glVertex2f(x+rad*cos(theta), y+rad*sin(theta));
+  glLineWidth(2.0);
+  glBegin(GL_LINES);
+  glVertex3f(-12, 0, 0);
+  glVertex3f(12, 0, 0);
   glEnd();
+  glBegin(GL_LINES);
+  glVertex3f(0, 0, -12);
+  glVertex3f(0, 0, 12);
+  glEnd();
+  glLineWidth(1.0);
 }
+
+void init() {
+  // set up camera
+  // parameters are eye point, aim point, up vector
+  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
+                      Vector3d(0, 1, 0));
+  
+  // grey background for window
+  glClearColor(0.62, 0.62, 0.62, 0.0);
+  glShadeModel(GL_SMOOTH);
+  glDepthRange(0.0, 1.0);
+  
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_NORMALIZE);
+}
+
+void mouseEventHandler(int button, int state, int x, int y) {
+  // let the camera handle some specific mouse events (similar to maya)
+  camera->HandleMouseEvent(button, state, x, y);
+}
+
+void motionEventHandler(int x, int y) {
+  // let the camera handle some mouse motions if the camera is to be moved
+  camera->HandleMouseMotion(x, y);
+  glutPostRedisplay();
+}
+
+void keyboardEventHandler(unsigned char key, int x, int y) {
+  switch (key) {
+    case 'r': case 'R':
+      // reset the camera to its initial position
+      camera->Reset();
+      break;
+    case 'f': case 'F':
+      camera->SetCenterOfFocus(Vector3d(0, 0, 0));
+      break;
+    case 'g': case 'G':
+      showGrid = !showGrid;
+      break;
+      
+    case 'q': case 'Q':	// q or esc - quit
+    case 27:		// esc
+      exit(0);
+  }
+  
+  glutPostRedisplay();
+}
+
 
 /*
  Draw a filled circle with center at position (x, y) and radius rad
@@ -196,15 +278,11 @@ void DrawSphere(int collison, void* ball) {
 void Draw3DWorld(){
   // when rendering a new frame, we told the video card that we need
   //  clear the bolor and deph information
-  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glEnable( GL_BLEND );
   glEnable(GL_DEPTH_TEST);
   
-  // loading the identity matrix means reset the screen corrdinate system to
-  // XYZ axis of length 1, it starts at z=0, x from [-1, 1] and y from [-1, 1]
-  glLoadIdentity();
-  glTranslatef(0.0f, 0.0f, -3.0f);
+
   glColor3f(RGBBLUE);
   DrawPlanes();
   DrawSphere(0, &ball3d);
@@ -216,7 +294,7 @@ void Draw3DWorld(){
 // simulation function that called in glIdle loop
 void Simulate(){
 //  ball2d.move(DrawABall, 0.1f, obbox);
-  ball3d.move(DrawSphere, 0.05f, obbox3d);
+  ball3d.move(DrawSphere, 0.005f, obbox3d);
   glutPostRedisplay();
 //  sleep(1);
 }
@@ -306,7 +384,23 @@ void handleButton(int button, int state, int x, int y){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
+  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  camera->PerspectiveDisplay(WIDTH, HEIGHT);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  if (showGrid)
+    makeGrid();
+  
+  //draw scene
+//  glTranslatef(0, 3.5, 0);
   Draw3DWorld();
+//  glutWireTeapot(5);
+  
+  
+  
+  glutSwapBuffers();
+  
 }
 
 
@@ -323,10 +417,10 @@ void LoadParameters(char *filename){
   }
   
   ParamFilename = filename;
-  double Mass, v0x, v0y, drag, elastic, time_step, vwx, vwy, disp_time;
-  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf",
-            &Mass, &v0x, &v0y, &drag, &elastic,
-            &time_step, &disp_time, &vwx, &vwy) != 9){
+  double Mass, v0x, v0y, v0z, drag, elastic, time_step, vwx, vwy, vwz, disp_time;
+  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
+            &Mass, &v0x, &v0y, &v0z, &drag, &elastic,
+            &time_step, &disp_time, &vwx, &vwy, &vwz) != 11){
     fprintf(stderr, "error reading parameter file %s\n", filename);
     fclose(paramfile);
     exit(1);
@@ -341,6 +435,16 @@ void LoadParameters(char *filename){
     Vector2d(0.0f, -9.86f), //g MotionVector g,
     Vector2d(100, 600), //init loc
     Vector2d(vwx, vwy))); // medium_speed
+  ball3d = *(new physical_objects::ball<Vector3d>(
+     0.15f,
+     Mass,
+     elastic,
+     drag,
+     Vector3d(v0x, v0y, v0z),
+     Vector3d(0.0, 0.0, 0.0),
+     Vector3d(0.0f, -9.86f, 0.0f),
+     Vector3d(0.0, 0.0, 0.0),
+     Vector3d(vwx, vwy, vwz)));
 
 }
 
@@ -349,30 +453,30 @@ void Reset(){
   LoadParameters(parafile);
 }
 
-void HandleMenu(int index){
-  switch(index){
-    case MenuReset:
-      Reset();
-      break;
-    case MenuQuit:
-      exit(0);
-      
-  }
-}
-/*
- Set up pop-up menu on right mouse button
- */
-void MakeMenu(){
-  
-  int id = glutCreateMenu(HandleMenu);
-  
-
-  glutAddMenuEntry("Reset", MenuReset);
-  glutAddMenuEntry("Quit", MenuQuit);
-  
-  glutSetMenu(id);
-  glutAttachMenu(GLUT_RIGHT_BUTTON);
-}
+//void HandleMenu(int index){
+//  switch(index){
+//    case MenuReset:
+//      Reset();
+//      break;
+//    case MenuQuit:
+//      exit(0);
+//      
+//  }
+//}
+///*
+// Set up pop-up menu on right mouse button
+// */
+//void MakeMenu(){
+//  
+//  int id = glutCreateMenu(HandleMenu);
+//  
+//
+//  glutAddMenuEntry("Reset", MenuReset);
+//  glutAddMenuEntry("Quit", MenuQuit);
+//  
+//  glutSetMenu(id);
+//  glutAttachMenu(GLUT_RIGHT_BUTTON);
+//}
 
 /*
  Main program to draw the square, change colors, and wait for quit
@@ -389,37 +493,33 @@ int main(int argc, char* argv[]){
   // start up the glut utilities
   glutInit(&argc, argv);
   
-//  glEnable(GL_DEPTH_TEST);
   
   // make GLUT select a double buffered display that uses RGBA colors
   // Julian: Add GLUT_DEPTH when in 3D program so that 3D objects drawed
   // correctly regardless the order they draw
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-  glutCreateWindow("Ball on the air");
+//  glutInitWindowPosition(50, 50);
+  persp_win = glutCreateWindow("Ball on the air");
+  
+  // initialize the camera and such
+  init();
+  
   
   // set up the callback routines to be called when glutMainLoop() detects
   // an event
-  glutReshapeFunc(doReshape);
+//  glutReshapeFunc(doReshape);
   glutDisplayFunc(RenderScene);
-  glutKeyboardFunc(handleKey);	  // keyboard callback
+  glutMouseFunc(mouseEventHandler);
+  glutMotionFunc(motionEventHandler);
+  glutKeyboardFunc(keyboardEventHandler);
   glutIdleFunc(Simulate);
-  glutMouseFunc(handleButton);
-  //glutReshapeFunc(..) // when window size changed
   
-//  // define the drawing coordinate system on the viewport
-//  // lower left is (0, 0), upper right is (WIDTH, HEIGHT), measured in pixels
-//  glMatrixMode(GL_PROJECTION);
-//  glLoadIdentity();
-//  gluOrtho2D(0, WIDTH, 0, HEIGHT);
-  
-  /* Set up to clear screen to black */
-  glClearColor(RGBBLACK, 0);
   
   /* Set shading to flat shading */
 //  glShadeModel(GL_FLAT);
 
-  MakeMenu();
+//  MakeMenu();
   
   // Routine that loops forever looking for events. It calls the registered
   // callback routine to handle each event that is detected
