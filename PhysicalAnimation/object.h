@@ -13,6 +13,7 @@
 // debug
 #include<stdio.h>
 #include<vector>
+#include"Vector.h"
 //----------
 namespace physical_objects{
   // a box that is the obstacle in this scene
@@ -206,6 +207,42 @@ namespace physical_objects{
     
   };
   
-  }//ns pobj
+  //-------------------Particle system elements---------------------------------
+  class Particle {
+  public:
+    Particle(const Vector4d& color, Vector3d loc, Vector3d speed ) :
+      color_(color), location_(loc), velocity_(speed) {
+      
+    }
+    
+    
+    // change the speed of this particle
+    Vector3d& reflect(Vector3d speed,
+                     Vector3d plane_norm,
+                     float elasticity_coefficient) {
+      return velocity();
+    }
+    
+    
+    //color can be changed
+    Vector4d& get_color() { return color_; }
+    float mass() {return this->mass_;}
+    float elasticity() {return this->elasticity_;}
+    float drag_coeff() {return this->drag_coeff_;}
+    Vector3d& g() {return this->g_;}
+    Vector3d& velocity() {return this->velocity_;}
+    Vector3d& acceleration() {return this->accel_;}
+    Vector3d& location() {return this->location_;}
+    
+  private:
+    Vector4d color_;
+    Vector3d location_;
+    float mass_, elasticity_, drag_coeff_;
+    Vector3d g_, velocity_, accel_, medium_speed_;
+    bool rest;
+    float current_time_, time_step_;
+  };
+  
+}//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */
