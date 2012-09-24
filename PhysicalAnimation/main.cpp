@@ -285,6 +285,7 @@ void RenderScene(){
   glLoadIdentity();
   if (showGrid)
     makeGrid();
+  draw_obstancles(&obs2ctr);
   drawParticleGenerationPlane();
   draw_particles(particle_manager1.particles());
   //draw scene

@@ -77,16 +77,36 @@ static float fps;
 
 static char* window_title = "Particle System -- Yanxiang Wu";
 
-particle_manager::ParticleManager particle_manager1 ( 50000,
-                                                     Vector3d(-2.0,5.0, 2.0),
-                                                     4.0, 2.0,
-                                                     Vector3d( 0.0, 1.0, 0.0),
-                                                     1.0,
-                                                     0.2 );
+static float fall_src_orix = -2.0, fall_src_oriy = 5.0, fall_src_oriz = -2.0;
+particle_manager::ParticleManager particle_manager1 (
+    50000, // particle #
+    Vector3d(
+    fall_src_orix, 
+    fall_src_oriy,
+    fall_src_oriz), // generation plane original
+    2 * abs(fall_src_orix), 2.0, //width and height
+    Vector3d( 0.0, 1.0, 0.0), // output direction
+    1.0,      // position mean
+    0.2 );    // position var
+
+static float obs1x = fall_src_orix + 0.3,
+  obs1y = fall_src_oriy - 3.0,
+  obs1z = fall_src_oriz + 0.3;
+static float obs1width = 1.0, obs1height = 0.5;
+
+Vector3d obs1p0(obs1x, obs1y, obs1z),
+         obs1p1(obs1x + obs1width, obs1y, obs1z),
+         obs1p2(obs1x + obs1width, obs1y, obs1z + obs1height),
+         obs1p3(obs1x, obs1y, obs1z + obs1height); 
+Vector3d obstancle1[4] = {obs1p0, obs1p1, obs1p2, obs1p3};
+
+Vector3d obs2ctr(obs1x + 1.3, obs1y + 0.6, obs1z + 1.8);
+float obs2rad = 0.5;
 
 ////static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
 ////static physical_world::StandardWorld<Vector2d, Vector2d> world2d;
-////static physical_objects::Ball2D<Vector2d, Vector2d> ball(1.0f, 0.5f, 10.1f, Vector2d(10,10), Vector2d(0,0), Vector2d(0,0), air);
+////static physical_objects::Ball2D<Vector2d, Vector2d> ball(1.0f, 0.5f, 10.1f,
+//          Vector2d(10,10), Vector2d(0,0), Vector2d(0,0), air);
 //static physical_objects::ball<Vector2d>
 //  ball2d(
 //         20.0f, // radius
