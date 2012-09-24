@@ -52,8 +52,8 @@
 		B99FCBA815E726D10048BBBA /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		B9D3BED4160FBCE3000FDC7B /* particle_manager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = particle_manager.cpp; sourceTree = "<group>"; };
 		B9D3BED5160FBCE3000FDC7B /* particle_manager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = particle_manager.h; sourceTree = "<group>"; };
-		B9D3BEDA160FC876000FDC7B /* gauss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gauss.cpp; path = PhysicalAnimation/gauss.cpp; sourceTree = "<group>"; };
-		B9D3BEDB160FC876000FDC7B /* gauss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gauss.h; path = PhysicalAnimation/gauss.h; sourceTree = "<group>"; };
+		B9D3BEDA160FC876000FDC7B /* gauss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gauss.cpp; sourceTree = "<group>"; };
+		B9D3BEDB160FC876000FDC7B /* gauss.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gauss.h; sourceTree = "<group>"; };
 		B9D3BEDD160FD0C8000FDC7B /* object_drawer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = object_drawer.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,8 +73,6 @@
 		B99FCB8915E71FD10048BBBA = {
 			isa = PBXGroup;
 			children = (
-				B9D3BEDA160FC876000FDC7B /* gauss.cpp */,
-				B9D3BEDB160FC876000FDC7B /* gauss.h */,
 				B99FCBA815E726D10048BBBA /* OpenGL.framework */,
 				B99FCBA515E726C60048BBBA /* GLUT.framework */,
 				B99FCB9715E71FD10048BBBA /* PhysicalAnimation */,
@@ -94,6 +92,8 @@
 		B99FCB9715E71FD10048BBBA /* PhysicalAnimation */ = {
 			isa = PBXGroup;
 			children = (
+				B9D3BEDA160FC876000FDC7B /* gauss.cpp */,
+				B9D3BEDB160FC876000FDC7B /* gauss.h */,
 				B94E7AE015F5AB0800BEEB53 /* Utility.cpp */,
 				B94E7AE115F5AB0800BEEB53 /* Utility.h */,
 				B94E7AE215F5AB0800BEEB53 /* Vector.cpp */,

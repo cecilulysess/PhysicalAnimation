@@ -12,7 +12,7 @@
 #include "object.h"
 #include "stdio.h"
 
-#define rectsize 0.05
+#define rectsize 0.5
 
 void draw_point(Vector3d& loc) {
   glVertex3d(loc.x , loc.y, loc.z);
@@ -28,6 +28,10 @@ void draw_particles(const std::vector<physical_objects::Particle*>& particles){
   
   for (int i = 0 ; i < particles.size(); ++i ) {
     physical_objects::Particle* par = particles.at(i);
+    if (!par->is_alive) {
+      // skip if not alive
+      continue;
+    }
     Vector3d& loc = par->location();
     if ( par -> velocity().norm() < 0.8 ) {
       glColor4f(0.33, 0.66, 1.0, 0.8);

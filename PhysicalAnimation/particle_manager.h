@@ -42,6 +42,13 @@ namespace particle_manager {
         init();
     }
     
+    
+    void move_particles(float time_step){
+      for ( int i = 0 ; i < this->particles_.size(); ++i ) {
+        this->particles_.at(i)->move(time_step);
+      }
+    }
+    
     Vector3d* generation_plane() {
       return this->generation_plane_;
     }
@@ -52,6 +59,8 @@ namespace particle_manager {
     std::vector<physical_objects::Particle*>& particles(){
       return particles_;
     }
+    
+    
   private:
     // randomly generate particles
     void init();

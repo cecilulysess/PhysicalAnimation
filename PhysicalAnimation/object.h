@@ -207,14 +207,46 @@ namespace physical_objects{
     
   };
   
+  
   //-------------------Particle system elements---------------------------------
   class Particle {
   public:
+    
     Particle(const Vector4d& color, Vector3d loc, Vector3d speed ) :
       color_(color), location_(loc), velocity_(speed) {
-      
+        is_alive = true;
+        mass_ = 0.1;
+        g_ = Vector3d(0.0, -0.98, 0.0);
+        drag_coeff_ = 1.0;
+        elasticity_ = 1.0;
+        medium_speed_  = Vector3d(0.0, 0.0, 0.0);
     }
     
+    // responsible for the motion of this ball
+    void move( float time_step
+              ) {
+      if (is_alive) {
+        this->time_step_ = time_step;
+        
+        Vector3d tmp_a, tmp_v, tmp_x, norm;
+        
+        Vector3d tmp_f =(mass_ * g_);
+        //(mass_ * g_ - drag_coeff_ * (velocity_ - medium_speed_));
+        
+//        printf("F: %f, %f, %f", tmp_f.x, tmp_f.y, tmp_f.z);
+        tmp_a =  tmp_f / mass_;
+        tmp_v = velocity_ + tmp_a * time_step;
+        tmp_x = location_ + velocity_ * time_step;
+        
+        velocity_ = tmp_v;
+        location_ = tmp_x;
+//        printf("th part vol: %f, %f, %f \n",
+//               this->velocity().x,
+//               this->velocity().y,
+//               this->velocity().z);
+      }
+      
+    }
     
     // change the speed of this particle
     Vector3d& reflect(Vector3d speed,
@@ -231,14 +263,14 @@ namespace physical_objects{
     float drag_coeff() {return this->drag_coeff_;}
     Vector3d& g() {return this->g_;}
     Vector3d& velocity() {return this->velocity_;}
-    Vector3d& acceleration() {return this->accel_;}
     Vector3d& location() {return this->location_;}
-    
+    // control whether this particle is still alive
+    bool is_alive;
   private:
     Vector4d color_;
     Vector3d location_;
     float mass_, elasticity_, drag_coeff_;
-    Vector3d g_, velocity_, accel_, medium_speed_;
+    Vector3d g_, velocity_,  medium_speed_;
     bool rest;
     float current_time_, time_step_;
   };

@@ -70,11 +70,11 @@ static int HaveWind = false;
 static int Floor = false;
 
 particle_manager::ParticleManager particle_manager1 ( 10,
-                                                     Vector3d( -2.0,5.0, 2.0),
+                                                     Vector3d(-2.0,5.0, 2.0),
                                                      4.0, 2.0,
                                                      Vector3d( 0.0, 1.0, 0.0),
                                                      1.0,
-                                                     0.8 );
+                                                     0.1 );
 
 ////static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
 ////static physical_world::StandardWorld<Vector2d, Vector2d> world2d;

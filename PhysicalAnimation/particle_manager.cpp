@@ -14,7 +14,8 @@
 
 namespace particle_manager {
   float get_rand(float low, float high) {
-    return ((rand() % 1000) / 1000.0) * (high - low) + low;
+//    return ((rand() % 1000) / 1000.0) * (high - low) + low;
+    return gauss( (high+low)/2, (high+low)/9, (int) time(NULL));
   }
   
   //
@@ -47,10 +48,11 @@ namespace particle_manager {
            plane_norm * gauss(speed_mean_, speed_var_, seed)
       );
       this->particles_.push_back(particle);
-//      
-//      printf("new part: %f, %f, %f \n", particle->location().x,
-//             particle->location().y,
-//             particle->location().z);
+      
+//      printf("%dth part vol: %f, %f, %f \n", i,
+//             particle->velocity().x,
+//             particle->velocity().y,
+//             particle->velocity().z);
     }
   }
   
