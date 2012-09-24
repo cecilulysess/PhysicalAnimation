@@ -179,29 +179,6 @@ void Simulate(){
 }
 
 /*
- Keyboard Callback Routine: 'c' cycle through colors, 'q' or ESC quit
- This routine is called every time a key is pressed on the keyboard
- */
-void handleKey(unsigned char key, int x, int y){
-  
-  switch(key){
-//    case 'c':		// 'c' - cycle to next color
-//    case 'C':
-//      icolor = (icolor + 1) % 6;
-//      glutPostRedisplay();
-//      break;
-      
-    case 'q':		// q - quit
-    case 'Q':
-    case 27:		// esc - quit
-      exit(0);
-      
-    default:		// not a valid key -- just ignore it
-      return;
-  }
-}
-
-/*
  On Reshape request, reshape viewing coordinates to keep the viewport set
  to the original window proportions and to keep the window coordinates fixed
  */
