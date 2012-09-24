@@ -28,6 +28,7 @@
 
 //  Definitions and namespace
 #include"definitions.h"
+#include "object_drawer.h"
 using namespace std;
 
 #define WIDTH	    1024	/* window dimensions */
@@ -135,12 +136,13 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 
 
 //// simulation function that called in glIdle loop
-//void Simulate(){
-////  ball2d.move(DrawABall, 0.1f, obbox);
+void Simulate(){
+//  ball2d.move(DrawABall, 0.1f, obbox);
 //  ball3d.move(DrawSphere, 0.005f, obbox3d);
-//  glutPostRedisplay();
-////  sleep(1);
-//}
+  
+  glutPostRedisplay();
+//  sleep(1);
+}
 
 /*
  Keyboard Callback Routine: 'c' cycle through colors, 'q' or ESC quit
@@ -223,7 +225,7 @@ void handleButton(int button, int state, int x, int y){
 }
 
 void drawParticleGenerationPlane(){
-  glColor4f(1.0, 1.0, 1.0, 0.5);
+  glColor4f(1.0, 1.0, 1.0, 0.2);
   Vector3d* genP = particle_manager1.generation_plane();
   glBegin(GL_QUADS);
   glVertex3f(genP[0].x, genP[0].y, genP[0].z );
@@ -250,13 +252,11 @@ void RenderScene(){
   if (showGrid)
     makeGrid();
   drawParticleGenerationPlane();
-
+  draw_particles(particle_manager1.particles());
   //draw scene
 //  glTranslatef(0, 3.5, 0);
 //  Draw3DWorld();
 //  glutWireTeapot(5);
-  
-  
   
   glutSwapBuffers();
   
@@ -379,7 +379,7 @@ int main(int argc, char* argv[]){
   glutMouseFunc(mouseEventHandler);
   glutMotionFunc(motionEventHandler);
   glutKeyboardFunc(keyboardEventHandler);
-//  glutIdleFunc(Simulate);
+  glutIdleFunc(Simulate);
   
   
   /* Set shading to flat shading */
