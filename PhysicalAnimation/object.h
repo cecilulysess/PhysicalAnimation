@@ -212,20 +212,29 @@ namespace physical_objects{
   class Particle {
   public:
     
-    Particle(const Vector4d& color, Vector3d loc, Vector3d speed ) :
-      color_(color), location_(loc), velocity_(speed) {
+    Particle(const Vector4d& color, Vector3d loc, Vector3d speed,
+             float max_age ) :
+      color_(color), location_(loc), velocity_(speed) , max_age_(max_age){
         is_alive = true;
         mass_ = 0.1;
         g_ = Vector3d(0.0, -0.98, 0.0);
         drag_coeff_ = 1.0;
         elasticity_ = 1.0;
         medium_speed_  = Vector3d(0.0, 0.0, 0.0);
+        age_ = 0.0f;
     }
     
     // responsible for the motion of this ball
     void move( float time_step
               ) {
       if (is_alive) {
+        age_ += time_step;
+        if ( age_ < 0.0f ) {
+          return;
+        }
+        if ( age_ > max_age_ ) {
+          is_alive = false;
+        }
         this->time_step_ = time_step;
         
         Vector3d tmp_a, tmp_v, tmp_x, norm;
@@ -266,6 +275,8 @@ namespace physical_objects{
     Vector3d& location() {return this->location_;}
     // control whether this particle is still alive
     bool is_alive;
+    
+    float age_;
   private:
     Vector4d color_;
     Vector3d location_;
@@ -273,6 +284,7 @@ namespace physical_objects{
     Vector3d g_, velocity_,  medium_speed_;
     bool rest;
     float current_time_, time_step_;
+    float max_age_;
   };
   
 }//ns pobj

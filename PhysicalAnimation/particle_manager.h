@@ -11,14 +11,19 @@
 
 #include <iostream>
 #include <vector>
-//#include <queue>
+#include <queue>
 
 #include "object.h"
 #include "Vector.h"
 
+#define PARTICLE_AGE 10.0f
+
 namespace particle_manager {
+  //particle manager, maintained particle_size particles showed at the same
+  // time
   class ParticleManager {
   public:
+    
     ParticleManager(int particle_size, Vector3d generation_plane_origin,
                     float generation_plane_width, float generation_plane_height,
                     Vector3d generation_direction,
@@ -28,6 +33,7 @@ namespace particle_manager {
       speed_var_(speed_var), gen_pl_origin_(generation_plane_origin),
       gen_pl_height_(generation_plane_height),
       gen_pl_width_(generation_plane_width) {
+        
         this->generation_plane_[0] =
           generation_plane_origin;
         this->generation_plane_[1] =
@@ -38,16 +44,14 @@ namespace particle_manager {
         this->generation_plane_[3] =
         generation_plane_origin + Vector3d(generation_plane_width, 0.0, 0.0);
 
+        Ux = Vector3d(1.0, 0.0, 0.0);
+        Uy = Vector3d(0.0, 1.0, 0.0);
         
         init();
     }
     
     
-    void move_particles(float time_step){
-      for ( int i = 0 ; i < this->particles_.size(); ++i ) {
-        this->particles_.at(i)->move(time_step);
-      }
-    }
+    void move_particles(float time_step);
     
     Vector3d* generation_plane() {
       return this->generation_plane_;
@@ -65,13 +69,18 @@ namespace particle_manager {
     // randomly generate particles
     void init();
     
+    // internal func to calculate init location
+    Vector3d get_init_loc(Vector3d& gen_pl_orig) ;
+    
     int particle_size_;
     double speed_mean_, speed_var_;
     Vector3d gen_dir_;
     Vector3d generation_plane_[4];
     float gen_pl_width_, gen_pl_height_;
+    Vector3d Ux, Uy;
     Vector3d gen_pl_origin_;
     std::vector<physical_objects::Particle*> particles_;
+    std::queue<physical_objects::Particle*> dead_particles_;
   };
   
   

@@ -11,8 +11,9 @@
 
 #include "object.h"
 #include "stdio.h"
+#include<cmath>
 
-#define rectsize 0.5
+#define rectsize 0.05
 
 void draw_point(Vector3d& loc) {
   glVertex3d(loc.x , loc.y, loc.z);
@@ -28,16 +29,21 @@ void draw_particles(const std::vector<physical_objects::Particle*>& particles){
   
   for (int i = 0 ; i < particles.size(); ++i ) {
     physical_objects::Particle* par = particles.at(i);
-    if (!par->is_alive) {
+    if (!par->is_alive || par->age_ < 0.0) {
       // skip if not alive
       continue;
     }
     Vector3d& loc = par->location();
-    if ( par -> velocity().norm() < 0.8 ) {
-      glColor4f(0.33, 0.66, 1.0, 0.8);
-    } else {
-      glColor4f(0.66, 0.88, 1.0, 0.9);
-    }
+//    if ( par -> velocity().norm() < 4.0 ) {
+//      glColor4f(0.33, 0.66, 1.0, 0.8);
+//    } else {
+//      glColor4f(0.66, 0.88, 1.0, 0.9);
+//    }
+    float speed_threshold = 4.0f;
+    glColor4f( 0.33 * (1.0 + fmin(1.0, par -> velocity().norm() / speed_threshold )),
+              0.66 + 0.1 * (1 + fmin(1.0, par -> velocity().norm() / speed_threshold)),
+              1.0,
+              0.8 + 0.1 * (fmin(1, par -> velocity().norm() / speed_threshold )));
     draw_point(loc);
 //    printf("%d point: %f, %f, %f\n",i,
 //           loc.x, loc.y, loc.z);

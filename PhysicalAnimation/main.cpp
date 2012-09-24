@@ -42,6 +42,37 @@ int persp_win;
 //void DrawABall(int collision,
 //               void* obj);
 //----------------------Including and definitions end-----------------------
+
+//-------------------------------------------------------------------------
+// Calculates the frames per second
+//-------------------------------------------------------------------------
+void calculateFPS()
+{
+  //  Increase frame count
+  frameCount++;
+  
+  //  Get the number of milliseconds since glutInit called
+  //  (or first call to glutGet(GLUT ELAPSED TIME)).
+  currentTime = glutGet(GLUT_ELAPSED_TIME);
+  
+  //  Calculate time passed
+  int timeInterval = currentTime - previousTime;
+  
+  if(timeInterval > 1000)
+  {
+    //  calculate the number of frames per second
+    fps = frameCount / (timeInterval / 1000.0f);
+    
+    //  Set time
+    previousTime = currentTime;
+    
+    //  Reset frame count
+    frameCount = 0;
+  }
+  
+  printf("FPS: %f\n", fps);
+}
+
 // draws a simple grid
 void makeGrid() {
   glColor3f(0.0, 0.0, 0.0);
@@ -139,9 +170,12 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 void Simulate(){
 //  ball2d.move(DrawABall, 0.1f, obbox);
 //  ball3d.move(DrawSphere, 0.005f, obbox3d);
-  particle_manager1.move_particles(0.01f);
+  particle_manager1.move_particles(0.03f);
+  
+  calculateFPS();
   glutPostRedisplay();
-//  sleep(1);
+  usleep(13000);
+  //  sleep(1);
 }
 
 /*
@@ -265,6 +299,8 @@ void RenderScene(){
 
 
 
+
+
 // set up something in the world
 void init_the_world() {
   
@@ -366,7 +402,7 @@ int main(int argc, char* argv[]){
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 //  glutInitWindowPosition(50, 50);
-  persp_win = glutCreateWindow("Ball on the air");
+  persp_win = glutCreateWindow(window_title);
   
   // initialize the camera and such
   init();

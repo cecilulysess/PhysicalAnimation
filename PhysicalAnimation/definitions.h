@@ -45,6 +45,7 @@
 #define HEAVY		3
 
 
+
 //---------for test -------
 #define Trace true
 #define WINDOW_WIDTH	1000	/* window dimensions */
@@ -69,12 +70,19 @@ static int Throw = false;
 static int HaveWind = false;
 static int Floor = false;
 
-particle_manager::ParticleManager particle_manager1 ( 10,
+
+
+static int frameCount, currentTime, previousTime;
+static float fps;
+
+static char* window_title = "Particle System -- Yanxiang Wu";
+
+particle_manager::ParticleManager particle_manager1 ( 50000,
                                                      Vector3d(-2.0,5.0, 2.0),
                                                      4.0, 2.0,
                                                      Vector3d( 0.0, 1.0, 0.0),
                                                      1.0,
-                                                     0.1 );
+                                                     0.2 );
 
 ////static physical_world::Air<Vector2d> air(0.1, Vector2d(0,0));
 ////static physical_world::StandardWorld<Vector2d, Vector2d> world2d;
