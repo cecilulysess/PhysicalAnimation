@@ -275,7 +275,7 @@ namespace physical_objects{
                              Vector3d& center, float radius) {
       Vector3d xr_dir = (next_x - center) / (next_x - center).norm();
       
-      next_x = center + radius;
+      next_x = center + radius * xr_dir;
       return xr_dir * next_v.norm() * 0.5;
     }
     

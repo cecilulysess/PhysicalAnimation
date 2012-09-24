@@ -19,11 +19,17 @@ void draw_point(Vector3d& loc) {
   glVertex3d(loc.x , loc.y, loc.z);
   glVertex3d(loc.x, loc.y + rectsize, loc.z);
   glVertex3d(loc.x + rectsize, loc.y + rectsize, loc.z);
-  glVertex3d(loc.x + rectsize, loc.y, loc.z);
+  glVertex3d(loc.x + rectsize, loc.y, loc.z + rectsize);
 }
 
 
 void draw_particles(const std::vector<physical_objects::Particle*>& particles){
+  //rotate the square so that is face camera
+  GLdouble m[16];
+  glGetDoublev(GL_MODELVIEW_MATRIX, m);
+  glPushMatrix();
+  glRotatef(-acos(m[10]), m[6], -m[2], 0.0);
+  
   glBegin(GL_QUADS);
 //  printf("Particles: %d\n",(int) particles.size());
   
@@ -34,11 +40,6 @@ void draw_particles(const std::vector<physical_objects::Particle*>& particles){
       continue;
     }
     Vector3d& loc = par->location();
-//    if ( par -> velocity().norm() < 4.0 ) {
-//      glColor4f(0.33, 0.66, 1.0, 0.8);
-//    } else {
-//      glColor4f(0.66, 0.88, 1.0, 0.9);
-//    }
     float speed_threshold = 4.0f;
     glColor4f( 0.33 * (1.0 + fmin(1.0, par -> velocity().norm() / speed_threshold )),
               0.66 + 0.1 * (1 + fmin(1.0, par -> velocity().norm() / speed_threshold)),
@@ -49,19 +50,17 @@ void draw_particles(const std::vector<physical_objects::Particle*>& particles){
 //           loc.x, loc.y, loc.z);
 //    glVertex3f(loc.x, loc.y, loc.z);
   }
-//  glVertex3f(0.0, 0.0, 0.0);
-//  //  glColor4f(0.0, 1.0, 0.0, 0.5);
-//  glVertex3f(1.0, 0.0, 0.0);
-//  //  glColor4f(0.0, 0.0, 1.0, 0.5);
-//  glVertex3f(1.0, 1.0, 0.0);
-//  glVertex3f(0.0, 1.0, 0.0 );
+
   glEnd();
+  
+  //end rotate
+  glPopMatrix();
 }
 
 void draw_obstancles(Vector3d* obses){
 //  int listID = glGenLists(1);
 //  glNewList(listID, glCheckFramebufferStatus(<#GLenum target#>))
-  glColor4f(0.15, 0.2, 0.0, 0.95);
+  glColor4f(0.15, 0.2, 0.0, 0.4);
   glClear(GL_DEPTH_BUFFER_BIT);
   glPushMatrix();
   glTranslatef(obses[0].x, obses[0].y, obses[0].z);

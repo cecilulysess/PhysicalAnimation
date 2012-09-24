@@ -70,7 +70,7 @@ void calculateFPS()
     frameCount = 0;
   }
   
-  printf("FPS: %f\n", fps);
+//  printf("FPS: %f\n", fps);
 }
 
 // draws a simple grid
@@ -144,6 +144,7 @@ void motionEventHandler(int x, int y) {
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
+  float move_step = 0.07;
   switch (key) {
     case 'r': case 'R':
       // reset the camera to its initial position
@@ -155,7 +156,24 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     case 'g': case 'G':
       showGrid = !showGrid;
       break;
-      
+    case 'a': case 'A':
+      obs2ctr.x -= move_step;
+      break;
+    case 'd': case 'D':
+      obs2ctr.x += move_step;
+      break;
+    case 's': case 'S':
+      obs2ctr.y -= move_step;
+      break;
+    case 'w': case 'W':
+      obs2ctr.y += move_step;
+      break;
+    case 'z': case 'Z':
+      obs2ctr.z += move_step;
+      break;
+    case 'x': case 'X':
+      obs2ctr.z -= move_step;
+      break;
     case 'q': case 'Q':	// q or esc - quit
     case 27:		// esc
       exit(0);
@@ -176,63 +194,6 @@ void Simulate(){
   glutPostRedisplay();
   usleep(13000);
   //  sleep(1);
-}
-
-/*
- On Reshape request, reshape viewing coordinates to keep the viewport set
- to the original window proportions and to keep the window coordinates fixed
- */
-void doReshape(int w, int h){
-  glViewport(0, 0, (GLsizei)WIDTH, (GLsizei)HEIGHT); // Set our viewport to the size of our window
-  glMatrixMode(GL_PROJECTION); // Switch to the projection matrix so that we can manipulate how our scene is viewed
-  glLoadIdentity(); // Reset the projection matrix to the identity matrix so that we don't get any artifacts (cleaning up)
-  gluPerspective(60, (GLfloat)WIDTH / (GLfloat)HEIGHT, 1.0, 100.0); // Set the Field of view angle (in degrees), the aspect ratio of our window, and the new and far planes
-  glMatrixMode(GL_MODELVIEW); // Switch back to the model view matrix, so that we can start drawing shapes correctly
-}
-
-/*
- Adjust mouse coordinates to match window coordinates
- */
-void AdjustMouse(int& x, int& y){
-  
-  /* reverse y, so zero at bottom, and max at top */
-  y = int(WinHeight - y);
-  
-  /* rescale x, y to match current window size (may have been rescaled) */
-  y = int(y * WINDOW_HEIGHT / WinHeight);
-  x = int(x * WINDOW_WIDTH / WinWidth);
-}
-
-/*
- Watch mouse button presses and handle them
- */
-void handleButton(int button, int state, int x, int y){
-  
-  if(button == GLUT_MIDDLE_BUTTON)
-    MiddleButton = (state == GLUT_DOWN);
-  
-  if(button != GLUT_LEFT_BUTTON)
-    return;
-  
-  AdjustMouse(x, y);	/* adjust mouse coords to current window size */
-  
-  if(state == GLUT_UP){
-    if(Start){
-      Start = false;
-      Stopped = false;
-      Ball.set(STARTX, STARTY);
-//      DrawABall(0, &ball2d);
-      //glutIdleFunc(Simulate);
-    }
-    else if(Stopped){
-      Stopped = false;
-      //glutIdleFunc(Simulate);
-    }
-    else{
-      Stopped = true;
-      glutIdleFunc(NULL);
-    }
-  }
 }
 
 void drawParticleGenerationPlane(){
@@ -275,10 +236,6 @@ void RenderScene(){
 }
 
 
-
-
-
-
 // set up something in the world
 void init_the_world() {
   
@@ -305,27 +262,6 @@ void LoadParameters(char *filename){
     fclose(paramfile);
     exit(1);
   }
-//  ball2d = *(new physical_objects::ball<Vector2d>(
-//    20.0f, // radius
-//    Mass, // mass
-//    elastic, // elasticity
-//    drag, // drag_coeef
-//    Vector2d(v0x, v0y), //init_v
-//    Vector2d(0.0f, 0.0f),  //init_a
-//    Vector2d(0.0f, -9.86f), //g MotionVector g,
-//    Vector2d(100, 600), //init loc
-//    Vector2d(vwx, vwy))); // medium_speed
-//  ball3d = *(new physical_objects::ball<Vector3d>(
-//     0.15f,
-//     Mass,
-//     elastic,
-//     drag,
-//     Vector3d(v0x, v0y, v0z),
-//     Vector3d(0.0, 0.0, 0.0),
-//     Vector3d(0.0f, -9.86f, 0.0f),
-//     Vector3d(0.0, 0.0, 0.0),
-//     Vector3d(vwx, vwy, vwz)));
-
 }
 
 static char* parafile;
@@ -333,42 +269,19 @@ void Reset(){
   LoadParameters(parafile);
 }
 
-//void HandleMenu(int index){
-//  switch(index){
-//    case MenuReset:
-//      Reset();
-//      break;
-//    case MenuQuit:
-//      exit(0);
-//      
-//  }
-//}
-///*
-// Set up pop-up menu on right mouse button
-// */
-//void MakeMenu(){
-//  
-//  int id = glutCreateMenu(HandleMenu);
-//  
-//
-//  glutAddMenuEntry("Reset", MenuReset);
-//  glutAddMenuEntry("Quit", MenuQuit);
-//  
-//  glutSetMenu(id);
-//  glutAttachMenu(GLUT_RIGHT_BUTTON);
-//}
 
 /*
  Main program to draw the square, change colors, and wait for quit
  */
 int main(int argc, char* argv[]){
-  if(argc != 2){
-    fprintf(stderr, "usage: bounce paramfile\n");
-    exit(1);
-  }
-  LoadParameters(argv[1]);
-  parafile = argv[1];
+//  if(argc != 2){
+//    fprintf(stderr, "usage: bounce paramfile\n");
+//    exit(1);
+//  }
+//  LoadParameters(argv[1]);
+//  parafile = argv[1];
   init_the_world();
+  printf("R reset camera\nG toggle grid\nASWDZX move ball\nQ quit");
   
   // start up the glut utilities
   glutInit(&argc, argv);
