@@ -225,7 +225,7 @@ namespace physical_objects{
     }
     
     // responsible for the motion of this ball
-    void move( float time_step
+    void move( float time_step, Vector3d& center, float obsrad
               ) {
       if (is_alive) {
         age_ += time_step;
@@ -247,6 +247,12 @@ namespace physical_objects{
         tmp_v = velocity_ + tmp_a * time_step;
         tmp_x = location_ + velocity_ * time_step;
         
+        // collision with a sphere
+        if ( (tmp_x - center).norm() <  obsrad ) {
+//          printf("collision\n");
+          tmp_v = reflect_sphere(tmp_x, tmp_v, center, obsrad);
+        }
+        
         velocity_ = tmp_v;
         location_ = tmp_x;
 //        printf("th part vol: %f, %f, %f \n",
@@ -262,6 +268,15 @@ namespace physical_objects{
                      Vector3d plane_norm,
                      float elasticity_coefficient) {
       return velocity();
+    }
+    
+    //return next_v after reflected and modify next_x
+    Vector3d reflect_sphere(Vector3d& next_x, Vector3d& next_v,
+                             Vector3d& center, float radius) {
+      Vector3d xr_dir = (next_x - center) / (next_x - center).norm();
+      
+      next_x = center + radius;
+      return xr_dir * next_v.norm() * 0.5;
     }
     
     

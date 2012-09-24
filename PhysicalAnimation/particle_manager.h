@@ -51,7 +51,8 @@ namespace particle_manager {
     }
     
     
-    void move_particles(float time_step);
+    void move_particles(float time_step, Vector3d& obs_ctr,
+                        float obsrad);
     
     Vector3d* generation_plane() {
       return this->generation_plane_;

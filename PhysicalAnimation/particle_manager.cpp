@@ -63,12 +63,13 @@ namespace particle_manager {
     }
   }
   
-  void ParticleManager::move_particles(float time_step){
+  void ParticleManager::move_particles(float time_step, Vector3d& obs_ctr,
+                                       float obsrad){
     int seed = (int) time(NULL);
     Vector3d plane_norm = Ux % Uy;
     for ( int i = 0 ; i < this->particles_.size(); ++i ) {
       physical_objects::Particle* par = this->particles_.at(i);
-      par->move(time_step);
+      par->move(time_step, obs_ctr, obsrad);
       if ( !par->is_alive ) {
         dead_particles_.push(par);
         par->location() = get_init_loc(this->gen_pl_origin_);

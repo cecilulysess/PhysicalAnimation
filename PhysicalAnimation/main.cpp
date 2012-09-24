@@ -170,7 +170,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 void Simulate(){
 //  ball2d.move(DrawABall, 0.1f, obbox);
 //  ball3d.move(DrawSphere, 0.005f, obbox3d);
-  particle_manager1.move_particles(0.03f);
+  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
   
   calculateFPS();
   glutPostRedisplay();
