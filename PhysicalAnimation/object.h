@@ -240,6 +240,9 @@ namespace physical_objects{
         Vector3d tmp_a, tmp_v, tmp_x, norm;
         
         Vector3d tmp_f =(mass_ * g_);
+        if ( mass() < 0.1 ) {
+          tmp_f = Vector3d(0);
+        }
         //(mass_ * g_ - drag_coeff_ * (velocity_ - medium_speed_));
         
 //        printf("F: %f, %f, %f", tmp_f.x, tmp_f.y, tmp_f.z);
@@ -251,6 +254,10 @@ namespace physical_objects{
         if ( (tmp_x - center).norm() <  obsrad ) {
 //          printf("collision\n");
           tmp_v = reflect_sphere(tmp_x, tmp_v, center, obsrad);
+          if ( (rand() % 1000) < 100 ) {
+            mass_ = 0.01;
+            tmp_v = tmp_v / 1.5 ;
+          }
         }
         
         velocity_ = tmp_v;
@@ -283,6 +290,7 @@ namespace physical_objects{
     //color can be changed
     Vector4d& get_color() { return color_; }
     float mass() {return this->mass_;}
+    void set_mass(float mass) { this->mass_ = mass; }
     float elasticity() {return this->elasticity_;}
     float drag_coeff() {return this->drag_coeff_;}
     Vector3d& g() {return this->g_;}

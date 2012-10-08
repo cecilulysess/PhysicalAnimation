@@ -74,6 +74,7 @@ namespace particle_manager {
         dead_particles_.push(par);
         par->location() = get_init_loc(this->gen_pl_origin_);
         par->velocity() = plane_norm * gauss(speed_mean_, speed_var_, seed);
+        par->set_mass(0.1);
 //        if (dead_particles_.size() < particle_size_/10 ) {
 //          par->age_ = 0.0;
 //        } else { 
@@ -82,6 +83,7 @@ namespace particle_manager {
         par->age_ = 0.0;
         if ( dead_particles_.size() != 0 ) {
           dead_particles_.front()->is_alive = true;
+          
           dead_particles_.pop();
         }
       }

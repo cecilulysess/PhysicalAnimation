@@ -192,7 +192,7 @@ void Simulate(){
   
   calculateFPS();
   glutPostRedisplay();
-  usleep(13000);
+//  usleep(13000);
   //  sleep(1);
 }
 

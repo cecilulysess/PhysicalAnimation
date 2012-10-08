@@ -12,7 +12,7 @@
 #define __CAMERA_H__
 
 #include "Matrix.h"
-
+#include <stdio.h>
 #define INACTIVE 0
 #define TRANSLATE 1
 #define ROTATE 2
