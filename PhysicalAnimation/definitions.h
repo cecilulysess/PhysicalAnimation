@@ -136,7 +136,7 @@ float obs2rad = 0.5;
 //static std::vector<Vector3d> obbox3d;
 static char *ParamFilename = NULL;
 
-#define N 10  //# of interacted particles 
+#define N 100  //# of interacted particles 
 typedef struct StateVector {
   Vector3d s[2 * N];
   

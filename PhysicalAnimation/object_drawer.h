@@ -67,7 +67,7 @@ void draw_particles(const std::vector<physical_objects::Particle*>& particles){
 void draw_obstancles(Vector3d* obses){
 //  int listID = glGenLists(1);
 //  glNewList(listID, glCheckFramebufferStatus(<#GLenum target#>))
-  glColor4f(0.15, 0.2, 0.0, 0.4);
+  glColor4f(0.15, 0.2, 0.0, 0.9);
   glClear(GL_DEPTH_BUFFER_BIT);
   glPushMatrix();
   glTranslatef(obses[0].x, obses[0].y, obses[0].z);

@@ -47,9 +47,9 @@ void init_flock(){
     flockmass[i] = 1;
   }
   for( int i = 0 ; i < N; ++i ) {
-    X0.s[i] = Vector3d(get_rand(0.0, 1.0),
-                       get_rand(1.0, 2.0),
-                       get_rand(2.0, 3.0) );
+    X0.s[i] = Vector3d(get_rand(4.0, 6.0),
+                       get_rand(4.0, 6.0),
+                       get_rand(4.0, 6.0) );
   }
   for( int i = N; i < 2 * N; ++i ) {
     X0.s[i] = Vector3d(get_rand(0.0, 1.3),
@@ -63,17 +63,21 @@ Vector3d f(Vector3d X, double t, double T, int i) {
   double ctx = obs2ctr.x, cty = obs2ctr.y, ctz = obs2ctr.z;
   Vector3d ctr(ctx, cty, ctz);
   Vector3d r(X.x - ctx, X.y - cty, X.z - ctz);//X - ctr;
-  if (r.norm() > 15 * obs2rad ) {
-    dxdt = -r;
+  if (r.norm() > 25 * obs2rad ) {
+    dxdt = - r;
   } else {
-    if (r.norm() > 5 * obs2rad ) {
-      dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm();
+    if (r.norm() > 15 * obs2rad ) {
+      dxdt = - 1.2 * flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm();
+//      dxdt = - r * ((rand() % 10) / 10.0 );
     } else {
-      dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm() * 0.3;
+      if ( r.norm() < 8 * obs2rad) {
+        dxdt = 2 * r;
+      } else 
+        dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm() ;
     }
   }
   for (int i = 0 ; i < N; ++i ) {
-    if ( (X - curr_X.s[i]).norm() < 1 ) {
+    if ( (X - curr_X.s[i]).norm() < 3 * RECTSIZE ) {
       Vector3d tmp (0.1, 0.1, 0.1);
       tmp = tmp + X - curr_X.s[i];
       tmp = (X - curr_X.s[i]) % tmp;
