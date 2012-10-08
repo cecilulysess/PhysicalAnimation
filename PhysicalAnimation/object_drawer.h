@@ -75,4 +75,6 @@ void draw_obstancles(Vector3d* obses){
   glPopMatrix();
 }
 
+
+
 #endif

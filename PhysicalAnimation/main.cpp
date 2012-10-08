@@ -38,40 +38,108 @@ Camera *camera;
 bool showGrid = true;
 int persp_win;
 
-
-//void DrawABall(int collision,
-//               void* obj);
-//----------------------Including and definitions end-----------------------
-
-//-------------------------------------------------------------------------
-// Calculates the frames per second
-//-------------------------------------------------------------------------
-void calculateFPS()
-{
-  //  Increase frame count
-  frameCount++;
-  
-  //  Get the number of milliseconds since glutInit called
-  //  (or first call to glutGet(GLUT ELAPSED TIME)).
-  currentTime = glutGet(GLUT_ELAPSED_TIME);
-  
-  //  Calculate time passed
-  int timeInterval = currentTime - previousTime;
-  
-  if(timeInterval > 1000)
-  {
-    //  calculate the number of frames per second
-    fps = frameCount / (timeInterval / 1000.0f);
-    
-    //  Set time
-    previousTime = currentTime;
-    
-    //  Reset frame count
-    frameCount = 0;
-  }
-  
-//  printf("FPS: %f\n", fps);
+float get_rand(float low, float high) {
+    return ((rand() % 1000) / 1000.0) * (high - low) + low;
 }
+//========================================================
+void init_flock(){
+  for( int i = 0 ; i < N; ++i ) {
+    flockmass[i] = 1;
+  }
+  for( int i = 0 ; i < N; ++i ) {
+    X0.s[i] = Vector3d(get_rand(0.0, 1.0),
+                       get_rand(1.0, 2.0),
+                       get_rand(2.0, 3.0) );
+  }
+  for( int i = N; i < 2 * N; ++i ) {
+    X0.s[i] = Vector3d(get_rand(0.0, 1.3),
+                       get_rand(0.0, 1.3),
+                       get_rand(0.0, 0.3));
+  }
+}
+
+Vector3d f(Vector3d X, double t, double T, int i) {
+  Vector3d dxdt;
+  double ctx = obs2ctr.x, cty = obs2ctr.y, ctz = obs2ctr.z;
+  Vector3d ctr(ctx, cty, ctz);
+  Vector3d r(X.x - ctx, X.y - cty, X.z - ctz);//X - ctr;
+  if (r.norm() > 15 * obs2rad ) {
+    dxdt = -r;
+  } else {
+    if (r.norm() > 5 * obs2rad ) {
+      dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm();
+    } else {
+      dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm() * 0.3;
+    }
+  }
+  for (int i = 0 ; i < N; ++i ) {
+    if ( (X - curr_X.s[i]).norm() < 1 ) {
+      Vector3d tmp (0.1, 0.1, 0.1);
+      tmp = tmp + X - curr_X.s[i];
+      tmp = (X - curr_X.s[i]) % tmp;
+      dxdt = dxdt + tmp;
+    }
+  }
+//  dxdt = - (curr_X.s[i + N] * r) * r ;
+//  dxdt = -r;
+//  dxdt.x = 0.01;
+//  dxdt.y = X.y + (rand() % 2) / 2000.0;
+//  dxdt.z = X.z + (rand() % 2) / 2000.0;
+//  double omega = 2 * PI / T;
+//  
+//  dxdt.x = X.y;
+//  dxdt.y = -Sqr(omega) * X.x;
+  return dxdt;
+}
+
+StateVector F(StateVector X, double t) {
+  StateVector Xp;
+  for ( int i = 0 ; i < N ; ++i ) {
+    Xp.s[i] = X.s[i + N];
+  }
+  for ( int i = 0;  i < N ; ++i ) {
+    Xp.s[i + N] = 1 / flockmass[i] * f(X.s[i], t, dT, i);
+  }
+  return Xp;
+}
+
+StateVector NumInt ( StateVector X, StateVector Xp, float t, float dt) {
+  StateVector K1, K2, K3, K4;
+  K1 = Xp * dt;
+  
+  K2 = F(X + K1 * (1.0 / 2.0), t + dt / 2.0) * dt;
+  K3 = F(X + K2 * 0.5 , t + 0.5 * dt) * dt;
+  K4 = F(X + K3, t + dt) * dt;
+  return X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
+}
+
+void mainloop(){
+  StateVector Xp = F(curr_X, curr_t);
+  StateVector Xnew = NumInt(curr_X, Xp, curr_t, dt);
+  // collision
+  curr_X = Xnew;
+  curr_t = curr_t + dt;
+}
+
+void draw_flock_point(Vector3d& loc, float rectsize) {
+  glVertex3d(loc.x , loc.y, loc.z);
+  glVertex3d(loc.x, loc.y + rectsize, loc.z);
+  glVertex3d(loc.x + rectsize, loc.y + rectsize, loc.z);
+  glVertex3d(loc.x + rectsize, loc.y, loc.z + rectsize);
+}
+
+void draw_flocking_particles(StateVector X) {
+  glBegin(GL_QUADS);
+  for ( int i = 0 ; i < N ; ++i ) {
+    glColor4f(0.33, 0.76, 1.0, 1.0);
+    draw_flock_point(X.s[i], RECTSIZE * 4 );
+  }
+//  draw_flock_point(curr_X.s[0], RECTSIZE);
+  glEnd();
+           
+}
+
+//========================================================
 
 // draws a simple grid
 void makeGrid() {
@@ -117,6 +185,8 @@ void makeGrid() {
   glLineWidth(1.0);
 }
 
+
+
 void init() {
   // set up camera
   // parameters are eye point, aim point, up vector
@@ -144,7 +214,7 @@ void motionEventHandler(int x, int y) {
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
-  float move_step = 0.07;
+  float move_step = 0.15;
   switch (key) {
     case 'r': case 'R':
       // reset the camera to its initial position
@@ -186,27 +256,13 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 
 //// simulation function that called in glIdle loop
 void Simulate(){
-//  ball2d.move(DrawABall, 0.1f, obbox);
-//  ball3d.move(DrawSphere, 0.005f, obbox3d);
-  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
   
-  calculateFPS();
+//  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
+  mainloop();
   glutPostRedisplay();
-//  usleep(13000);
+//  usleep(130000);
+  usleep(130000);
   //  sleep(1);
-}
-
-void drawParticleGenerationPlane(){
-  glColor4f(1.0, 1.0, 1.0, 0.2);
-  Vector3d* genP = particle_manager1.generation_plane();
-  glBegin(GL_QUADS);
-  glVertex3f(genP[0].x, genP[0].y, genP[0].z );
-//  glColor4f(0.0, 1.0, 0.0, 0.5);
-  glVertex3f(genP[1].x, genP[1].y, genP[1].z );
-//  glColor4f(0.0, 0.0, 1.0, 0.5);
-  glVertex3f(genP[2].x, genP[2].y, genP[2].z );
-  glVertex3f(genP[3].x, genP[3].y, genP[3].z );
-  glEnd() ;
 }
 
 
@@ -223,10 +279,12 @@ void RenderScene(){
   glLoadIdentity();
   if (showGrid)
     makeGrid();
+  
   draw_obstancles(&obs2ctr);
-  drawParticleGenerationPlane();
-  draw_particles(particle_manager1.particles());
+//  drawParticleGenerationPlane();
+//  draw_particles(particle_manager1.particles());
   //draw scene
+  draw_flocking_particles(curr_X);
 //  glTranslatef(0, 3.5, 0);
 //  Draw3DWorld();
 //  glutWireTeapot(5);
@@ -238,7 +296,8 @@ void RenderScene(){
 
 // set up something in the world
 void init_the_world() {
-  
+  init_flock();
+  curr_X = X0;
 }
 
 /*

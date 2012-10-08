@@ -136,5 +136,35 @@ float obs2rad = 0.5;
 //static std::vector<Vector3d> obbox3d;
 static char *ParamFilename = NULL;
 
+#define N 10  //# of interacted particles 
+typedef struct StateVector {
+  Vector3d s[2 * N];
+  
+  StateVector operator*(double s) const{
+    StateVector res;
+    for (int i = 0 ; i < 2 * N; ++i ) {
+      res.s[i] = this->s[i] * s;
+    }
+    return res;
+  }
+  const StateVector& operator=(const StateVector& v2) {
+    for ( int i = 0 ; i < 2 * N; ++i ) {
+      this->s[i] = v2.s[i];
+    }
+    return *this;
+  }
+  StateVector operator+(const StateVector& v2) {
+    StateVector res;
+    for (int i = 0 ; i < 2 * N; ++i ) {
+      res.s[i] = (this->s[i] + v2.s[i]);
+    }
+    return res;
+  }
+}StateVector;
 
+static float flockmass[N];
+static float dt = 0.1, dT = 0.5;
+static StateVector X0;
+static StateVector curr_X;
+static float curr_t = 0.0f, t_max = 10000.0f;
 #endif
