@@ -79,12 +79,15 @@ void draw_surface(physical_objects::surface surface2draw) {
   glColor4f(1, 1, 1, 0.9);
   glClear(GL_DEPTH_BUFFER_BIT);
   glPushMatrix();
-  for ( int i = 0 ; i < surface2draw.vertices.size(); ++i ) {
+  int count = 0;
+  for ( int i = 0 ; i < surface2draw.vertices.size() ; ++i ) {
     Vector3d& loc = surface2draw.vertices.at(i).location;
     glLoadIdentity();
     glTranslatef(loc.x, loc.y, loc.z);
     glutSolidSphere(0.2, 20, 20);
+    count++;
   }
+//  printf("\tCnt for ball to draw : %d\n", surface2draw.vertices.size());
 
   glPopMatrix();
 }

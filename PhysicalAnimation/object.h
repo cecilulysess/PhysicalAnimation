@@ -351,16 +351,7 @@ namespace physical_objects{
       //int strut_no = (subdivide + 1) * (3 * subdivide + 5);
       int strut_no = (subdivide + 1) * (4 * subdivide + 6); // for all connection
       subdividion_no = subdivide;
-      
-//      for ( int i = 0 ; i < subdivide * 4; ++i ) {
-//        vertices.push_back(Struts_Vertice(
-//            1.0, //mass = 1.0 kg
-//            Vector3d(0.0, 0.0, 0.0), //force 0, 0, 0
-//            Vector3d(Center.x - width / 2 + (int) i * wstep,  Center.y, Center.z),
-//            Vector3d(0.0, 0.0, 0.0),
-//            
-//            ) );
-//      }
+
       for(int i = 0 ; i < subdivide + 2; ++i) {
         for(int j = 0; j < subdivide + 2; ++j) {
           vertices.push_back(
@@ -378,16 +369,42 @@ namespace physical_objects{
         }
       }
       
-      Vector3d& current_loc = vertices[0].location;
+      Vector3d current_loc = vertices[0].location;
       for(int i = 0 ; i < subdivide + 2; ++i) {
         for(int j = 0; j < subdivide + 2; ++j) {
           current_loc = vertices[i * (subdivide + 2) + j].location;
-          // right i, j+1
+          // right i + 1, j
+          if ( i + 1 < subdivide + 2 )
+            struts.push_back(
+              Strut(spring, damper,
+                    (vertices[(i + 1) * ( subdivide + 2 ) + j].location - current_loc).norm()
+              )
+            );
+          
+          // right down i+1, j+1
+          if ( i + 1 < subdivide + 2 && j + 1 < subdivide ) 
+            struts.push_back(
+                           Strut(spring, damper,
+                                 (vertices[(i+1) * ( subdivide + 2 ) + j + 1].location - current_loc).norm()
+                                 )
+                           );
+          
+          // down i, j + 1
+          if ( j + 1 < subdivide + 2)
           struts.push_back(
-            Strut(spring, damper,
-                  (vertices[i * ( subdivide + 2 ) + j].location - current_loc).norm()
-                  )
-          );
+                           Strut(spring, damper,
+                                 (vertices[i * ( subdivide + 2 ) + j + 1].location - current_loc).norm()
+                                 )
+                           );
+          
+          //left down i - 1, j - 1
+          if ( j - 1 < 0 || i - 1  < 0 )
+          struts.push_back(
+                           Strut(spring, damper,
+                                 (vertices[(i-1)* ( subdivide + 2 ) + j - 1 ].location - current_loc).norm()
+                                 )
+                           );
+          
         }
       }
       
