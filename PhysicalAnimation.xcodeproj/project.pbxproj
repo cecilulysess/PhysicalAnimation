@@ -231,6 +231,7 @@
 		B99FCB9F15E71FD10048BBBA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = /Users/julian/Programming/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -238,6 +239,7 @@
 		B99FCBA015E71FD10048BBBA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				HEADER_SEARCH_PATHS = /Users/julian/Programming/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

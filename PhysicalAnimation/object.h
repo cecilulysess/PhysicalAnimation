@@ -14,6 +14,7 @@
 #include<stdio.h>
 #include<vector>
 #include"Vector.h"
+
 //----------
 namespace physical_objects{
   // a box that is the obstacle in this scene
@@ -310,6 +311,92 @@ namespace physical_objects{
     float max_age_;
   };
   
+  // verticles that stands for interaction vertices as struts
+  class Struts_Vertice {
+  public:
+    Struts_Vertice(float mass_, Vector3d force_, Vector3d location_,
+                   Vector3d velocity_) :
+      mass(mass_), location(location_), velocity(velocity_), force(force_){
+      
+    }
+    float mass;    Vector3d location;
+    Vector3d velocity;
+    Vector3d force;
+    
+    
+  };
+  
+  class Strut {
+  public:
+    Strut(float spring, float damper, float original_len) :
+      K(spring), D(damper), L0(original_len) {
+    
+    }
+    float K, D, L0; //spring, damper, L_0
+  };
+  
+  // a surface that works as struts inside
+  class surface {
+  public:
+    int getIdx(int i, int j) {
+      return i * ( subdividion_no + 2 ) + j;
+    }
+
+    // subdivide conform to blender subdivide of triangled plane
+    // 0 is a two triangle plane
+    surface(int width, int height, Vector3d Center, int subdivide,
+            float spring, float damper, float mass) {
+      int wstep = width / (subdivide + 1), hstep = height / (subdivide + 1);
+      int vertice_no = (subdivide + 2) * (subdivide + 2);
+      //int strut_no = (subdivide + 1) * (3 * subdivide + 5);
+      int strut_no = (subdivide + 1) * (4 * subdivide + 6); // for all connection
+      subdividion_no = subdivide;
+      
+//      for ( int i = 0 ; i < subdivide * 4; ++i ) {
+//        vertices.push_back(Struts_Vertice(
+//            1.0, //mass = 1.0 kg
+//            Vector3d(0.0, 0.0, 0.0), //force 0, 0, 0
+//            Vector3d(Center.x - width / 2 + (int) i * wstep,  Center.y, Center.z),
+//            Vector3d(0.0, 0.0, 0.0),
+//            
+//            ) );
+//      }
+      for(int i = 0 ; i < subdivide + 2; ++i) {
+        for(int j = 0; j < subdivide + 2; ++j) {
+          vertices.push_back(
+            Struts_Vertice(
+                           mass, // mass
+                           Vector3d(0.0, 0.0, 0.0), // force
+                           Vector3d(Center.x - width / 2 + (int) (wstep * j),
+                                    0.0,
+                                    Center.z - hstep / 2 + (int) (hstep * i)
+                                    ), //location
+                           Vector3d(0.0, 0.0, 0.0) // velocity
+                           
+            )
+          );
+        }
+      }
+      
+      Vector3d& current_loc = vertices[0].location;
+      for(int i = 0 ; i < subdivide + 2; ++i) {
+        for(int j = 0; j < subdivide + 2; ++j) {
+          current_loc = vertices[i * (subdivide + 2) + j].location;
+          // right i, j+1
+          struts.push_back(
+            Strut(spring, damper,
+                  (vertices[i * ( subdivide + 2 ) + j].location - current_loc).norm()
+                  )
+          );
+        }
+      }
+      
+    }
+    std::vector<Struts_Vertice> vertices;
+    std::vector<Strut> struts;
+    int subdividion_no;
+    
+  };
 }//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */
