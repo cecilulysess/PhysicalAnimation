@@ -263,7 +263,7 @@ using physical_objects::t_max;
 
 void push(){
   surfaceObj.vertices[surfaceObj.vertices.size()/2].external_force =
-  Vector3d(0,-100, 0);
+  Vector3d(0,-300, 0);
 }
 void mainloop(){
 //  surfaceObj.print_surface();
@@ -288,7 +288,7 @@ void Simulate(){
   mainloop();
   glutPostRedisplay();
 //  usleep(130000);
-  usleep(130000);
+  usleep(30000);
   //  sleep(1);
 }
 

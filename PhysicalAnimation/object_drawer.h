@@ -84,21 +84,29 @@ void draw_surface(physical_objects::surface surface2draw) {
     Vector3d& loc = surface2draw.vertices.at(i).location;
     glLoadIdentity();
     glTranslatef(loc.x, loc.y, loc.z);
-    glutSolidSphere(0.2, 20, 20);
+    glutSolidSphere(0.04, 5, 5);
     count++;
   }
   float colorstep = 1.0/surfaceObj.struts.size();
   glLoadIdentity();
-  for ( int i = 0 ; i < surfaceObj.struts.size(); ++i ) {
-    physical_objects::Strut& str = surfaceObj.struts[i];
-    glColor4f(colorstep*i, colorstep*i,colorstep*i, 1.0);
-    glBegin(GL_LINES);
-    Vector3d& a = str.vertices_pair.first->location,
-              b = str.vertices_pair.second->location;
-    glVertex3f(a.x, a.y, a.z);
-    glVertex3f(b.x, b.y, b.z);
-    glEnd();
+//  for ( int i = 0 ; i < surfaceObj.struts.size(); ++i ) {
+//    physical_objects::Strut& str = surfaceObj.struts[i];
+//    glColor4f(colorstep*i, colorstep*i,colorstep*i, 1.0);
+//    glBegin(GL_LINES);
+//    Vector3d& a = str.vertices_pair.first->location,
+//              b = str.vertices_pair.second->location;
+//    glVertex3f(a.x, a.y, a.z);
+//    glVertex3f(b.x, b.y, b.z);
+//    glEnd();
+//  }
+  glColor4f(0.0, 0.0, 0.8, 0.7);
+  glBegin(GL_POLYGON);
+  for ( int i = 0 ; i < surface2draw.vertices.size() ; ++i ) {
+    Vector3d& v = surfaceObj.vertices[i].location;
+    glVertex3d(v.x, v.y, v.z);
   }
+  
+  glEnd();
 //  printf("\tCnt for ball to draw : %d\n", surface2draw.vertices.size());
 
   glPopMatrix();

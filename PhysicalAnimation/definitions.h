@@ -175,7 +175,7 @@ static char *ParamFilename = NULL;
 physical_objects::surface surfaceObj(
                    24, 24, Vector3d(0.0, 0.0, 0.0), SUBDIVITION,
                    0.9, //spring
-                   0.2, //damper
+                   0.1, //damper
                    0.5
                    );
 
