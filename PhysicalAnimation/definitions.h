@@ -59,8 +59,8 @@ static Vector2d Ball(STARTX, STARTY);
 //static int NTimeSteps = -1;
 static Vector2d OldBall[MAXSTEPS];
 
-static double WinWidth = WINDOW_WIDTH;
-static double WinHeight = WINDOW_HEIGHT;
+//static double WinWidth = WINDOW_WIDTH;
+//static double WinHeight = WINDOW_HEIGHT;
 static int Step = true;
 static int Start = true;
 static int Stopped = true;
@@ -72,8 +72,8 @@ static int Floor = false;
 
 
 
-static int frameCount, currentTime, previousTime;
-static float fps;
+//static int frameCount, currentTime, previousTime;
+//static float fps;
 
 static char* window_title = "Particle System -- Yanxiang Wu";
 
@@ -137,7 +137,8 @@ float obs2rad = 0.5;
 static char *ParamFilename = NULL;
 
 //===================flocking==================================
-//#define N 100  //# of interacted particles 
+//#define SUBDIVITION 0
+//#define N ((SUBDIVITION + 2) * (SUBDIVITION + 2))  //# of interacted particles 
 //typedef struct StateVector {
 //  Vector3d s[2 * N];
 //  
@@ -170,11 +171,12 @@ static char *ParamFilename = NULL;
 //static float curr_t = 0.0f, t_max = 10000.0f;
 
 // flocking===========================================
-
+// define
 physical_objects::surface surfaceObj(
-                                     5, 5, Vector3d(0.0, 0.0, 0.0), 0,
-                                     0.5, //spring 
-                                     0.5, //damper
-                                     1.0
-);
+                   2, 2, Vector3d(0.0, 0.0, 0.0), SUBDIVITION,
+                   0.8, //spring
+                   0.5, //damper
+                   0.3
+                   );
+
 #endif

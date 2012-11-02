@@ -29,6 +29,7 @@ Vector3d::Vector3d(const Vector3d &v){
   set(v);
 }
 
+
 Vector4d::Vector4d(double vx, double vy, double vz, double vw){
   set(vx, vy, vz, vw);
 }

@@ -333,11 +333,20 @@ namespace physical_objects{
       mass(mass_), location(location_), velocity(velocity_), force(force_){
       
     }
+    
+    Struts_Vertice(const Struts_Vertice& vrt) {
+      this->mass = vrt.mass;
+      this->force = vrt.force;
+      this->location = vrt.location;
+      this->velocity = vrt.velocity;
+    }
+    
     float mass;    Vector3d location;
     Vector3d velocity;
     Vector3d force;
     // accel just used for temporary storage purpose during calculation
     Vector3d accel;
+    int vertice_id;
     
     std::vector<Strut*> connected_struts;
     
@@ -351,7 +360,56 @@ namespace physical_objects{
     
     
   };
+  
+
+  
+  
+  //===================StateVector==================================
+#define SUBDIVITION 0
+#define N ((SUBDIVITION + 2) * (SUBDIVITION + 2))  //# of interacted particles
+  typedef struct StateVector {
+    Vector3d s[2 * N];
     
+    StateVector operator*(double s) const{
+      StateVector res;
+      for (int i = 0 ; i < 2 * N; ++i ) {
+        res.s[i] = this->s[i] * s;
+      }
+      return res;
+    }
+    
+    const StateVector& operator=(const StateVector& v2) {
+      for ( int i = 0 ; i < 2 * N; ++i ) {
+        this->s[i] = v2.s[i];
+      }
+      return *this;
+    }
+    
+    StateVector operator+(const StateVector& v2) {
+      StateVector res;
+      for (int i = 0 ; i < 2 * N; ++i ) {
+        res.s[i] = (this->s[i] + v2.s[i]);
+      }
+      return res;
+    }
+    
+    void print(char* name){
+      printf("StateVector %s:\n", name);
+      for(int i = 0 ; i < 2 * N; ++i) {
+        printf("\t\t(%5.2f, %5.2f, %5.2f)\n", s[i].x, s[i].y, s[i].z);
+      }
+    }
+  }StateVector;
+  
+  static StateVector X0;
+  static StateVector curr_X;
+  static float dt = 0.1, dT = 0.5;
+  static float curr_t = 0.0f, t_max = 10000.0f;
+  
+  // ===========================================
+  
+
+
   // a surface that works as struts inside
   class surface {
   public:
@@ -364,12 +422,23 @@ namespace physical_objects{
     surface(int width, int height, Vector3d Center, int subdivide,
             float spring, float damper, float mass);
     
-    void calculate_dynamics();
+    StateVector calculate_dynamics( StateVector X, double t );
+    
+    StateVector NumInt ( StateVector X,
+                                    StateVector Xp, float t, float dt);
+    void calculate_a(StateVector X, float dt);
+    void update_State(StateVector& Xnew);
+    
+    void print_surface();
+    
+    
     std::vector<Struts_Vertice> vertices;
     std::vector<Strut> struts;
     int subdividion_no;
-    
+    StateVector X;
   };
-}//ns pobj
+  
+  
+  }//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */

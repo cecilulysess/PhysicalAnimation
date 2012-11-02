@@ -29,6 +29,8 @@
 //#include<glm/glm.hpp>
 
 //  Definitions and namespace
+
+#include"object.h"
 #include"definitions.h"
 #include "object_drawer.h"
 using namespace std;
@@ -42,6 +44,7 @@ int persp_win;
 
 float get_rand(float low, float high) {
     return ((rand() % 1000) / 1000.0) * (high - low) + low;
+
 }
 ////========================================================
 //void init_flock(){
@@ -86,15 +89,6 @@ float get_rand(float low, float high) {
 //      dxdt = dxdt + tmp;
 //    }
 //  }
-////  dxdt = - (curr_X.s[i + N] * r) * r ;
-////  dxdt = -r;
-////  dxdt.x = 0.01;
-////  dxdt.y = X.y + (rand() % 2) / 2000.0;
-////  dxdt.z = X.z + (rand() % 2) / 2000.0;
-////  double omega = 2 * PI / T;
-////  
-////  dxdt.x = X.y;
-////  dxdt.y = -Sqr(omega) * X.x;
 //  return dxdt;
 //}
 //
@@ -258,14 +252,32 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
   
   glutPostRedisplay();
 }
+using physical_objects::curr_t;
+using physical_objects::curr_X;
+using physical_objects::dt;
+using physical_objects::t_max;
 
-
+void mainloop(){
+//  surfaceObj.print_surface();
+  physical_objects::StateVector Xp =
+    surfaceObj.calculate_dynamics(surfaceObj.X, curr_t);
+  physical_objects::StateVector Xnew = surfaceObj.NumInt(surfaceObj.X, Xp, curr_t, dt);
+  
+  surfaceObj.update_State(Xnew);
+  for(int i = 0; i < surfaceObj.vertices.size(); ++i ) {
+    surfaceObj.vertices[i].location =
+    //surfaceObj.vertices[i].location  + Vector3d(0,0.5,0);
+    surfaceObj.X.s[i];
+  }
+  curr_t = curr_t + dt;
+}
 
 //// simulation function that called in glIdle loop
 void Simulate(){
   
 //  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
-//  mainloop();
+  
+  mainloop();
   glutPostRedisplay();
 //  usleep(130000);
   usleep(130000);

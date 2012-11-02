@@ -87,6 +87,18 @@ void draw_surface(physical_objects::surface surface2draw) {
     glutSolidSphere(0.2, 20, 20);
     count++;
   }
+  float colorstep = 1.0/surfaceObj.struts.size();
+  glLoadIdentity();
+  for ( int i = 0 ; i < surfaceObj.struts.size(); ++i ) {
+    physical_objects::Strut& str = surfaceObj.struts[i];
+    glColor4f(colorstep*i, colorstep*i,colorstep*i, 1.0);
+    glBegin(GL_LINES);
+    Vector3d& a = str.vertices_pair.first->location,
+              b = str.vertices_pair.second->location;
+    glVertex3f(a.x, a.y, a.z);
+    glVertex3f(b.x, b.y, b.z);
+    glEnd();
+  }
 //  printf("\tCnt for ball to draw : %d\n", surface2draw.vertices.size());
 
   glPopMatrix();
