@@ -366,7 +366,7 @@ namespace physical_objects{
   
   
   //===================StateVector==================================
-#define SUBDIVITION 23
+#define SUBDIVITION 63
 #define N ((SUBDIVITION + 2) * (SUBDIVITION + 2))  //# of interacted particles
   typedef struct StateVector {
     Vector3d s[2 * N];

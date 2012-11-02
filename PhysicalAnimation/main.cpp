@@ -33,6 +33,8 @@
 #include"object.h"
 #include"definitions.h"
 #include "object_drawer.h"
+#include<stdlib.h>
+#include<time.h>
 using namespace std;
 
 #define WIDTH	    1024	/* window dimensions */
@@ -262,8 +264,14 @@ using physical_objects::dt;
 using physical_objects::t_max;
 
 void push(){
-  surfaceObj.vertices[surfaceObj.vertices.size()/2].external_force =
-  Vector3d(0,-300, 0);
+  /* initialize random seed: */
+  srand ( time(NULL) );
+  int push_loc = rand() % (surfaceObj.vertices.size() - 10) + 1 ;
+  int force = (rand() % 10 + 1) * 150 + 150;
+  
+  surfaceObj.vertices[push_loc].external_force =
+  Vector3d(0, - force, 0);
+  
 }
 void mainloop(){
 //  surfaceObj.print_surface();
@@ -371,7 +379,7 @@ int main(int argc, char* argv[]){
 //  parafile = argv[1];
 
   init_the_world();
-  printf("R reset camera\nG toggle grid\nASWDZX move ball\nQ quit");
+  printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit");
   
   // start up the glut utilities
   glutInit(&argc, argv);
