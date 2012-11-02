@@ -48,7 +48,7 @@ namespace physical_objects{
   
   surface::surface(int width, int height, Vector3d Center, int subdivide,
                    float spring, float damper, float mass) {
-    int wstep = width / (subdivide + 1), hstep = height / (subdivide + 1);
+    float wstep = width / (subdivide + 1), hstep = height / (subdivide + 1);
     int vertice_no = (subdivide + 2) * (subdivide + 2);
     //int strut_no = (subdivide + 1) * (3 * subdivide + 5);
     int strut_no = (subdivide + 1) * (4 * subdivide + 6); // for all connection
@@ -60,9 +60,9 @@ namespace physical_objects{
                            Struts_Vertice(
                                           mass, // mass
                                           Vector3d(0.0, 0.0, 0.0), // force
-                                          Vector3d(Center.x - width / 2 + (int) (wstep * j),
-                                                   1.0,
-                                                   Center.z - hstep / 2 + (int) (hstep * i)
+                                          Vector3d((float)Center.x - width / 2.0 + (wstep * j),
+                                                   0.0,
+                                                   (float)Center.z - height / 2.0 + (hstep * i)
                                                    ), //location
                                           Vector3d(0.0, 0.0, 0.0) // velocity
                                           
@@ -70,12 +70,14 @@ namespace physical_objects{
                            );
 
       }
-      this->vertices[0].velocity.y = 5;
+      
     }
     
     for(int i = 0; i < vertices.size(); ++i ) {
       vertices[i].vertice_id = i;
     }
+//    this->vertices[vertices.size()/2].velocity.y = 5;
+    
     
     for(int i = 0; i < N; ++i){
       X.s[i] = vertices[i].location;
@@ -134,7 +136,7 @@ namespace physical_objects{
     
       }
     }
-    printf("stru_S %d", struts.size());
+//    printf("stru_S %d", struts.size());
   }
   
   
@@ -149,19 +151,23 @@ namespace physical_objects{
       Vector3d uab =  L / L.norm();
       
       float delta_L = (L.norm() - this->struts[i].L0);
-            printf("d_L(%d, %d) :%f\n", a->vertice_id, b->vertice_id, delta_L);
+//            printf("d_L(%d, %d) :%f\n", a->vertice_id, b->vertice_id, delta_L);
       Vector3d fsab = - this->struts[i].K * delta_L * uab;
 //            printf("%d: fsab: %f\n", i, fsab.norm());
       Vector3d fdab = this->struts[i].D * (
                                            //Vb-Va
                (X.s[b->vertice_id + N] - X.s[a->vertice_id + N]) * uab * uab
                );
-      printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
-                         fdab.x, fdab.y, fdab.z);
+//      printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
+//                         fdab.x, fdab.y, fdab.z);
 
       
       a->force = a->force + (fsab + fdab);
       b->force = b->force - (fsab + fdab);
+    }
+    for(int i = 0; i < this->vertices.size(); ++i ) {
+      vertices[i].force = vertices[i].force + vertices[i].external_force;
+      vertices[i].external_force = Vector3d(0,0,0);
     }
     
     for(int i = 0; i < this->vertices.size(); ++i) {
@@ -235,14 +241,14 @@ namespace physical_objects{
                                float t, float dt) {
     StateVector K1, K2, K3, K4;
     K1 = Xp * dt;
-    K1.print("K1");
-//    K2 = calculate_dynamics(X + K1 * 0.5, t + 0.5 * dt) * dt;
-//    K3 = calculate_dynamics(X + K2 * 0.5, t + 0.5 * dt) * dt;
-//    K4 = calculate_dynamics(X + K3, t + dt) * dt;
-//    StateVector res = X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
-    StateVector res = X + K1;
+//    K1.print("K1");
+    K2 = calculate_dynamics(X + K1 * 0.5, t + 0.5 * dt) * dt;
+    K3 = calculate_dynamics(X + K2 * 0.5, t + 0.5 * dt) * dt;
+    K4 = calculate_dynamics(X + K3, t + dt) * dt;
+    StateVector res = X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
+//    StateVector res = X + K1;
 //    printf("RES0: %f\n", res.s[0].norm());
-    print_surface();
+//    print_surface();
     return res;
   }
   

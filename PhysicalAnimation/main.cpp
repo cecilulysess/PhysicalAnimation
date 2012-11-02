@@ -46,6 +46,7 @@ float get_rand(float low, float high) {
     return ((rand() % 1000) / 1000.0) * (high - low) + low;
 
 }
+void push();
 ////========================================================
 //void init_flock(){
 //  for( int i = 0 ; i < N; ++i ) {
@@ -224,6 +225,9 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     case 'f': case 'F':
       camera->SetCenterOfFocus(Vector3d(0, 0, 0));
       break;
+    case 'l': case 'L':
+      push();
+      break;
     case 'g': case 'G':
       showGrid = !showGrid;
       break;
@@ -257,6 +261,10 @@ using physical_objects::curr_X;
 using physical_objects::dt;
 using physical_objects::t_max;
 
+void push(){
+  surfaceObj.vertices[surfaceObj.vertices.size()/2].external_force =
+  Vector3d(0,-100, 0);
+}
 void mainloop(){
 //  surfaceObj.print_surface();
   physical_objects::StateVector Xp =

@@ -344,6 +344,7 @@ namespace physical_objects{
     float mass;    Vector3d location;
     Vector3d velocity;
     Vector3d force;
+    Vector3d external_force;
     // accel just used for temporary storage purpose during calculation
     Vector3d accel;
     int vertice_id;
@@ -365,7 +366,7 @@ namespace physical_objects{
   
   
   //===================StateVector==================================
-#define SUBDIVITION 0
+#define SUBDIVITION 23
 #define N ((SUBDIVITION + 2) * (SUBDIVITION + 2))  //# of interacted particles
   typedef struct StateVector {
     Vector3d s[2 * N];
