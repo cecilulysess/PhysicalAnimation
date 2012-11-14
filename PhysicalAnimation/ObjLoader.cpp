@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-physical_objects::ModelObject* ObjLoader::loadObject(char const *path){
+physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   FILE *file ;
   if(!(file= fopen(path, "r"))){
     return NULL;

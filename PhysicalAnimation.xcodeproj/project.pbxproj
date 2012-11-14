@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B9149AE7164D63040065332F /* testmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9149AE6164D63040065332F /* testmain.cpp */; };
+		B9316D0E1653890B00827BC4 /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9316D0D1653890B00827BC4 /* Quaternion.cpp */; };
 		B94E7AE415F5AB0900BEEB53 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE015F5AB0800BEEB53 /* Utility.cpp */; };
 		B94E7AE515F5AB0900BEEB53 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE215F5AB0800BEEB53 /* Vector.cpp */; };
 		B99588C815FCE56B00A41403 /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B99588C615FCE56B00A41403 /* object.cpp */; };
@@ -37,6 +38,10 @@
 
 /* Begin PBXFileReference section */
 		B9149AE6164D63040065332F /* testmain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = testmain.cpp; sourceTree = "<group>"; };
+		B9316D0B1653890B00827BC4 /* Makefile.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Makefile.txt; sourceTree = "<group>"; };
+		B9316D0C1653890B00827BC4 /* parameters */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = parameters; sourceTree = "<group>"; };
+		B9316D0D1653890B00827BC4 /* Quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Quaternion.cpp; sourceTree = "<group>"; };
+		B9316D101653894900827BC4 /* Quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quaternion.h; sourceTree = "<group>"; };
 		B94E7AE015F5AB0800BEEB53 /* Utility.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utility.cpp; sourceTree = "<group>"; };
 		B94E7AE115F5AB0800BEEB53 /* Utility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utility.h; sourceTree = "<group>"; };
 		B94E7AE215F5AB0800BEEB53 /* Vector.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vector.cpp; sourceTree = "<group>"; };
@@ -104,6 +109,10 @@
 				B94E7AE215F5AB0800BEEB53 /* Vector.cpp */,
 				B94E7AE315F5AB0800BEEB53 /* Vector.h */,
 				B99FCB9815E71FD10048BBBA /* main.cpp */,
+				B9316D0B1653890B00827BC4 /* Makefile.txt */,
+				B9316D0C1653890B00827BC4 /* parameters */,
+				B9316D0D1653890B00827BC4 /* Quaternion.cpp */,
+				B9316D101653894900827BC4 /* Quaternion.h */,
 				B99F61A8160FB1C000C0B64D /* Matrix.cpp */,
 				B99F61A9160FB1C000C0B64D /* Matrix.h */,
 				B99FCB9A15E71FD10048BBBA /* PhysicalAnimation.1 */,
@@ -183,6 +192,7 @@
 				B9D3BEDC160FC876000FDC7B /* gauss.cpp in Sources */,
 				B9D6F672164B052D00D2DBC8 /* ObjLoader.cpp in Sources */,
 				B9149AE7164D63040065332F /* testmain.cpp in Sources */,
+				B9316D0E1653890B00827BC4 /* Quaternion.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

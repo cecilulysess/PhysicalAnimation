@@ -17,7 +17,8 @@
 class ObjLoader{
 public:
   //read object into an array, if file have problem, return NULL
-  static physical_objects::ModelObject* loadObject(char const *path);
+  // return obj numbers and its obj
+  static physical_objects::ModelObject* loadObject(char const *path, int &obj_no);
   
 private:
   

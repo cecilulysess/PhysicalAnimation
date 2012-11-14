@@ -249,7 +249,7 @@ void RenderScene(){
 //  
 ////  glDrawRangeElements(GL_QUADS, 0, 15, 16,
 ////                      GL_UNSIGNED_BYTE, indices);
-  glDrawElements(GL_QUADS, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
+  glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
 
 //  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
 //  

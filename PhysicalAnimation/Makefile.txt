@@ -22,8 +22,8 @@ else
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} particle_manager.${H} object_drawer.${H} definitions.${H} object.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Camera.o gauss.o object.o particle_manager.o
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} particle_manager.${H} object_drawer.${H} definitions.${H} object.${H} Quaternion.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Camera.o gauss.o object.o particle_manager.o Quaternion.o
 PROJECT = particlefall
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
@@ -52,7 +52,10 @@ object.o : object.${C} object.${H}
 
 particle_manager.o : particle_manager.${C} particle_manager.${H}
 	${CC} $(CFLAGS) -c particle_manager.${C}
-
+  
+Quaternion.o : Quaternion.${C} Quaternion.${H}
+	${CC} $(CFLAGS) -c Quaternion.${C}
+  
 debug:
 	make 'DFLAGS = /usr/lib/debug/malloc.o'
 
