@@ -56,18 +56,21 @@ namespace physical_objects{
     
     for(int i = 0 ; i < subdivide + 2; ++i) {
       for(int j = 0; j < subdivide + 2; ++j) {
-        vertices.push_back(
-                           Struts_Vertice(
-                                          mass, // mass
-                                          Vector3d(0.0, 0.0, 0.0), // force
-                                          Vector3d((float)Center.x - width / 2.0 + (wstep * j),
-                                                   0.0,
-                                                   (float)Center.z - height / 2.0 + (hstep * i)
-                                                   ), //location
-                                          Vector3d(0.0, 0.0, 0.0) // velocity
-                                          
-                                          )
+        Struts_Vertice str(mass, // mass
+                           Vector3d(0.0, 0.0, 0.0), // force
+                           Vector3d((float)Center.x - width / 2.0 + (wstep * j),
+                                    0.0,
+                                    (float)Center.z - height / 2.0 + (hstep * i)
+                                    ), //location
+                           Vector3d(0.0, 0.0, 0.0) // velocity
+                           
                            );
+        if( i == 0 || j ==0 || i == subdivide + 1 || j == subdivide + 1) {
+          printf("Set true\n");
+          str.is_static_vertice = true;
+        }
+        vertices.push_back(str);
+        
 
       }
       
@@ -168,10 +171,16 @@ namespace physical_objects{
     for(int i = 0; i < this->vertices.size(); ++i ) {
       vertices[i].force = vertices[i].force + vertices[i].external_force;
       vertices[i].external_force = Vector3d(0,0,0);
+      if (vertices[i].is_static_vertice) {
+        vertices[i].force = Vector3d(0.0, 0.0, 0.0);
+      }
     }
     
     for(int i = 0; i < this->vertices.size(); ++i) {
       vertices[i].accel = vertices[i].force / vertices[i].mass;
+      if (vertices[i].is_static_vertice) {
+        vertices[i].accel = Vector3d(0.0, 0.0, 0.0);
+      }
     }
   }
   
@@ -248,7 +257,7 @@ namespace physical_objects{
     StateVector res = X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
 //    StateVector res = X + K1;
 //    printf("RES0: %f\n", res.s[0].norm());
-//    print_surface();
+    print_surface();
     return res;
   }
   
@@ -273,11 +282,11 @@ namespace physical_objects{
   void surface::print_surface() {
     printf("\nVertices:\n");
     for(int i = 0; i < N; ++i) {
-      printf("\tV_%d:(%5.2f, %5.2f, %5.2f) v(%5.2f,%5.2f,%5.2f)\n", vertices[i].vertice_id, vertices[i].location.x,
+      printf("\tV_%d:(%5.2f, %5.2f, %5.2f) v(%5.2f,%5.2f,%5.2f) Stat:%d\n", vertices[i].vertice_id, vertices[i].location.x,
              vertices[i].location.y, vertices[i].location.z,
              //velocity
              vertices[i].velocity.x, vertices[i].velocity.y,
-             vertices[i].velocity.z);
+             vertices[i].velocity.z, vertices[i].is_static_vertice);
       
     }
     printf("Struts:\n");

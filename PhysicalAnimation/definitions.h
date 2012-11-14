@@ -172,8 +172,8 @@ static char *ParamFilename = NULL;
 
 // flocking===========================================
 // define
-physical_objects::surface surfaceObj(
-                   64, 64, Vector3d(0.0, 0.0, 0.0), SUBDIVITION,
+physical_objects::surface surfaceObj(//64
+                   5, 5, Vector3d(0.0, 0.0, 0.0), SUBDIVITION,
                    0.9, //spring
                    0.2, //damper
                    0.3

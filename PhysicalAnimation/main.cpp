@@ -30,17 +30,19 @@
 
 //  Definitions and namespace
 
-#include"object.h"
-#include"definitions.h"
+#include "object.h"
+#include "definitions.h"
 #include "object_drawer.h"
 #include<stdlib.h>
 #include<time.h>
 using namespace std;
 
-#define WIDTH	    1024	/* window dimensions */
+#define WIDTH	    1024	/* Window dimensions */
 #define HEIGHT		768
 
 Camera *camera;
+physical_objects::ModelObject *obj;
+
 bool showGrid = true;
 int persp_win;
 
@@ -266,7 +268,7 @@ using physical_objects::t_max;
 void push(){
   /* initialize random seed: */
   srand ( time(NULL) );
-  int push_loc = rand() % (surfaceObj.vertices.size() - 10) + 1 ;
+  int push_loc = rand() % (surfaceObj.vertices.size() - 0) + 1 ;
   int force = (rand() % 10 + 1) * 150 + 150;
   
   surfaceObj.vertices[push_loc].external_force =
@@ -325,7 +327,17 @@ void RenderScene(){
 //  glTranslatef(0, 3.5, 0);
 //  Draw3DWorld();
 //  glutWireTeapot(5);
-  draw_surface(surfaceObj);
+//  draw_surface(surfaceObj);
+  
+  // activate and specify pointer to vertex array
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
+  
+  // draw first half, range is 6 - 0 + 1 = 7 vertices used
+  const GLvoid* indice_array = &obj->indices;
+  glDrawRangeElements(GL_QUADS, 0, obj->indices.size()-1, obj->indices.size(),
+                      GL_UNSIGNED_BYTE, indice_array);
+
   glutSwapBuffers();
   
 }

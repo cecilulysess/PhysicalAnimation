@@ -331,7 +331,7 @@ namespace physical_objects{
     Struts_Vertice(float mass_, Vector3d force_, Vector3d location_,
                    Vector3d velocity_) :
       mass(mass_), location(location_), velocity(velocity_), force(force_){
-      
+        this->is_static_vertice = false;
     }
     
     Struts_Vertice(const Struts_Vertice& vrt) {
@@ -339,6 +339,7 @@ namespace physical_objects{
       this->force = vrt.force;
       this->location = vrt.location;
       this->velocity = vrt.velocity;
+      this->is_static_vertice = false;
     }
     
     float mass;    Vector3d location;
@@ -348,6 +349,7 @@ namespace physical_objects{
     // accel just used for temporary storage purpose during calculation
     Vector3d accel;
     int vertice_id;
+    bool is_static_vertice; // mark if it is never moved
     
     std::vector<Strut*> connected_struts;
     
@@ -366,7 +368,7 @@ namespace physical_objects{
   
   
   //===================StateVector==================================
-#define SUBDIVITION 63
+#define SUBDIVITION 1
 #define N ((SUBDIVITION + 2) * (SUBDIVITION + 2))  //# of interacted particles
   typedef struct StateVector {
     Vector3d s[2 * N];
@@ -439,7 +441,22 @@ namespace physical_objects{
     StateVector X;
   };
   
-  
+  // a defined model
+  class ModelObject {
+  public:
+    std::vector<float> vertices;
+    std::vector<unsigned char> indices;
+    std::string objectName;
+    ModelObject(char const *obj_name){
+      objectName = std::string(obj_name);
+    }
+    
+    void print(){
+      std::cout<<"Object Name: "<<this->objectName<<", vertices number: " <<
+      this->vertices.size()<<std::endl;
+    }
+    
+  };
   }//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */

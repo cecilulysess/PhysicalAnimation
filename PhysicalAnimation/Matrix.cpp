@@ -12,7 +12,7 @@
  Copyright (C) - Donald H. House. 2005
  
  *********************************************************************/
-
+#include <iostream>
 using namespace std;
 
 #include "Matrix.h"
