@@ -303,6 +303,45 @@ Matrix4x4 Quaternion::rotation()
   return(rot);
 }
 
+//
+// construct and return a general rotation transformation matrix from the
+// normalized (unit length) quaternion
+//
+Matrix3x3 Quaternion::rotation3x3()
+{
+  Matrix3x3 rot;
+  /* in the following variable names, tx means 2x, and x2 means x^2 */
+  double tx,ty,tz,tx2,ty2,tz2,txy,txz,txw,tyz,tyw,tzw;
+  
+  /* construct the rotation matrix from the Quaternion, which
+   is assumed to already be of unit length */
+  tx = q.x + q.x;
+  ty = q.y + q.y;
+  tz = q.z + q.z;
+  tx2 = tx * q.x;
+  txy = tx * q.y;
+  txz = tx * q.z;
+  txw = tx * q.w;
+  ty2 = ty * q.y;
+  tyz = ty * q.z;
+  tyw = ty * q.w;
+  tz2 = tz * q.z;
+  tzw = tz * q.w;
+  
+  /* make matrix row by row from above subelements */
+  rot[0][0] = 1 - ty2 - tz2;
+  rot[0][1] = txy - tzw;
+  rot[0][2] = txz + tyw;
+  rot[1][0] = txy + tzw;
+  rot[1][1] = 1 - tx2 - tz2;
+  rot[1][2] = tyz - txw;
+  rot[2][0] = txz - tyw;
+  rot[2][1] = tyz + txw;
+  rot[2][2] = 1 - tx2 - ty2;
+  
+  return(rot);
+}
+
 double Quaternion::angle(){	// rotation angle, assuming rotation quaternion
   return 360 * acos(q.w) / PI;
 }

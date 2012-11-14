@@ -175,7 +175,7 @@
 //  glutMotionFunc(motionEventHandler);
 //
 //	// enter GLUT event processing cycle
-//	glutMainLoop();
+//	glutMainLoop();/Users/julian/Programming/cs619/PhysicalAnimation/PhysicalAnimation/definitions.h
 //	
 //	return 1;
 ////  if(argc != 2){

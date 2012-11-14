@@ -311,4 +311,107 @@ namespace physical_objects{
     make_array();
   }
   
+  
+  void RigidBody::State_to_Array(RigidBody *rb, double *y) {
+    *y++ = rb->x.x;
+    *y++ = rb->x.y;
+    *y++ = rb->x.z;
+    
+    *y++ = rb->q.q.x;
+    *y++ = rb->q.q.y;
+    *y++ = rb->q.q.z;
+    *y++ = rb->q.q.w;
+    
+    *y++ = rb->P.x;
+    *y++ = rb->P.y;
+    *y++ = rb->P.z;
+    
+    *y++ = rb->L.x;
+    *y++ = rb->L.y;
+    *y++ = rb->L.z;
+    
+  }
+  
+  void RigidBody::Array_to_State(RigidBody *rb, double *y) {
+    rb->x.x = *y++;
+    rb->x.y = *y++;
+    rb->x.z = *y++;
+    
+    //..rotation matrix
+    
+    rb->P.x = *y++;
+    rb->P.y = *y++;
+    rb->P.z = *y++;
+    
+    rb->L.x = *y++;
+    rb->L.y = *y++;
+    rb->L.z = *y++;
+    
+    rb->v = rb->P / rb->mass;
+    rb->R = rb->q.normalize().rotation3x3();
+    rb->Iinv = rb->R * rb->Ibody * rb->R.transpose();
+    
+    rb->omega = rb->Iinv * rb->L;
+  }
+
+  
+  Matrix3x3 Star(Vector3d a){
+    Matrix3x3 res(
+                  0, -a.z, a.y,
+                  a.z, 0, -a.x,
+                  -a.y, a.x, 0
+    );
+    
+    return res;
+  }
+  
+  static Vector3d gravity(0, -0.98, 0);
+  void Compute_Force_and_torque(double t, RigidBody *rb){
+    rb->force = gravity;
+    
+  }
+  
+  void dydt(double t, ModelObject* obj, double ydot[]) {
+    RigidBody::Array_to_State(&obj->rbody, obj->body_array);
+    for(int i = 0 ; i < NBODY; ++i) {
+      Compute_Force_and_torque(t, &obj->rbody);
+      ddt_State_to_Array(&obj->rbody, obj->body_array_dot);
+    }
+  }
+  
+  void ddt_State_to_Array(RigidBody *rb, double *ydot){
+    *ydot++ = rb->v.x;
+    *ydot++ = rb->v.y;
+    *ydot++ = rb->v.z;
+    
+    //    Matrix3x3 Rdot = Star(rb->omega) * rb->R;
+    //
+    //    for(int i = 0 ; i < 3; ++i ) {
+    //      *ydot++ = Rdot.row[i].x;
+    //      *ydot++ = Rdot.row[i].y;
+    //      *ydot++ = Rdot.row[i].z;
+    //
+    //    }
+    Quaternion qdot = .5 * (rb->omega * rb->q);
+    *ydot++ = qdot.q.x;
+    *ydot++ = qdot.q.y;
+    *ydot++ = qdot.q.z;
+    *ydot++ = qdot.q.w;
+    
+    // dP(t)/dt = F(t)
+    *ydot++ = rb->force.x;
+    *ydot++ = rb->force.y;
+    *ydot++ = rb->force.z;
+    // dL(t)/dt = t(t);
+    *ydot++ = rb->torque.x;
+    *ydot++ = rb->torque.y;
+    *ydot++ = rb->torque.z;
+  }
+  
+  void RunSimulation(){
+    double y0[STATE_SIZE * NBODY];
+    double yfinal[STATE_SIZE * NBODY];
+    
+//    init
+  }
 } //ns

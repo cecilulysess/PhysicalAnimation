@@ -14,6 +14,8 @@
 #include<stdio.h>
 #include<vector>
 #include"Vector.h"
+#include"Matrix.h"
+#include "Quaternion.h"
 #include<opengl/gl.h>
 
 //----------
@@ -442,14 +444,41 @@ namespace physical_objects{
     StateVector X;
   };
   
+  
+
+//  
+  typedef struct RigidBody {
+    double mass;
+    Matrix3x3 Ibody, Ibodyinv;
+    
+    Vector3d x;
+    Quaternion q;
+    Vector3d P, L;
+    
+    Matrix3x3 Iinv, R;
+    Vector3d v, omega;
+    
+    Vector3d force, torque;
+    
+    static void State_to_Array(RigidBody *rb, double *y) ;
+    
+    static void Array_to_State(RigidBody *rb, double *y) ;
+  }RigidBody;
+  
+#define STATE_SIZE 18
+#define NBODY 1
+  
   // a defined model
   class ModelObject {
   public:
+    
     std::vector<GLfloat> vertices;
     std::vector<GLubyte> indices;
     std::string objectName;
     ModelObject(char const *obj_name){
       objectName = std::string(obj_name);
+      body_array = (double *)malloc(sizeof(double) * STATE_SIZE);
+      body_array_dot = (double *)malloc(sizeof(double) * STATE_SIZE);
     }
     
     void make_array(){
@@ -480,8 +509,31 @@ namespace physical_objects{
   
     GLfloat *vertices_array;
     GLubyte *indice_array;
+//    
+    RigidBody rbody;
+    double *body_array, *body_array_dot;
+
+    void Array_to_Model(){
+      RigidBody::Array_to_State(&rbody, body_array);
+    }
+    
+    void Model_to_Array(){
+      RigidBody::State_to_Array(&rbody, body_array);
+    }
+    
     
   };
+  
+  Matrix3x3 Star(Vector3d a);
+  
+  void ddt_State_to_Array(RigidBody *rb, double *ydot);
+  
+  void Compute_Force_and_torque(double t, RigidBody *rb);
+  
+  void dydt(double t, ModelObject* obj, double ydot[]) ;
+  
+  void RunSimulation();
+  
   }//ns pobj
 
 #endif /* defined(__PhysicalAnimation__object__) */

@@ -65,6 +65,7 @@ public:
   void rotate(const Matrix4x4 &rot);
 
   Matrix4x4 rotation();		// return rotation matrix for quaternion
+  Matrix3x3 rotation3x3(); // return rotation matrix as 3x3 matrix for quaternion
 
   double angle();		// rotation angle, assuming rotation quaternion
   Vector3d axis();		// rotation axis, assuming rotation quaternion
