@@ -474,6 +474,9 @@ namespace physical_objects{
       }
     }
     
+    // rotate this object along vector(x,y,z) for degree
+    void rotate(float degree, float x, float y, float z) ;
+    
   
     GLfloat *vertices_array;
     GLubyte *indice_array;

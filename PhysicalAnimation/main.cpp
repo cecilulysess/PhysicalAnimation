@@ -42,7 +42,6 @@ using namespace std;
 #define HEIGHT		768
 
 Camera *camera;
-physical_objects::ModelObject *obj;
 
 bool showGrid = true;
 int persp_win;
@@ -237,25 +236,19 @@ void RenderScene(){
 //  glTranslatef(0, 3.5, 0);
 //  Draw3DWorld();
 //  glutWireTeapot(5);
-//  draw_surface(surfaceObj);
+  draw_surface(surfaceObj);
   
   glColor3f(0.0, 1.0, 1.0);
+  
+  physical_objects::ModelObject *obj;
+  for(int i = 0 ; i < ObjLoader::objects.size(); ++i ) {
+    obj = ObjLoader::objects[i];
+    // activate and specify pointer to vertex array
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
+    glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
 
-  // activate and specify pointer to vertex array
-  glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
-//  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
-//
-//  
-////  glDrawRangeElements(GL_QUADS, 0, 15, 16,
-////                      GL_UNSIGNED_BYTE, indices);
-  glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
-
-//  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
-//  
-//  glDrawRangeElements(GL_QUADS, 0, obj->indices.size()-1, obj->indices.size(),
-//                      GL_UNSIGNED_BYTE, indice_array);
-
+  }
   glutSwapBuffers();
   
 }
@@ -307,8 +300,9 @@ int main(int argc, char* argv[]){
 //  }
 //  LoadParameters(argv[1]);
 //  parafile = argv[1];
-  obj = ObjLoader::loadObject(argv[1]);
-  obj->print();
+  int obj_no = 0 ;
+  ObjLoader::loadObject(argv[1], obj_no);
+  ObjLoader::objects[0]->rotate(90, 0, 0, 1);
   init_the_world();
   printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit");
   

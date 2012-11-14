@@ -9,6 +9,7 @@
 #include "ObjLoader.h"
 
 #include <stdio.h>
+std::vector<physical_objects::ModelObject*> ObjLoader::objects;
 
 physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   FILE *file ;
@@ -19,66 +20,80 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_
   char objectname[255];
   float value1, value2, value3;
   int v1, vt1, v2, vt2, v3, vt3, v4, vt4;
-  physical_objects::ModelObject* obj1;
+  
+  physical_objects::ModelObject*  objpt;
   fscanf(file, "%s", identifier);
   int i = 0, off = -1;
+  bool have_vt = false;
   while( !feof(file) ){
-    printf("%d: ", i);
+//    printf("%d: ", i);
     i++;
     switch (identifier[0]) {
         case '#':
-        printf("#\n");
+//        printf("#\n");
         fgets(identifier, 100, file);
         break;
         
         case 'o':
         fscanf(file, "%s", objectname);
-        obj1 = new physical_objects::ModelObject(objectname);
+        objpt = new physical_objects::ModelObject(objectname);
+        objects.push_back(objpt);
         printf("\tRead Object:%s\n", objectname);
+        obj_no ++;
         fgets(identifier, 100, file);
+        have_vt = false;
         break;
         
         case 'v':
         if (identifier[1] == ' ') {
           fscanf(file, "%f %f %f", &value1, &value2, &value3 );
-          obj1->vertices.push_back(value1);
-          obj1->vertices.push_back(value2);
-          obj1->vertices.push_back(value3);
+          objpt->vertices.push_back(value1);
+          objpt->vertices.push_back(value2);
+          objpt->vertices.push_back(value3);
         } else {
-          printf("vt\n");
+//          printf("vt\n");
           // it is vt
         }
         fgets(identifier, 100, file);
         break;
         
         case 'u':
-        printf("u\n");
+//        printf("u\n");
         // texture image?
         fgets(identifier, 100, file);
         break;
         case 's':
-        printf("s\n");
+//        printf("s\n");
+        have_vt = true;
         fgets(identifier, 100, file);
         // skip s line
         break;
         case 'f':
         //load face indice
 //        printf("f\n");
-        fscanf(file, "%d/%d %d/%d %d/%d %d/%d",
+        if(have_vt) {
+          fscanf(file, "%d/%d %d/%d %d/%d %d/%d",
                &v1, &vt1, &v2, &vt2, &v3, &vt3, &v4, &vt4);
-      
-        obj1->indices.push_back(v1 + off);
-        obj1->indices.push_back(v2 + off);
-        obj1->indices.push_back(v3 + off);
-        obj1->indices.push_back(v4 + off);
+        } else {
+          
+        }
+        
+        objpt->indices.push_back(v1 + off);
+        objpt->indices.push_back(v2 + off);
+        objpt->indices.push_back(v3 + off);
+        objpt->indices.push_back(v4 + off);
         break;
         case 'm':
-        printf("m\n");
+//        printf("m\n");
         fgets(identifier, 100, file);
         break;
     }
     fgets(identifier, 3, file);
   }
-  obj1->make_array();
-  return obj1;
+  for(int i = 0 ; i < objects.size(); ++i ) {
+    objects[i]->make_array();
+    objects[i]->print();
+  }
+  
+  return objects[0];
 }

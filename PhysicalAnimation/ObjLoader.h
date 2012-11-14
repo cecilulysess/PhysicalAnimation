@@ -16,6 +16,7 @@
 
 class ObjLoader{
 public:
+  static std::vector<physical_objects::ModelObject*> objects;
   //read object into an array, if file have problem, return NULL
   // return obj numbers and its obj
   static physical_objects::ModelObject* loadObject(char const *path, int &obj_no);

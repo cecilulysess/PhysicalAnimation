@@ -10,6 +10,7 @@
 
 #include "object.h"
 //#include "definitions.h"
+#include "Quaternion.h"
 
 #include<utility>
 using namespace std;
@@ -297,5 +298,17 @@ namespace physical_objects{
     this->X.print("X");
   }
 
+  void ModelObject::rotate(float degree, float x, float y, float z) {
+    Quaternion qt(degree, x, y, z);
+    for (int i = 0 ; i < vertices.size(); i += 3) {
+      Vector3d v(vertices[i], vertices[i+1], vertices[i+2]);
+      Quaternion qout = qt * Quaternion(v) * qt.inv();
+      Vector3d vout = Vector3d(qout);
+      vertices[i] = vout.x;
+      vertices[i+1] = vout.y;
+      vertices[i+2] = vout.z;
+    }
+    make_array();
+  }
   
 } //ns

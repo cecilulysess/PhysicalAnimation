@@ -16,6 +16,7 @@
 #define _QUATERNION_H_
 
 #include "Matrix.h"
+#include <iostream>
 
 struct Quaternion{
 public:
@@ -88,7 +89,7 @@ public:
   friend Quaternion operator/(const Quaternion &q, double s); // q / scalar
   friend short operator==(const Quaternion &q1, const Quaternion &q2); // ==
   const Quaternion& operator=(const Quaternion& qright);  // assignment
-  friend ostream& operator<< (ostream& os, const Quaternion& q);   // output to stream
+  friend std::ostream& operator<< (std::ostream& os, const Quaternion& q);   // output to stream
 };
 
 #endif
