@@ -14,6 +14,7 @@
 #include<stdio.h>
 #include<vector>
 #include"Vector.h"
+#include<opengl/gl.h>
 
 //----------
 namespace physical_objects{
@@ -444,17 +445,38 @@ namespace physical_objects{
   // a defined model
   class ModelObject {
   public:
-    std::vector<float> vertices;
-    std::vector<unsigned char> indices;
+    std::vector<GLfloat> vertices;
+    std::vector<GLubyte> indices;
     std::string objectName;
     ModelObject(char const *obj_name){
       objectName = std::string(obj_name);
     }
     
-    void print(){
-      std::cout<<"Object Name: "<<this->objectName<<", vertices number: " <<
-      this->vertices.size()<<std::endl;
+    void make_array(){
+      this->vertices_array = (GLfloat*) malloc(sizeof(GLfloat) * vertices.size());
+      this->indice_array =  (GLubyte*) malloc(sizeof(GLubyte) * indices.size());
+      for (int i = 0; i < vertices.size(); ++i) {
+        vertices_array[i] = vertices[i];
+      }
+      for (int i = 0; i < indices.size(); ++i) {
+        indice_array[i] = indices[i];
+      }
     }
+    
+    void print(){
+      std::cout<<"Object Name: "<<this->objectName<<", vertices #: " <<
+      this->vertices.size()<<", indice #:"<<this->indices.size()<<std::endl;
+      for(int i = 0; i < vertices.size(); i+=3){
+        printf("v %f %f %f\n", vertices_array[i], vertices_array[i+1], vertices_array[i+2]);
+      }
+      for(int i = 0; i < indices.size(); i+=4){
+        printf("f %d %d %d %d\n", indice_array[i], indice_array[i+1], indice_array[i+2], indice_array[i+3]);
+      }
+    }
+    
+  
+    GLfloat *vertices_array;
+    GLubyte *indice_array;
     
   };
   }//ns pobj

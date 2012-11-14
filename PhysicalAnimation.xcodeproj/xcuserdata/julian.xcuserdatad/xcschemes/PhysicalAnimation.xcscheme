@@ -64,7 +64,15 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/flag.obj"
+            isEnabled = "NO">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/rigid.obj"
             isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/test.obj"
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>

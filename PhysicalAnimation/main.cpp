@@ -33,6 +33,7 @@
 #include "object.h"
 #include "definitions.h"
 #include "object_drawer.h"
+#include "ObjLoader.h"
 #include<stdlib.h>
 #include<time.h>
 using namespace std;
@@ -51,100 +52,7 @@ float get_rand(float low, float high) {
 
 }
 void push();
-////========================================================
-//void init_flock(){
-//  for( int i = 0 ; i < N; ++i ) {
-//    flockmass[i] = 1;
-//  }
-//  for( int i = 0 ; i < N; ++i ) {
-//    X0.s[i] = Vector3d(get_rand(4.0, 6.0),
-//                       get_rand(4.0, 6.0),
-//                       get_rand(4.0, 6.0) );
-//  }
-//  for( int i = N; i < 2 * N; ++i ) {
-//    X0.s[i] = Vector3d(get_rand(0.0, 1.3),
-//                       get_rand(0.0, 1.3),
-//                       get_rand(0.0, 0.3));
-//  }
-//}
-//
-//Vector3d f(Vector3d X, double t, double T, int i) {
-//  Vector3d dxdt;
-//  double ctx = obs2ctr.x, cty = obs2ctr.y, ctz = obs2ctr.z;
-//  Vector3d ctr(ctx, cty, ctz);
-//  Vector3d r(X.x - ctx, X.y - cty, X.z - ctz);//X - ctr;
-//  if (r.norm() > 25 * obs2rad ) {
-//    dxdt = - r;
-//  } else {
-//    if (r.norm() > 15 * obs2rad ) {
-//      dxdt = - 1.2 * flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm();
-////      dxdt = - r * ((rand() % 10) / 10.0 );
-//    } else {
-//      if ( r.norm() < 8 * obs2rad) {
-//        dxdt = 2 * r;
-//      } else 
-//        dxdt = - flockmass[i] * curr_X.s[i + N] * curr_X.s[i + N] * r / r.norm() ;
-//    }
-//  }
-//  for (int i = 0 ; i < N; ++i ) {
-//    if ( (X - curr_X.s[i]).norm() < 3 * RECTSIZE ) {
-//      Vector3d tmp (0.1, 0.1, 0.1);
-//      tmp = tmp + X - curr_X.s[i];
-//      tmp = (X - curr_X.s[i]) % tmp;
-//      dxdt = dxdt + tmp;
-//    }
-//  }
-//  return dxdt;
-//}
-//
-//StateVector F(StateVector X, double t) {
-//  StateVector Xp;
-//  for ( int i = 0 ; i < N ; ++i ) {
-//    Xp.s[i] = X.s[i + N];
-//  }
-//  for ( int i = 0;  i < N ; ++i ) {
-//    Xp.s[i + N] = 1 / flockmass[i] * f(X.s[i], t, dT, i);
-//  }
-//  return Xp;
-//}
-//
-//StateVector NumInt ( StateVector X, StateVector Xp, float t, float dt) {
-//  StateVector K1, K2, K3, K4;
-//  K1 = Xp * dt;
-//  
-//  K2 = F(X + K1 * (1.0 / 2.0), t + dt / 2.0) * dt;
-//  K3 = F(X + K2 * 0.5 , t + 0.5 * dt) * dt;
-//  K4 = F(X + K3, t + dt) * dt;
-//  return X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
-//}
-//
-//void mainloop(){
-//  StateVector Xp = F(curr_X, curr_t);
-//  StateVector Xnew = NumInt(curr_X, Xp, curr_t, dt);
-//  // collision
-//  curr_X = Xnew;
-//  curr_t = curr_t + dt;
-//}
-//
-//void draw_flock_point(Vector3d& loc, float rectsize) {
-//  glVertex3d(loc.x , loc.y, loc.z);
-//  glVertex3d(loc.x, loc.y + rectsize, loc.z);
-//  glVertex3d(loc.x + rectsize, loc.y + rectsize, loc.z);
-//  glVertex3d(loc.x + rectsize, loc.y, loc.z + rectsize);
-//}
-//
-//void draw_flocking_particles(StateVector X) {
-//  glBegin(GL_QUADS);
-//  for ( int i = 0 ; i < N ; ++i ) {
-//    glColor4f(0.33, 0.76, 1.0, 1.0);
-//    draw_flock_point(X.s[i], RECTSIZE * 4 );
-//  }
-////  draw_flock_point(curr_X.s[0], RECTSIZE);
-//  glEnd();
-//           
-//}
-//
-////========================================================
+
 
 // draws a simple grid
 void makeGrid() {
@@ -196,9 +104,10 @@ void makeGrid() {
 void init() {
   // set up camera
   // parameters are eye point, aim point, up vector
-  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
-                      Vector3d(0, 1, 0));
-  
+//  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
+//                      Vector3d(0, 1, 0));
+camera = new Camera(Vector3d(0, 5, 4), Vector3d(0, 0, 0),
+                                                Vector3d(0, 1, 0));
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0);
   glShadeModel(GL_SMOOTH);
@@ -260,6 +169,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
   
   glutPostRedisplay();
 }
+
 using physical_objects::curr_t;
 using physical_objects::curr_X;
 using physical_objects::dt;
@@ -295,7 +205,7 @@ void Simulate(){
   
 //  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
   
-  mainloop();
+//  mainloop();
   glutPostRedisplay();
 //  usleep(130000);
   usleep(30000);
@@ -309,7 +219,7 @@ void Simulate(){
 void RenderScene(){
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_BLEND);
+//  glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   camera->PerspectiveDisplay(WIDTH, HEIGHT);
   glMatrixMode(GL_MODELVIEW);
@@ -329,14 +239,22 @@ void RenderScene(){
 //  glutWireTeapot(5);
 //  draw_surface(surfaceObj);
   
+  glColor3f(0.0, 1.0, 1.0);
+
   // activate and specify pointer to vertex array
   glEnableClientState(GL_VERTEX_ARRAY);
-  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
-  
-  // draw first half, range is 6 - 0 + 1 = 7 vertices used
-  const GLvoid* indice_array = &obj->indices;
-  glDrawRangeElements(GL_QUADS, 0, obj->indices.size()-1, obj->indices.size(),
-                      GL_UNSIGNED_BYTE, indice_array);
+  glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
+//  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
+//
+//  
+////  glDrawRangeElements(GL_QUADS, 0, 15, 16,
+////                      GL_UNSIGNED_BYTE, indices);
+  glDrawElements(GL_QUADS, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
+
+//  glVertexPointer(3, GL_FLOAT, 0, &obj->vertices);
+//  
+//  glDrawRangeElements(GL_QUADS, 0, obj->indices.size()-1, obj->indices.size(),
+//                      GL_UNSIGNED_BYTE, indice_array);
 
   glutSwapBuffers();
   
@@ -347,7 +265,7 @@ void RenderScene(){
 void init_the_world() {
 //  init_flock();
 //  curr_X = X0;
-  
+
 }
 
 /*
@@ -389,7 +307,8 @@ int main(int argc, char* argv[]){
 //  }
 //  LoadParameters(argv[1]);
 //  parafile = argv[1];
-
+  obj = ObjLoader::loadObject(argv[1]);
+  obj->print();
   init_the_world();
   printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit");
   

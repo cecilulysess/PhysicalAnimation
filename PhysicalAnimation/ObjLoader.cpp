@@ -21,7 +21,7 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path){
   int v1, vt1, v2, vt2, v3, vt3, v4, vt4;
   physical_objects::ModelObject* obj1;
   fscanf(file, "%s", identifier);
-  int i = 0;
+  int i = 0, off = -1;
   while( !feof(file) ){
     printf("%d: ", i);
     i++;
@@ -66,10 +66,11 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path){
 //        printf("f\n");
         fscanf(file, "%d/%d %d/%d %d/%d %d/%d",
                &v1, &vt1, &v2, &vt2, &v3, &vt3, &v4, &vt4);
-        obj1->indices.push_back(v1);
-        obj1->indices.push_back(v2);
-        obj1->indices.push_back(v3);
-        obj1->indices.push_back(v4);
+      
+        obj1->indices.push_back(v1 + off);
+        obj1->indices.push_back(v2 + off);
+        obj1->indices.push_back(v3 + off);
+        obj1->indices.push_back(v4 + off);
         break;
         case 'm':
         printf("m\n");
@@ -78,5 +79,6 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path){
     }
     fgets(identifier, 3, file);
   }
+  obj1->make_array();
   return obj1;
 }
