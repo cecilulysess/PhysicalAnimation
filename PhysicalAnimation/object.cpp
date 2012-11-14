@@ -371,6 +371,37 @@ namespace physical_objects{
     
   }
   
+  // y*k
+  double* array_time(double *y, int len, float k){
+    for(int i = 0; i < len; ++i) {
+      y[i] *= k;
+    }
+    return y;
+  }
+  
+  // add b to a
+  double * array_sum(double *a, double *b, int len) {
+    for(int i = 0; i < len; ++i ) {
+      a[i] += b[i];
+    }
+    return a;
+  }
+  
+  void ode(double y0[], double yend[], int len, double t0,
+           double t1, dydt_func dydt,
+           ModelObject* obj) {
+    double* K1 = (double*)malloc(sizeof(double) * STATE_SIZE);
+    double* K2 = (double*)malloc(sizeof(double) * STATE_SIZE);
+    double* K3 = (double*)malloc(sizeof(double) * STATE_SIZE);
+//    double* K4 = (double*)malloc(sizeof(double) * STATE_SIZE);
+    
+    dydt(t1 - t0, obj, K1);
+    
+    dydt((t1 - t0)/2 + t0, obj,
+         array_sum(array_time(K1, STATE_SIZE, 0.5), y0, STATE_SIZE));
+    
+  }
+  
   void dydt(double t, ModelObject* obj, double ydot[]) {
     RigidBody::Array_to_State(&obj->rbody, obj->body_array);
     for(int i = 0 ; i < NBODY; ++i) {
@@ -408,10 +439,16 @@ namespace physical_objects{
     *ydot++ = rb->torque.z;
   }
   
-  void RunSimulation(){
-    double y0[STATE_SIZE * NBODY];
-    double yfinal[STATE_SIZE * NBODY];
+//  void InitState(ModelObject* obj, double *y0, double *yfinal) {
+//    
+//  }
+//  
+//  void RunSimulation(ModelObject* obj){
+//    double y0[STATE_SIZE * NBODY];
+//    double yfinal[STATE_SIZE * NBODY];
+//    
+  
     
 //    init
-  }
+//  }
 } //ns

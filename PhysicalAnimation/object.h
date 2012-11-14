@@ -445,7 +445,9 @@ namespace physical_objects{
   };
   
   
-
+#define STATE_SIZE 18
+#define NBODY 1
+  
 //  
   typedef struct RigidBody {
     double mass;
@@ -465,8 +467,7 @@ namespace physical_objects{
     static void Array_to_State(RigidBody *rb, double *y) ;
   }RigidBody;
   
-#define STATE_SIZE 18
-#define NBODY 1
+
   
   // a defined model
   class ModelObject {
@@ -523,6 +524,10 @@ namespace physical_objects{
     
     
   };
+  
+  typedef void (*dydt_func)(double t, ModelObject* obj, double ydot[]);
+  void ode(double y0[], double yend[], int len, double t0, double t1,
+           dydt_func dydt);
   
   Matrix3x3 Star(Vector3d a);
   

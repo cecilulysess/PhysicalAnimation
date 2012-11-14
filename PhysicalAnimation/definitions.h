@@ -179,5 +179,6 @@ physical_objects::surface surfaceObj(//64
                    0.3
                    );
 
-//physical_objects::RigidBody bodies[1];
+
+physical_objects::RigidBody bodies[NBODY];
 #endif

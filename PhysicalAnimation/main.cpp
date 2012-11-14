@@ -186,17 +186,32 @@ void push(){
 }
 void mainloop(){
 //  surfaceObj.print_surface();
-  physical_objects::StateVector Xp =
-    surfaceObj.calculate_dynamics(surfaceObj.X, curr_t);
-  physical_objects::StateVector Xnew = surfaceObj.NumInt(surfaceObj.X, Xp, curr_t, dt);
-  
-  surfaceObj.update_State(Xnew);
-  for(int i = 0; i < surfaceObj.vertices.size(); ++i ) {
-    surfaceObj.vertices[i].location =
-    //surfaceObj.vertices[i].location  + Vector3d(0,0.5,0);
-    surfaceObj.X.s[i];
+//  physical_objects::StateVector Xp =
+//    surfaceObj.calculate_dynamics(surfaceObj.X, curr_t);
+//  physical_objects::StateVector Xnew = surfaceObj.NumInt(surfaceObj.X, Xp, curr_t, dt);
+//  
+//  surfaceObj.update_State(Xnew);
+//  for(int i = 0; i < surfaceObj.vertices.size(); ++i ) {
+//    surfaceObj.vertices[i].location =
+//    //surfaceObj.vertices[i].location  + Vector3d(0,0.5,0);
+//    surfaceObj.X.s[i];
+//  }
+//  curr_t = curr_t + dt;
+//=======================
+//  double y0 = 
+}
+
+double bd_y0[STATE_SIZE * NBODY], bd_yfinal[STATE_SIZE * NBODY];
+
+void init_rigid_body() {
+  curr_t = 0.0f;
+  dt = 0.1f;
+}
+void RigidMainLoop(){
+  for(int i = 0; i < STATE_SIZE * NBODY; ++i) {
+    bd_y0[i] = bd_yfinal[i];
   }
-  curr_t = curr_t + dt;
+  ode(y0, yfinal, STATE_SIZE *NBODY, curr_t, dt, physical_objects::dydt);  
 }
 
 //// simulation function that called in glIdle loop
@@ -205,6 +220,7 @@ void Simulate(){
 //  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
   
 //  mainloop();
+  RigidMainLoop();
   glutPostRedisplay();
 //  usleep(130000);
   usleep(30000);
@@ -236,7 +252,7 @@ void RenderScene(){
 //  glTranslatef(0, 3.5, 0);
 //  Draw3DWorld();
 //  glutWireTeapot(5);
-  draw_surface(surfaceObj);
+//  draw_surface(surfaceObj);
   
   glColor3f(0.0, 1.0, 1.0);
   
@@ -258,7 +274,7 @@ void RenderScene(){
 void init_the_world() {
 //  init_flock();
 //  curr_X = X0;
-
+  init_rigid_body();
 }
 
 /*
