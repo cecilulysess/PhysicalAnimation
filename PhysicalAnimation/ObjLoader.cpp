@@ -7,11 +7,11 @@
 //
 
 #include "ObjLoader.h"
-
+#include "Quaternion.h"
 #include <stdio.h>
-std::vector<physical_objects::ModelObject*> ObjLoader::objects;
+std::vector<ModelObject*> ObjLoader::objects;
 
-physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
+ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   FILE *file ;
   if(!(file= fopen(path, "r"))){
     return NULL;
@@ -21,7 +21,7 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_
   float value1, value2, value3;
   int v1, vt1, v2, vt2, v3, vt3, v4, vt4;
   
-  physical_objects::ModelObject*  objpt;
+  ModelObject*  objpt;
   fscanf(file, "%s", identifier);
   int i = 0, off = -1;
   bool have_vt = false;
@@ -36,7 +36,7 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_
         
         case 'o':
         fscanf(file, "%s", objectname);
-        objpt = new physical_objects::ModelObject(objectname);
+        objpt = new ModelObject(objectname);
         objects.push_back(objpt);
         printf("\tRead Object:%s\n", objectname);
         obj_no ++;
@@ -96,4 +96,17 @@ physical_objects::ModelObject* ObjLoader::loadObject(char const *path, int &obj_
   }
   
   return objects[0];
+}
+
+void ModelObject::rotate(float degree, float x, float y, float z) {
+  Quaternion qt(degree, x, y, z);
+  for (int i = 0 ; i < vertices.size(); i += 3) {
+    Vector3d v(vertices[i], vertices[i+1], vertices[i+2]);
+    Quaternion qout = qt * Quaternion(v) * qt.inv();
+    Vector3d vout = Vector3d(qout);
+    vertices[i] = vout.x;
+    vertices[i+1] = vout.y;
+    vertices[i+2] = vout.z;
+  }
+  make_array();
 }

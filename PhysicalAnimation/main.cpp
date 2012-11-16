@@ -196,7 +196,7 @@ void RenderScene(){
   
   glColor3f(0.0, 1.0, 1.0);
   
-  ObjLoader::ModelObject *obj;
+  ModelObject *obj;
   for(int i = 0 ; i < ObjLoader::objects.size(); ++i ) {
     obj = ObjLoader::ObjLoader::objects[i];
     // activate and specify pointer to vertex array
@@ -214,7 +214,7 @@ void RenderScene(){
 void init_the_world() {
 //  init_flock();
 //  curr_X = X0;
-  init_rigid_body();
+//  init_rigid_body();
 }
 
 /*
@@ -229,7 +229,7 @@ void LoadParameters(char *filename){
     exit(1);
   }
   
-  ParamFilename = filename;
+//  ParamFilename = filename;
   double Mass, v0x, v0y, v0z, drag, elastic, time_step, vwx, vwy, vwz, disp_time;
   if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
             &Mass, &v0x, &v0y, &v0z, &drag, &elastic,
@@ -270,9 +270,9 @@ int main(int argc, char* argv[]){
   // Julian: Add GLUT_DEPTH when in 3D program so that 3D objects drawed
   // correctly regardless the order they draw
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+  glutInitWindowSize(WIDTH, HEIGHT);
 //  glutInitWindowPosition(50, 50);
-  persp_win = glutCreateWindow(window_title);
+  glutCreateWindow("Strange Rigid Body");
   
   // initialize the camera and such
   init();
