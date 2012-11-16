@@ -526,9 +526,9 @@ namespace physical_objects{
   };
   
   typedef void (*dydt_func)(double t, ModelObject* obj, double ydot[]);
-  void ode(double y0[], double yend[], int len, double t0, double t1,
-           dydt_func dydt);
-  
+  void ode(double y0[], double yend[], int len, double t0,
+            double t1, dydt_func dydt,
+           ModelObject* obj);
   Matrix3x3 Star(Vector3d a);
   
   void ddt_State_to_Array(RigidBody *rb, double *ydot);

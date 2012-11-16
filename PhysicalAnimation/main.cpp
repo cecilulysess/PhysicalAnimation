@@ -207,11 +207,17 @@ void init_rigid_body() {
   curr_t = 0.0f;
   dt = 0.1f;
 }
+
+
 void RigidMainLoop(){
   for(int i = 0; i < STATE_SIZE * NBODY; ++i) {
     bd_y0[i] = bd_yfinal[i];
   }
-  ode(y0, yfinal, STATE_SIZE *NBODY, curr_t, dt, physical_objects::dydt);  
+  
+  physical_objects::ode(bd_y0,
+                        bd_yfinal,
+                        STATE_SIZE * NBODY,
+                        curr_t, dt, physical_objects::dydt, ObjLoader::objects[0]);
 }
 
 //// simulation function that called in glIdle loop
@@ -232,13 +238,14 @@ void Simulate(){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
-  
+  glEnable(GL_LIGHTING);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //  glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   camera->PerspectiveDisplay(WIDTH, HEIGHT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+  
   if (showGrid)
     makeGrid();
   
@@ -262,7 +269,7 @@ void RenderScene(){
     // activate and specify pointer to vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
-    glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
+    glDrawElements(GL_QUADS, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
 
   }
   glutSwapBuffers();
@@ -305,7 +312,10 @@ void Reset(){
   LoadParameters(parafile);
 }
 
-
+void init_lighting(){
+  glEnable(GL_LIGHT0);
+  glEnable(GL_LIGHT5);
+}
 /*
  Main program to draw the square, change colors, and wait for quit
  */
@@ -331,13 +341,14 @@ int main(int argc, char* argv[]){
   // correctly regardless the order they draw
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+  
 //  glutInitWindowPosition(50, 50);
   persp_win = glutCreateWindow(window_title);
   
   // initialize the camera and such
   init();
   
-  
+  init_lighting();
   // set up the callback routines to be called when glutMainLoop() detects
   // an event
 //  glutReshapeFunc(doReshape);

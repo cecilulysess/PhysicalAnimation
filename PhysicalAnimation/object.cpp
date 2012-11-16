@@ -372,33 +372,65 @@ namespace physical_objects{
   }
   
   // y*k
-  double* array_time(double *y, int len, float k){
+  double* array_time(double *y, int len, float k, double *result){
+    
     for(int i = 0; i < len; ++i) {
-      y[i] *= k;
+      result[i] = y[i] * k;
     }
-    return y;
+    return result;
   }
   
   // add b to a
-  double * array_sum(double *a, double *b, int len) {
+  double * array_sum(double *a, double *b, int len, double *result) {
     for(int i = 0; i < len; ++i ) {
-      a[i] += b[i];
+      result[i] = a[i] + b[i];
     }
-    return a;
+    return result;
+  }
+  
+  void copy_state(ModelObject* obj, double *res, int len){
+    RigidBody::Array_to_State(&obj->rbody, res);
   }
   
   void ode(double y0[], double yend[], int len, double t0,
            double t1, dydt_func dydt,
            ModelObject* obj) {
+    double* X = (double*)malloc(sizeof(double) * STATE_SIZE);
     double* K1 = (double*)malloc(sizeof(double) * STATE_SIZE);
     double* K2 = (double*)malloc(sizeof(double) * STATE_SIZE);
     double* K3 = (double*)malloc(sizeof(double) * STATE_SIZE);
-//    double* K4 = (double*)malloc(sizeof(double) * STATE_SIZE);
+    double* K4 = (double*)malloc(sizeof(double) * STATE_SIZE);
+    double* tmp = (double*)malloc(sizeof(double) * STATE_SIZE);
+    copy_state(obj, X, STATE_SIZE);
     
+    //Get K1
     dydt(t1 - t0, obj, K1);
     
-    dydt((t1 - t0)/2 + t0, obj,
-         array_sum(array_time(K1, STATE_SIZE, 0.5), y0, STATE_SIZE));
+    //Get K2
+    array_time(K1, STATE_SIZE, 0.5, tmp);
+    array_sum(tmp, X, STATE_SIZE, tmp);
+    dydt( (t1-t0) * 0.5 + t0, obj, K2);
+    array_time(K2, STATE_SIZE, (t1-t0), K2);
+    
+    //Get K3
+    array_time(K2, STATE_SIZE, 0.5, tmp);
+    array_sum(tmp, X, STATE_SIZE, tmp);
+    dydt( (t1-t0) * 0.5 + t0, obj, K3);
+    array_time(K3, STATE_SIZE, (t1-t0), K3);
+    
+    // get K4
+    array_sum(K3, X, STATE_SIZE, tmp);
+    dydt( t1, obj, K4 );
+    array_time(K4, STATE_SIZE, (t1-t0),K4);
+    
+    array_time(K2, STATE_SIZE, 2, K2);
+    array_time(K3, STATE_SIZE, 3, K3);
+    array_sum(K1, K2, STATE_SIZE, tmp);
+    array_sum(tmp, K3, STATE_SIZE, tmp);
+    array_sum(tmp, K4, STATE_SIZE, tmp);
+    array_time(tmp, STATE_SIZE, 1.0/6, tmp);
+    array_sum(X, tmp, STATE_SIZE, yend);
+    
     
   }
   
@@ -409,7 +441,7 @@ namespace physical_objects{
       ddt_State_to_Array(&obj->rbody, obj->body_array_dot);
     }
   }
-  
+    
   void ddt_State_to_Array(RigidBody *rb, double *ydot){
     *ydot++ = rb->v.x;
     *ydot++ = rb->v.y;
