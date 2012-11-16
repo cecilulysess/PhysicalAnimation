@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include "Matrix.h"
 std::vector<ModelObject*> ObjLoader::objects;
+#define KMASS 0.1
 
 ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   FILE *file ;
@@ -94,9 +95,21 @@ ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   for(int i = 0 ; i < objects.size(); ++i ) {
     objects[i]->make_array();
     objects[i]->print();
+    objects[i]->finished_loading();
   }
   
+  
+  
   return objects[0];
+}
+
+void ModelObject::finished_loading(){
+  RigidBody& rb = this->rigid_body;
+  rb.mass = KMASS;
+  rb.x = this->center();
+  rb.q = Quaternion();
+  rb.P = Vector3d(0,0,0);
+  rb.L = Vector3d(0,0,0);
 }
 
 //======================Model Object=============================
@@ -158,7 +171,7 @@ Vector3d ModelObject::center() {
 }
 
 //=======================ODE============================
-typedef void (*dydt_func) (double t, StateVector& y, StateVector& ydot);
+
 //receive an initial state vector y0, ode calculate the value using dydt
 // function to get dy(t)/dt
 void ODE(StateVector& y0, StateVector yend,
@@ -170,9 +183,18 @@ void ODE(StateVector& y0, StateVector yend,
 void MotionController::next_step() {
   //    Vector3d rot_axis = object->center() + Vector3d(1.0, 1.0, 1.0);
   //    object->rotate(3, rot_axis);
-  for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
-    object->vertices[i] -= 0.05;
-  }
+  
+//  for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
+//    object->vertices[i] -= 0.05;
+//  }
+  
+  StateVector& y0 = StateVector::RigidBody_State_to_Array(*object);
+  // create a tmp statevector to receive the result
+  StateVector yend = StateVector(y0);
+  // calculate the result by ode
+  ODE(y0, yend, current_time, current_time + dt, &MotionController::dydt);
+  // re assign the state vector back to the original object
+  StateVector::RigidBody_Array_to_state(*object, yend);
   object->make_array();
 }
 
@@ -213,12 +235,16 @@ void MotionController::ddt_State_to_Array(StateVector& ydot){
 
 
 //===================StateVector=======================
-StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj, int size){
-  StateVector *res = new StateVector(18);
+
+
+StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj){
+  StateVector *ss = new StateVector(18);
+  StateVector& res = *ss;
   int idx = 0;
-  res[idx++] = obj.rigid_body.x[0];
-  res[idx++] = obj.rigid_body.x[1];
-  res[idx++] = obj.rigid_body.x[2];
+  res[idx] = 1.0;
+  res[idx++] = obj.rigid_body.x.x;
+  res[idx++] = obj.rigid_body.x.y;
+  res[idx++] = obj.rigid_body.x.z;
   
 //  using rotation matrix
 //  for (int i = 0; i < 3; i++) {
@@ -241,7 +267,7 @@ StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj, int size){
   res[idx++] = obj.rigid_body.L[1];
   res[idx++] = obj.rigid_body.L[2];
   
-  return *res;
+  return res;
 }
 
 void StateVector::RigidBody_Array_to_state(ModelObject &obj, const StateVector &vector){

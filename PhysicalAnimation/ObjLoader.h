@@ -65,6 +65,7 @@ public:
   GLubyte *indice_array;
   RigidBody rigid_body;
   
+  void finished_loading();
 private:
   //geometric center of this object
   Vector3d center_;
@@ -73,12 +74,12 @@ private:
 
 class StateVector : public Vector{
 public:
-  StateVector(int Size, double *data = NULL) : Vector(Size, data) {}
+  explicit StateVector(int Size, double *data = NULL) : Vector(Size, data) {}
   
   int size() { return this->getn(); }
-  
+    
   // get the state vector from an object
-  static StateVector& RigidBody_State_to_Array(ModelObject& obj, int size);
+  static StateVector& RigidBody_State_to_Array(ModelObject& obj);
   static void RigidBody_Array_to_state(ModelObject& obj, const StateVector& vector);
   inline static double sqr(double a) {
     return a*a;
@@ -87,17 +88,17 @@ public:
   inline static Matrix3x3& quaternion_to_matrix(Quaternion q) {
     Matrix3x3 *res = new Matrix3x3(
                                    // row 1
-                                   1 - 2 * sqr(q.q.z) - 2 * sqr(q.q.w),
-                                   2 * q.q.y * q.q.z - 2 * q.q.x * q.q.w,
-                                   2 * q.q.y * q.q.z + 2 * q.q.x * q.q.z,
+                                   1 - 2 * sqr(q.q.y) - 2 * sqr(q.q.z),
+                                   2 * q.q.x * q.q.y - 2 * q.q.w * q.q.z,
+                                   2 * q.q.x * q.q.z + 2 * q.q.w * q.q.y,
                                    // row 2
-                                   2 * q.q.y * q.q.z + 2 * q.q.x * q.q.w,
-                                   1 - 2 * sqr(q.q.y) - 2 * sqr(q.q.w),
-                                   2 * q.q.z * q.q.w - 2 * q.q.x * q.q.y,
+                                   2 * q.q.x * q.q.y + 2 * q.q.w * q.q.z,
+                                   1 - 2 * sqr(q.q.x) - 2 * sqr(q.q.z),
+                                   2 * q.q.y * q.q.z - 2 * q.q.w * q.q.x,
                                    // row 3
-                                   2 * q.q.y * q.q.w - 2 * q.q.z,
-                                   2 * q.q.z * q.q.w + 2 * q.q.x * q.q.y,
-                                   1 - 2 * sqr(q.q.y) - 2 * sqr(q.q.z)
+                                   2 * q.q.x * q.q.z - 2 * q.q.y,
+                                   2 * q.q.y * q.q.z + 2 * q.q.w * q.q.x,
+                                   1 - 2 * sqr(q.q.x) - 2 * sqr(q.q.y)
                                    );
     return *res;
   }
@@ -140,7 +141,8 @@ private:
   
 };
 
-typedef void (*dydt_func) (double t, StateVector& y, StateVector& ydot);
+typedef void (MotionController::*dydt_func) (double t,
+                StateVector& y, StateVector& ydot);
 //receive an initial state vector y0, ode calculate the value using dydt
 // function to get dy(t)/dt
 void ODE(StateVector& y0, StateVector yend,

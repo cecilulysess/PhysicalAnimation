@@ -215,6 +215,7 @@ void init_rigid_object_world(char argc, char **argv){
   }
   ObjLoader::objects[0]->rotate(90, 0, 0, 1);
   rigid_objects = ObjLoader::objects[0];
+  
   controller = new MotionController(rigid_objects, 0.0, 0.05);
 }
 
