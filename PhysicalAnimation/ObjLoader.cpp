@@ -143,3 +143,42 @@ void ModelObject::make_array(){
     indice_array[i] = indices[i];
   }
 }
+
+Vector3d ModelObject::center() {
+  float x = 0.0f, y = 0.0f, z = 0.0f;
+  long cnt = vertices.size();
+  for (int i = 0 ; i < vertices.size(); i+=3) {
+    x += vertices[i];
+    y += vertices[i+1];
+    z += vertices[i+2];
+  }
+  this->center_ = Vector3d(x/cnt, y/cnt, z/cnt);
+  return center_;
+}
+
+
+//===================StateVector=======================
+StateVector::StateVector(int size){
+  this->size_ = size;
+  this->vector_ = new double[size];
+}
+
+void StateVector::init(int size, double const *data) {
+  this->size_ = size;
+  this->vector_ = new double[size];
+  for (int i = 0; i < size; ++i){
+    this->vector_[i] = data[i];
+  }
+}
+StateVector::StateVector(int size, double const *data) {
+  this->init(size, data);
+}
+
+
+StateVector::StateVector( StateVector& a) {
+  this->init(a.size(), a.vector());
+}
+
+StateVector::~StateVector(){
+  delete[] this->vector_;
+}

@@ -20,7 +20,7 @@
 #include "Quaternion.h"
 #include "Vector.h"
 
-typedef struct RigidBody{
+typedef struct RigidBody {
   double mass;
   Vector3d Ibody, Ibodyinv;
   
@@ -35,12 +35,7 @@ typedef struct RigidBody{
   Vector3d force, torque;
 }RigidBody;
 
-typedef struct MotionController{
-  double current_time;
-  double dt;
-  
-//  void simulate
-} MotionController;
+
 
 // a defined model
 class ModelObject {
@@ -58,17 +53,7 @@ public:
   void rotate(float degree, float x, float y, float z) ;
   void rotate(float degree, Vector3d axis);
   
-  Vector3d center() {
-    float x = 0.0f, y = 0.0f, z = 0.0f;
-    long cnt = vertices.size();
-    for (int i = 0 ; i < vertices.size(); i+=3) {
-      x += vertices[i];
-      y += vertices[i+1];
-      z += vertices[i+2];
-    }
-    this->center_ = Vector3d(x/cnt, y/cnt, z/cnt);
-    return center_;
-  }
+  Vector3d center();
   
   std::vector<GLfloat> vertices;
   std::vector<GLubyte> indices;
@@ -85,6 +70,49 @@ private:
   Vector3d center_;
 };
 
+
+class StateVector {
+public:  
+  StateVector(int size, double const *data);
+  explicit StateVector(int size);
+  StateVector(StateVector& a);
+  ~StateVector();
+  
+  int size() const {return this->size_;}
+  double const *vector() {return this->vector_;}
+  
+  
+  
+  static StateVector& RigidBody_State_to_Array(ModelObject& obj, int size);
+  
+  
+private:
+  void init(int size, double const *data);
+  int size_;
+  double *vector_;
+};
+
+typedef struct MotionController{
+  double current_time;
+  double dt;
+  ModelObject *object;
+  MotionController(ModelObject* object_, double begin_time, double timestep) {
+    current_time = begin_time;
+    dt = timestep;
+    object = object_;
+  }
+
+  void next_step(){
+    Vector3d rot_axis = object->center() + Vector3d(1.0, 1.0, 1.0);
+//    object->rotate(3, rot_axis);
+    for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
+      object->vertices[i] -= 0.05;
+    }
+    object->make_array();
+  }
+
+  
+} MotionController;
 
 class ObjLoader{
 public:

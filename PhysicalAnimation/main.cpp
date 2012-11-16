@@ -40,6 +40,7 @@ using namespace std;
 Camera *camera;
 //===================game objects definition=====================
 ModelObject *rigid_objects;
+MotionController *controller;
 //===============================================================
 
 bool showGrid = true;
@@ -163,6 +164,7 @@ void rigid_object_simulation(){
   //  rigid_objects->rotate(get_rand(0, 10), get_rand(-2.0, 2.0),
   //                        get_rand(-2.0, 2.0),
   //                        get_rand(-2.0, 2.0));
+  controller->next_step();
 }
 
 //// simulation function that called in glIdle loop
@@ -213,11 +215,13 @@ void init_rigid_object_world(char argc, char **argv){
   }
   ObjLoader::objects[0]->rotate(90, 0, 0, 1);
   rigid_objects = ObjLoader::objects[0];
+  controller = new MotionController(rigid_objects, 0.0, 0.05);
 }
 
 // set up something in the world
 void init_the_world(char argc, char **argv) {
   init_rigid_object_world(argc, argv);
+  
 }
 
 /*
