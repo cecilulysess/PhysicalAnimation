@@ -174,32 +174,38 @@ Vector3d ModelObject::center() {
 
 //receive an initial state vector y0, ode calculate the value using dydt
 // function to get dy(t)/dt
-void ODE(StateVector& y0, StateVector yend,
-         double t0, double t1, dydt_func dydt){
+void ODE(StateVector& y0, StateVector& yend,
+         double t0, double dt, MotionController& controller, dydt_func dydt){
+  StateVector K1(y0), K2(y0), K3(y0), K4(y0);
+  
+  (controller.*dydt)(t0, y0, K1);
+  StateVector tmp = K1 * dt;
+  K1 = tmp;
+//  K2 = calculate_dynamics(X + K1 * 0.5, t + 0.5 * dt) * dt;
+//  K3 = calculate_dynamics(X + K2 * 0.5, t + 0.5 * dt) * dt;
+//  K4 = calculate_dynamics(X + K3, t + dt) * dt;
+  yend = y0 + K1;//res = X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
   
 }
 
 //===================MotionController==================
 void MotionController::next_step() {
-  //    Vector3d rot_axis = object->center() + Vector3d(1.0, 1.0, 1.0);
-  //    object->rotate(3, rot_axis);
-  
-//  for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
-//    object->vertices[i] -= 0.05;
-//  }
   
   StateVector& y0 = StateVector::RigidBody_State_to_Array(*object);
+  
   // create a tmp statevector to receive the result
   StateVector yend = StateVector(y0);
+  
   // calculate the result by ode
-  ODE(y0, yend, current_time, current_time + dt, &MotionController::dydt);
+  ODE(y0, yend, current_time, current_time + dt, *this, &MotionController::dydt);
+  
   // re assign the state vector back to the original object
   StateVector::RigidBody_Array_to_state(*object, yend);
   object->make_array();
 }
 
 void MotionController::compute_force_and_torque(double t) {
-  
+  object->rigid_body.force = Vector3d(1,1,1);
 }
 
 void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
@@ -207,6 +213,7 @@ void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
   compute_force_and_torque(t);
   ddt_State_to_Array(ydot);
 }
+
 void MotionController::ddt_State_to_Array(StateVector& ydot){
   int idx = 0;
   RigidBody& rb = this->object->rigid_body;
@@ -235,7 +242,9 @@ void MotionController::ddt_State_to_Array(StateVector& ydot){
 
 
 //===================StateVector=======================
-
+StateVector::StateVector(const Vector& v) : Vector(v){
+  
+}
 
 StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj){
   StateVector *ss = new StateVector(18);
@@ -293,4 +302,8 @@ void StateVector::RigidBody_Array_to_state(ModelObject &obj, const StateVector &
   
   rb.omega = rb.Iinv * rb.L;
   
+}
+
+StateVector operator*(double s, const StateVector& v){
+  return StateVector(static_cast<const Vector&>(v) * s);
 }

@@ -75,9 +75,15 @@ private:
 class StateVector : public Vector{
 public:
   explicit StateVector(int Size, double *data = NULL) : Vector(Size, data) {}
+  StateVector(const Vector& v);
   
   int size() { return this->getn(); }
-    
+  
+  const StateVector& operator=(const StateVector& v2) {
+    return (StateVector&) Vector::operator=(v2);
+  }
+  friend StateVector operator*(double s, const StateVector& v);
+  
   // get the state vector from an object
   static StateVector& RigidBody_State_to_Array(ModelObject& obj);
   static void RigidBody_Array_to_state(ModelObject& obj, const StateVector& vector);
@@ -145,8 +151,8 @@ typedef void (MotionController::*dydt_func) (double t,
                 StateVector& y, StateVector& ydot);
 //receive an initial state vector y0, ode calculate the value using dydt
 // function to get dy(t)/dt
-void ODE(StateVector& y0, StateVector yend,
-         double t0, double t1, dydt_func dydt);
+void ODE(StateVector& y0, StateVector& yend,
+         double t0, double dt, MotionController& controller, dydt_func dydt);
 
 
 class ObjLoader{
