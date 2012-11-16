@@ -191,6 +191,7 @@ void RenderScene(){
   glColor3f(0.0, 1.0, 1.0);
   
   ModelObject *obj;
+  glTranslatef(0, 10.0, 0);
   for(int i = 0 ; i < ObjLoader::objects.size(); ++i ) {
     obj = ObjLoader::ObjLoader::objects[i];
     // activate and specify pointer to vertex array
@@ -217,7 +218,11 @@ void init_rigid_object_world(char argc, char **argv){
   rigid_objects = ObjLoader::objects[0];
   
   controller = new MotionController(rigid_objects, 0.0, 0.1);
-  rigid_objects->rigid_body.omega = Vector3d(0.0, 0.1, 0.0);
+//  rigid_objects->rigid_body.omega = Vector3d(0.0, 0.0, 0.0);
+  
+  rigid_objects->rigid_body.Ibody = Matrix3x3(1.0, 0.0, 0.0,
+                                              0.0, 1.0, 0.0,
+                                              0.0, 0.0, 1.0);
 }
 
 // set up something in the world

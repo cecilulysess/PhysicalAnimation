@@ -174,7 +174,7 @@ void ModelObject::update_object() {
   Vector3d newC = this->rigid_body.x, tran = newC - this->center_;
   this->center_ = newC;
   Vector3d omega = this->rigid_body.omega;
-  Quaternion q(omega.norm(), omega.x, omega.y, omega.z);
+  Quaternion q = this->rigid_body.q;//(omega.norm(), omega.x, omega.y, omega.z);
   printf("\tOmega: %f %f, %f\n", omega.x, omega.y, omega.z);
   for (int i = 0; i < vertices.size(); i+=3) {
     Vector3d v(vertices[i], vertices[i+1], vertices[i+2]);
@@ -235,8 +235,21 @@ void MotionController::next_step() {
 }
 
 void MotionController::compute_force_and_torque(double t) {
-//  object->rigid_body.force = Vector3d(0.0f, -0.098f, 0.0f);
-  object->rigid_body.torque = Vector3d(0.0f, 0.01, 0.00f);
+  object->rigid_body.force = Vector3d(0.0f, -0.98f, 0.0f);
+  double min = 100000.0;
+  int idx = 0;
+  //find minimium y
+  for (int i = 1; i < object->vertices.size();  i+=3 ) {
+    if (object->vertices[i] < min) {
+      min = object->vertices[i];
+      idx = i/3;
+    }
+  }
+  Vector3d norm(0, 1.0f, 0);
+  Vector3d P(object->vertices[i*3],
+             object->vertices[i*3+1],
+             object->vertices[i*3+2]);
+  
 }
 
 void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
@@ -333,6 +346,7 @@ void StateVector::RigidBody_Array_to_state(ModelObject &obj, const StateVector &
   
   rb.v = obj.rigid_body.P / rb.mass;
   rb.R = StateVector::quaternion_to_matrix(rb.q.normalize());
+  rb.Ibodyinv = rb.Ibody.inv();
   rb.Iinv = (rb.R * rb.Ibodyinv) * rb.R.transpose();
   
   rb.omega = rb.Iinv * rb.L;
