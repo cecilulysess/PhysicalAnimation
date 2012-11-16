@@ -9,6 +9,7 @@
 #include "ObjLoader.h"
 #include "Quaternion.h"
 #include <stdio.h>
+#include "Matrix.h"
 std::vector<ModelObject*> ObjLoader::objects;
 
 ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
@@ -156,29 +157,114 @@ Vector3d ModelObject::center() {
   return center_;
 }
 
+//=======================ODE============================
+typedef void (*dydt_func) (double t, StateVector& y, StateVector& ydot);
+//receive an initial state vector y0, ode calculate the value using dydt
+// function to get dy(t)/dt
+void ODE(StateVector& y0, StateVector yend,
+         double t0, double t1, dydt_func dydt){
+  
+}
+
+//===================MotionController==================
+void MotionController::next_step() {
+  //    Vector3d rot_axis = object->center() + Vector3d(1.0, 1.0, 1.0);
+  //    object->rotate(3, rot_axis);
+  for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
+    object->vertices[i] -= 0.05;
+  }
+  object->make_array();
+}
+
+void MotionController::compute_force_and_torque(double t) {
+  
+}
+
+void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
+  //for each rigid body
+  compute_force_and_torque(t);
+  ddt_State_to_Array(ydot);
+}
+void MotionController::ddt_State_to_Array(StateVector& ydot){
+  int idx = 0;
+  RigidBody& rb = this->object->rigid_body;
+  ydot[idx++] = rb.v[0];
+  ydot[idx++] = rb.v[1];
+  ydot[idx++] = rb.v[2];
+  
+  Quaternion qdot = 0.5 * (rb.omega * rb.q);
+  ydot[idx++] = qdot.q.x;
+  ydot[idx++] = qdot.q.y;
+  ydot[idx++] = qdot.q.z;
+  ydot[idx++] = qdot.q.w;
+  //assuming that the multiplication between rb.omega and rb.q defined to
+  //return the quateronion product [0, rb->omega] * q
+//----------------may cause problem--------------------------------------------------
+  
+  ydot[idx++] = rb.force[0];
+  ydot[idx++] = rb.force[1];
+  ydot[idx++] = rb.force[2];
+  
+  ydot[idx++] = rb.torque[0];
+  ydot[idx++] = rb.torque[1];
+  ydot[idx++] = rb.torque[2];
+}
+
+
 
 //===================StateVector=======================
-StateVector::StateVector(int size){
-  this->size_ = size;
-  this->vector_ = new double[size];
+StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj, int size){
+  StateVector *res = new StateVector(18);
+  int idx = 0;
+  res[idx++] = obj.rigid_body.x[0];
+  res[idx++] = obj.rigid_body.x[1];
+  res[idx++] = obj.rigid_body.x[2];
+  
+//  using rotation matrix
+//  for (int i = 0; i < 3; i++) {
+//    for (int j = 0; j < 3; j++) {
+//      res[idx++] = obj.rigid_body.R[i][j];
+//    }
+//  }
+  
+  // using quaternion
+  res[idx++] = obj.rigid_body.q.q.x;
+  res[idx++] = obj.rigid_body.q.q.y;
+  res[idx++] = obj.rigid_body.q.q.z;
+  res[idx++] = obj.rigid_body.q.q.w;
+  
+  res[idx++] = obj.rigid_body.P[0];
+  res[idx++] = obj.rigid_body.P[1];
+  res[idx++] = obj.rigid_body.P[2];
+  
+  res[idx++] = obj.rigid_body.L[0];
+  res[idx++] = obj.rigid_body.L[1];
+  res[idx++] = obj.rigid_body.L[2];
+  
+  return *res;
 }
 
-void StateVector::init(int size, double const *data) {
-  this->size_ = size;
-  this->vector_ = new double[size];
-  for (int i = 0; i < size; ++i){
-    this->vector_[i] = data[i];
-  }
-}
-StateVector::StateVector(int size, double const *data) {
-  this->init(size, data);
-}
-
-
-StateVector::StateVector( StateVector& a) {
-  this->init(a.size(), a.vector());
-}
-
-StateVector::~StateVector(){
-  delete[] this->vector_;
+void StateVector::RigidBody_Array_to_state(ModelObject &obj, const StateVector &vector){
+  int idx = 0;
+  obj.rigid_body.x[0] = vector[idx++];
+  obj.rigid_body.x[1] = vector[idx++];
+  obj.rigid_body.x[2] = vector[idx++];
+  
+  
+  obj.rigid_body.P[0] = vector[idx++];
+  obj.rigid_body.P[1] = vector[idx++];
+  obj.rigid_body.P[2] = vector[idx++];
+  
+  obj.rigid_body.L[0] = vector[idx++];
+  obj.rigid_body.L[1] = vector[idx++];
+  obj.rigid_body.L[2] = vector[idx++];
+  
+  RigidBody& rb = obj.rigid_body;
+  
+  rb.v = obj.rigid_body.P / rb.mass;
+  rb.R = StateVector::quaternion_to_matrix(rb.q.normalize());
+  rb.Iinv = (rb.R * rb.Ibodyinv) * rb.R.transpose();
+  
+  rb.omega = rb.Iinv * rb.L;
+  
 }

@@ -22,7 +22,7 @@
 
 typedef struct RigidBody {
   double mass;
-  Vector3d Ibody, Ibodyinv;
+  Matrix3x3 Ibody, Ibodyinv;
   
   //state var
   Vector3d x;
@@ -71,28 +71,41 @@ private:
 };
 
 
-class StateVector {
-public:  
-  StateVector(int size, double const *data);
-  explicit StateVector(int size);
-  StateVector(StateVector& a);
-  ~StateVector();
+class StateVector : public Vector{
+public:
+  StateVector(int Size, double *data = NULL) : Vector(Size, data) {}
   
-  int size() const {return this->size_;}
-  double const *vector() {return this->vector_;}
+  int size() { return this->getn(); }
   
-  
-  
+  // get the state vector from an object
   static StateVector& RigidBody_State_to_Array(ModelObject& obj, int size);
+  static void RigidBody_Array_to_state(ModelObject& obj, const StateVector& vector);
+  inline static double sqr(double a) {
+    return a*a;
+  }
   
+  inline static Matrix3x3& quaternion_to_matrix(Quaternion q) {
+    Matrix3x3 *res = new Matrix3x3(
+                                   // row 1
+                                   1 - 2 * sqr(q.q.z) - 2 * sqr(q.q.w),
+                                   2 * q.q.y * q.q.z - 2 * q.q.x * q.q.w,
+                                   2 * q.q.y * q.q.z + 2 * q.q.x * q.q.z,
+                                   // row 2
+                                   2 * q.q.y * q.q.z + 2 * q.q.x * q.q.w,
+                                   1 - 2 * sqr(q.q.y) - 2 * sqr(q.q.w),
+                                   2 * q.q.z * q.q.w - 2 * q.q.x * q.q.y,
+                                   // row 3
+                                   2 * q.q.y * q.q.w - 2 * q.q.z,
+                                   2 * q.q.z * q.q.w + 2 * q.q.x * q.q.y,
+                                   1 - 2 * sqr(q.q.y) - 2 * sqr(q.q.z)
+                                   );
+    return *res;
+  }
   
-private:
-  void init(int size, double const *data);
-  int size_;
-  double *vector_;
 };
 
-typedef struct MotionController{
+class MotionController{
+public:
   double current_time;
   double dt;
   ModelObject *object;
@@ -102,17 +115,37 @@ typedef struct MotionController{
     object = object_;
   }
 
-  void next_step(){
-    Vector3d rot_axis = object->center() + Vector3d(1.0, 1.0, 1.0);
-//    object->rotate(3, rot_axis);
-    for (int i = 1 ; i < object->vertices.size(); i += 3 ) {
-      object->vertices[i] -= 0.05;
-    }
-    object->make_array();
+  void next_step();
+private:
+  // compute the force F(t) and torque tau(t) acting on the rigid body at
+  // time t
+  void compute_force_and_torque(double t);
+  
+  // compute dy/dt
+  void dydt(double t, StateVector& y, StateVector& ydot);
+  
+  // computing dy/dt and store it to ydot
+  void ddt_State_to_Array(StateVector& ydot);
+  
+  inline Matrix3x3& Star(Vector3d a){
+    Matrix3x3 *res = new Matrix3x3(
+                  0, -a.z, a.y,
+                  a.z, 0, -a.x,
+                  -a.y, a.x, 0
+                  );
+    
+    return *res;
   }
 
   
-} MotionController;
+};
+
+typedef void (*dydt_func) (double t, StateVector& y, StateVector& ydot);
+//receive an initial state vector y0, ode calculate the value using dydt
+// function to get dy(t)/dt
+void ODE(StateVector& y0, StateVector yend,
+         double t0, double t1, dydt_func dydt);
+
 
 class ObjLoader{
 public:
