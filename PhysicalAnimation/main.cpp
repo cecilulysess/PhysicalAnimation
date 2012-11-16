@@ -95,7 +95,7 @@ void init() {
   // parameters are eye point, aim point, up vector
   //  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
   //                      Vector3d(0, 1, 0));
-  camera = new Camera(Vector3d(0, 5, 4), Vector3d(0, 0, 0),
+  camera = new Camera(Vector3d(0, 25, 18), Vector3d(0, 0, 0),
                                                 Vector3d(0, 1, 0));
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0);
@@ -213,10 +213,11 @@ void init_rigid_object_world(char argc, char **argv){
     printf("Loading object from %s error, exit", argv[1]);
     exit(1);
   }
-  ObjLoader::objects[0]->rotate(90, 0, 0, 1);
+//  ObjLoader::objects[0]->rotate(90, 0, 0, 0);
   rigid_objects = ObjLoader::objects[0];
   
   controller = new MotionController(rigid_objects, 0.0, 0.1);
+  rigid_objects->rigid_body.omega = Vector3d(0.0, 0.1, 0.0);
 }
 
 // set up something in the world
@@ -267,7 +268,7 @@ int main(int argc, char* argv[]){
 //  parafile = argv[1];
   
   init_the_world(argc, argv);
-  printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit");
+  printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit\n");
   
   // start up the glut utilities
   glutInit(&argc, argv);

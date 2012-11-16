@@ -173,13 +173,24 @@ Vector3d ModelObject::center() {
 void ModelObject::update_object() {
   Vector3d newC = this->rigid_body.x, tran = newC - this->center_;
   this->center_ = newC;
-  Quaternion q = this->rigid_body.q;
+  Vector3d omega = this->rigid_body.omega;
+  Quaternion q(omega.norm(), omega.x, omega.y, omega.z);
+  printf("\tOmega: %f %f, %f\n", omega.x, omega.y, omega.z);
+  for (int i = 0; i < vertices.size(); i+=3) {
+    Vector3d v(vertices[i], vertices[i+1], vertices[i+2]);
+    Quaternion qout = q * Quaternion(v) * q.inv();
+    Vector3d vout = Vector3d(qout);
+    vertices[i] = vout.x;
+    vertices[i+1] = vout.y;
+    vertices[i+2] = vout.z;
+  }
   
   for (int i = 0 ; i < this->vertices.size(); i+=3) {
     this->vertices[i] += tran.x;
     this->vertices[i+1] += tran.y;
     this->vertices[i+2]  += tran.z;
   }
+
 }
 
 //=======================ODE============================
@@ -213,7 +224,7 @@ void MotionController::next_step() {
   StateVector yend = StateVector(y0);
   
   // calculate the result by ode
-  ODE(y0, yend, current_time, current_time + dt, *this, &MotionController::dydt);
+  ODE(y0, yend, current_time, dt, *this, &MotionController::dydt);
   printf("Yend:\n");
   yend.print();
   // re assign the state vector back to the original object
@@ -224,7 +235,8 @@ void MotionController::next_step() {
 }
 
 void MotionController::compute_force_and_torque(double t) {
-  object->rigid_body.force = Vector3d(0, 0, 9.8);
+//  object->rigid_body.force = Vector3d(0.0f, -0.098f, 0.0f);
+  object->rigid_body.torque = Vector3d(0.0f, 0.01, 0.00f);
 }
 
 void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
@@ -266,7 +278,7 @@ StateVector::StateVector(const Vector& v) : Vector(v){
 }
 
 StateVector& StateVector::RigidBody_State_to_Array(ModelObject& obj){
-  StateVector *ss = new StateVector(18);
+  StateVector *ss = new StateVector(13);
   StateVector& res = *ss;
   int idx = 0;
   res[idx] = 1.0;
@@ -304,7 +316,11 @@ void StateVector::RigidBody_Array_to_state(ModelObject &obj, const StateVector &
   obj.rigid_body.x[1] = vector[idx++];
   obj.rigid_body.x[2] = vector[idx++];
   
-  
+  obj.rigid_body.q.q[0] = vector[idx++];
+  obj.rigid_body.q.q[1] = vector[idx++];
+  obj.rigid_body.q.q[2] = vector[idx++];
+  obj.rigid_body.q.q[3] = vector[idx++];
+
   obj.rigid_body.P[0] = vector[idx++];
   obj.rigid_body.P[1] = vector[idx++];
   obj.rigid_body.P[2] = vector[idx++];

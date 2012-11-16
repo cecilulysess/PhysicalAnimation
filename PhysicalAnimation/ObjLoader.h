@@ -88,7 +88,7 @@ public:
   void print(){
     
     for(int i = 0; i < this->N; ++i ) {
-      printf("%.4f ", this->v[i]);
+      printf("%.7f ", this->v[i]);
     }
     printf("\n");
   }
@@ -112,7 +112,7 @@ public:
                                    1 - 2 * sqr(q.q.x) - 2 * sqr(q.q.z),
                                    2 * q.q.y * q.q.z - 2 * q.q.w * q.q.x,
                                    // row 3
-                                   2 * q.q.x * q.q.z - 2 * q.q.y,
+                                   2 * q.q.x * q.q.z - 2 * q.q.w * q.q.y,
                                    2 * q.q.y * q.q.z + 2 * q.q.w * q.q.x,
                                    1 - 2 * sqr(q.q.x) - 2 * sqr(q.q.y)
                                    );
