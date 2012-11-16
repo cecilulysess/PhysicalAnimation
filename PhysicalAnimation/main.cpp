@@ -161,9 +161,9 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
 
 void rigid_object_simulation(){
   //testing with random behavior
-  //  rigid_objects->rotate(get_rand(0, 10), get_rand(-2.0, 2.0),
-  //                        get_rand(-2.0, 2.0),
-  //                        get_rand(-2.0, 2.0));
+//  rigid_objects->rotate(get_rand(0, 10), get_rand(-2.0, 2.0),
+//                        get_rand(-2.0, 2.0),
+//                        get_rand(-2.0, 2.0));
   controller->next_step();
 }
 
@@ -216,7 +216,7 @@ void init_rigid_object_world(char argc, char **argv){
   ObjLoader::objects[0]->rotate(90, 0, 0, 1);
   rigid_objects = ObjLoader::objects[0];
   
-  controller = new MotionController(rigid_objects, 0.0, 0.05);
+  controller = new MotionController(rigid_objects, 0.0, 0.1);
 }
 
 // set up something in the world

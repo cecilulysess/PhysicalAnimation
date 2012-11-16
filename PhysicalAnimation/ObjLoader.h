@@ -66,9 +66,10 @@ public:
   RigidBody rigid_body;
   
   void finished_loading();
+  void update_object();
 private:
   //geometric center of this object
-  Vector3d center_;
+  Vector3d center_, old_center_;
 };
 
 
@@ -83,6 +84,15 @@ public:
     return (StateVector&) Vector::operator=(v2);
   }
   friend StateVector operator*(double s, const StateVector& v);
+  
+  void print(){
+    
+    for(int i = 0; i < this->N; ++i ) {
+      printf("%.4f ", this->v[i]);
+    }
+    printf("\n");
+  }
+  
   
   // get the state vector from an object
   static StateVector& RigidBody_State_to_Array(ModelObject& obj);
@@ -108,6 +118,7 @@ public:
                                    );
     return *res;
   }
+  
   
 };
 
