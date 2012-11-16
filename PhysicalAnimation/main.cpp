@@ -30,12 +30,8 @@
 
 //  Definitions and namespace
 
-#include "object.h"
-#include "definitions.h"
-#include "object_drawer.h"
 #include "ObjLoader.h"
 #include<stdlib.h>
-#include<time.h>
 using namespace std;
 
 #define WIDTH	    1024	/* Window dimensions */
@@ -44,14 +40,6 @@ using namespace std;
 Camera *camera;
 
 bool showGrid = true;
-int persp_win;
-
-float get_rand(float low, float high) {
-    return ((rand() % 1000) / 1000.0) * (high - low) + low;
-
-}
-void push();
-
 
 // draws a simple grid
 void makeGrid() {
@@ -97,9 +85,6 @@ void makeGrid() {
   glLineWidth(1.0);
 }
 
-
-
-
 void init() {
   // set up camera
   // parameters are eye point, aim point, up vector
@@ -137,30 +122,30 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     case 'f': case 'F':
       camera->SetCenterOfFocus(Vector3d(0, 0, 0));
       break;
-    case 'l': case 'L':
-      push();
-      break;
+    // case 'l': case 'L':
+    //   push();
+    //   break;
     case 'g': case 'G':
       showGrid = !showGrid;
       break;
-    case 'a': case 'A':
-      obs2ctr.x -= move_step;
-      break;
-    case 'd': case 'D':
-      obs2ctr.x += move_step;
-      break;
-    case 's': case 'S':
-      obs2ctr.y -= move_step;
-      break;
-    case 'w': case 'W':
-      obs2ctr.y += move_step;
-      break;
-    case 'z': case 'Z':
-      obs2ctr.z += move_step;
-      break;
-    case 'x': case 'X':
-      obs2ctr.z -= move_step;
-      break;
+    // case 'a': case 'A':
+    //   obs2ctr.x -= move_step;
+    //   break;
+    // case 'd': case 'D':
+    //   obs2ctr.x += move_step;
+    //   break;
+    // case 's': case 'S':
+    //   obs2ctr.y -= move_step;
+    //   break;
+    // case 'w': case 'W':
+    //   obs2ctr.y += move_step;
+    //   break;
+    // case 'z': case 'Z':
+    //   obs2ctr.z += move_step;
+    //   break;
+    // case 'x': case 'X':
+    //   obs2ctr.z -= move_step;
+    //   break;
     case 'q': case 'Q':	// q or esc - quit
     case 27:		// esc
       exit(0);
@@ -169,56 +154,6 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
   glutPostRedisplay();
 }
 
-using physical_objects::curr_t;
-using physical_objects::curr_X;
-using physical_objects::dt;
-using physical_objects::t_max;
-
-void push(){
-  /* initialize random seed: */
-  srand ( time(NULL) );
-  int push_loc = rand() % (surfaceObj.vertices.size() - 0) + 1 ;
-  int force = (rand() % 10 + 1) * 150 + 150;
-  
-  surfaceObj.vertices[push_loc].external_force =
-  Vector3d(0, - force, 0);
-  
-}
-void mainloop(){
-//  surfaceObj.print_surface();
-//  physical_objects::StateVector Xp =
-//    surfaceObj.calculate_dynamics(surfaceObj.X, curr_t);
-//  physical_objects::StateVector Xnew = surfaceObj.NumInt(surfaceObj.X, Xp, curr_t, dt);
-//  
-//  surfaceObj.update_State(Xnew);
-//  for(int i = 0; i < surfaceObj.vertices.size(); ++i ) {
-//    surfaceObj.vertices[i].location =
-//    //surfaceObj.vertices[i].location  + Vector3d(0,0.5,0);
-//    surfaceObj.X.s[i];
-//  }
-//  curr_t = curr_t + dt;
-//=======================
-//  double y0 = 
-}
-
-double bd_y0[STATE_SIZE * NBODY], bd_yfinal[STATE_SIZE * NBODY];
-
-void init_rigid_body() {
-  curr_t = 0.0f;
-  dt = 0.1f;
-}
-
-
-void RigidMainLoop(){
-  for(int i = 0; i < STATE_SIZE * NBODY; ++i) {
-    bd_y0[i] = bd_yfinal[i];
-  }
-  
-  physical_objects::ode(bd_y0,
-                        bd_yfinal,
-                        STATE_SIZE * NBODY,
-                        curr_t, dt, physical_objects::dydt, ObjLoader::objects[0]);
-}
 
 //// simulation function that called in glIdle loop
 void Simulate(){
@@ -226,7 +161,6 @@ void Simulate(){
 //  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
   
 //  mainloop();
-  RigidMainLoop();
   glutPostRedisplay();
 //  usleep(130000);
   usleep(30000);
@@ -238,14 +172,13 @@ void Simulate(){
  On Redraw request, erase the window and redraw everything
  */
 void RenderScene(){
-  glEnable(GL_LIGHTING);
+  
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 //  glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   camera->PerspectiveDisplay(WIDTH, HEIGHT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
-  
   if (showGrid)
     makeGrid();
   
@@ -263,13 +196,13 @@ void RenderScene(){
   
   glColor3f(0.0, 1.0, 1.0);
   
-  physical_objects::ModelObject *obj;
+  ObjLoader::ModelObject *obj;
   for(int i = 0 ; i < ObjLoader::objects.size(); ++i ) {
-    obj = ObjLoader::objects[i];
+    obj = ObjLoader::ObjLoader::objects[i];
     // activate and specify pointer to vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
-    glDrawElements(GL_QUADS, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
+    glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
 
   }
   glutSwapBuffers();
@@ -312,10 +245,7 @@ void Reset(){
   LoadParameters(parafile);
 }
 
-void init_lighting(){
-  glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHT5);
-}
+
 /*
  Main program to draw the square, change colors, and wait for quit
  */
@@ -341,14 +271,13 @@ int main(int argc, char* argv[]){
   // correctly regardless the order they draw
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
   glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT);
-  
 //  glutInitWindowPosition(50, 50);
   persp_win = glutCreateWindow(window_title);
   
   // initialize the camera and such
   init();
   
-  init_lighting();
+  
   // set up the callback routines to be called when glutMainLoop() detects
   // an event
 //  glutReshapeFunc(doReshape);
