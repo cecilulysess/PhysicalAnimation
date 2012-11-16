@@ -38,6 +38,9 @@ using namespace std;
 #define HEIGHT		768
 
 Camera *camera;
+//===================game objects definition=====================
+ModelObject *rigid_objects;
+//===============================================================
 
 bool showGrid = true;
 
@@ -86,11 +89,12 @@ void makeGrid() {
 }
 
 void init() {
+  srand((unsigned int)time(NULL));
   // set up camera
   // parameters are eye point, aim point, up vector
-//  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
-//                      Vector3d(0, 1, 0));
-camera = new Camera(Vector3d(0, 5, 4), Vector3d(0, 0, 0),
+  //  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
+  //                      Vector3d(0, 1, 0));
+  camera = new Camera(Vector3d(0, 5, 4), Vector3d(0, 0, 0),
                                                 Vector3d(0, 1, 0));
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0);
@@ -113,7 +117,7 @@ void motionEventHandler(int x, int y) {
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
-  float move_step = 0.15;
+//  float move_step = 0.15;
   switch (key) {
     case 'r': case 'R':
       // reset the camera to its initial position
@@ -154,17 +158,18 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
   glutPostRedisplay();
 }
 
+void rigid_object_simulation(){
+  //testing with random behavior
+  //  rigid_objects->rotate(get_rand(0, 10), get_rand(-2.0, 2.0),
+  //                        get_rand(-2.0, 2.0),
+  //                        get_rand(-2.0, 2.0));
+}
 
 //// simulation function that called in glIdle loop
 void Simulate(){
-  
-//  particle_manager1.move_particles(0.03f, obs2ctr, obs2rad);
-  
-//  mainloop();
+  rigid_object_simulation();
   glutPostRedisplay();
-//  usleep(130000);
   usleep(30000);
-  //  sleep(1);
 }
 
 
@@ -174,26 +179,13 @@ void Simulate(){
 void RenderScene(){
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//  glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   camera->PerspectiveDisplay(WIDTH, HEIGHT);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   if (showGrid)
     makeGrid();
-  
 
-//  draw_obstancles(&obs2ctr);
-//  drawParticleGenerationPlane();
-//  draw_particles(particle_manager1.particles());
-  //draw scene
-//  draw_flocking_particles(curr_X);
-  
-//  glTranslatef(0, 3.5, 0);
-//  Draw3DWorld();
-//  glutWireTeapot(5);
-//  draw_surface(surfaceObj);
-  
   glColor3f(0.0, 1.0, 1.0);
   
   ModelObject *obj;
@@ -202,19 +194,30 @@ void RenderScene(){
     // activate and specify pointer to vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
-    glDrawElements(GL_POINT_BIT, obj->indices.size(), GL_UNSIGNED_BYTE, obj->indice_array);
+    glDrawElements(GL_POINT_BIT,
+                   (int)obj->indices.size(),
+                   GL_UNSIGNED_BYTE,
+                   obj->indice_array);
 
   }
   glutSwapBuffers();
   
 }
 
+void init_rigid_object_world(char argc, char **argv){
+  int obj_no = 0 ;
+  ObjLoader::loadObject(argv[1], obj_no);
+  if (obj_no < 1) {
+    printf("Loading object from %s error, exit", argv[1]);
+    exit(1);
+  }
+  ObjLoader::objects[0]->rotate(90, 0, 0, 1);
+  rigid_objects = ObjLoader::objects[0];
+}
 
 // set up something in the world
-void init_the_world() {
-//  init_flock();
-//  curr_X = X0;
-//  init_rigid_body();
+void init_the_world(char argc, char **argv) {
+  init_rigid_object_world(argc, argv);
 }
 
 /*
@@ -241,6 +244,7 @@ void LoadParameters(char *filename){
 }
 
 static char* parafile;
+
 void Reset(){
   LoadParameters(parafile);
 }
@@ -256,10 +260,8 @@ int main(int argc, char* argv[]){
 //  }
 //  LoadParameters(argv[1]);
 //  parafile = argv[1];
-  int obj_no = 0 ;
-  ObjLoader::loadObject(argv[1], obj_no);
-  ObjLoader::objects[0]->rotate(90, 0, 0, 1);
-  init_the_world();
+  
+  init_the_world(argc, argv);
   printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit");
   
   // start up the glut utilities
@@ -276,7 +278,6 @@ int main(int argc, char* argv[]){
   
   // initialize the camera and such
   init();
-  
   
   // set up the callback routines to be called when glutMainLoop() detects
   // an event

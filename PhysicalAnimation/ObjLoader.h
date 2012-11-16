@@ -16,51 +16,73 @@
 #endif
 #define STATE_SIZE 18
 
-#include <iostream>
 #include <vector>
+#include "Quaternion.h"
 #include "Vector.h"
+
+typedef struct RigidBody{
+  double mass;
+  Vector3d Ibody, Ibodyinv;
+  
+  //state var
+  Vector3d x;
+  Quaternion q;
+  Vector3d P, L;
+  
+  //state var
+  Matrix3x3 Iinv, R;
+  Vector3d v, omega;
+  Vector3d force, torque;
+}RigidBody;
+
+typedef struct MotionController{
+  double current_time;
+  double dt;
+  
+//  void simulate
+} MotionController;
 
 // a defined model
 class ModelObject {
 public:
+
+  ModelObject(char const *obj_name);
+  
+  // get the data from vector so that opengl draw it correct
+  void make_array();
+  
+  //print the vertices
+  void print();
+  
+  // rotate this object along vector(x,y,z) for degree
+  void rotate(float degree, float x, float y, float z) ;
+  void rotate(float degree, Vector3d axis);
+  
+  Vector3d center() {
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    long cnt = vertices.size();
+    for (int i = 0 ; i < vertices.size(); i+=3) {
+      x += vertices[i];
+      y += vertices[i+1];
+      z += vertices[i+2];
+    }
+    this->center_ = Vector3d(x/cnt, y/cnt, z/cnt);
+    return center_;
+  }
   
   std::vector<GLfloat> vertices;
   std::vector<GLubyte> indices;
   std::string objectName;
-  ModelObject(char const *obj_name){
-    objectName = std::string(obj_name);
-    body_array = (double *)malloc(sizeof(double) * STATE_SIZE);
-    body_array_dot = (double *)malloc(sizeof(double) * STATE_SIZE);
-  }
-  
-  void make_array(){
-    this->vertices_array = (GLfloat*) malloc(sizeof(GLfloat) * vertices.size());
-    this->indice_array =  (GLubyte*) malloc(sizeof(GLubyte) * indices.size());
-    for (int i = 0; i < vertices.size(); ++i) {
-      vertices_array[i] = vertices[i];
-    }
-    for (int i = 0; i < indices.size(); ++i) {
-      indice_array[i] = indices[i];
-    }
-  }
-  
-  void print(){
-    std::cout<<"Object Name: "<<this->objectName<<", vertices #: " <<
-    this->vertices.size()<<", indice #:"<<this->indices.size()<<std::endl;
-    for(int i = 0; i < vertices.size(); i+=3){
-      printf("v %f %f %f\n", vertices_array[i], vertices_array[i+1], vertices_array[i+2]);
-    }
-    for(int i = 0; i < indices.size(); i+=4){
-      printf("f %d %d %d %d\n", indice_array[i], indice_array[i+1], indice_array[i+2], indice_array[i+3]);
-    }
-  }
-  
-  // rotate this object along vector(x,y,z) for degree
-  void rotate(float degree, float x, float y, float z) ;
   
   double *body_array, *body_array_dot;
+  
   GLfloat *vertices_array;
   GLubyte *indice_array;
+  RigidBody rigid_body;
+  
+private:
+  //geometric center of this object
+  Vector3d center_;
 };
 
 

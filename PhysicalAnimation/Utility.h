@@ -42,6 +42,7 @@
 #define DegToRad(x) ((x)*DEG2RAD)
 #define RadToDeg(x) ((x)*RAD2DEG)
 
+
 /*
   Boolean type
 */
@@ -71,4 +72,5 @@ void error(char *s1, char *s2 = NULL, char *s3 = NULL);
 // print error(s1, s2, s3) and then exit program with code 1 
 void abort(char *s1, char *s2 = NULL, char *s3 = NULL);
 
+float get_rand(float min, float max);
 #endif

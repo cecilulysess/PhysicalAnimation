@@ -10,6 +10,8 @@
 using namespace std;
 
 #include "Utility.h"
+#include "time.h"
+
 
 /*
   computes sqrt(a^2 + b^2) without destructive underflow or overflow
@@ -68,4 +70,9 @@ void abort(char *s1, char *s2, char *s3)
 {
   error(s1, s2, s3);
   exit(1);
+}
+
+float get_rand(float min, float max){
+  
+  return (rand() % 1000) / 1000.0 * (max - min) + min;
 }

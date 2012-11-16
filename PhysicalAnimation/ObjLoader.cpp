@@ -98,6 +98,7 @@ ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   return objects[0];
 }
 
+//======================Model Object=============================
 void ModelObject::rotate(float degree, float x, float y, float z) {
   Quaternion qt(degree, x, y, z);
   for (int i = 0 ; i < vertices.size(); i += 3) {
@@ -109,4 +110,36 @@ void ModelObject::rotate(float degree, float x, float y, float z) {
     vertices[i+2] = vout.z;
   }
   make_array();
+}
+
+void ModelObject::rotate(float degree, Vector3d axis){
+  rotate(degree, axis.x, axis.y, axis.z);
+}
+
+ModelObject::ModelObject(char const *obj_name){
+  objectName = std::string(obj_name);
+  body_array = (double *)malloc(sizeof(double) * STATE_SIZE);
+  body_array_dot = (double *)malloc(sizeof(double) * STATE_SIZE);
+}
+
+void ModelObject::print(){
+  std::cout<<"Object Name: "<<this->objectName<<", vertices #: " <<
+  this->vertices.size()<<", indice #:"<<this->indices.size()<<std::endl;
+  for(int i = 0; i < vertices.size(); i+=3){
+    printf("v %f %f %f\n", vertices_array[i], vertices_array[i+1], vertices_array[i+2]);
+  }
+  for(int i = 0; i < indices.size(); i+=4){
+    printf("f %d %d %d %d\n", indice_array[i], indice_array[i+1], indice_array[i+2], indice_array[i+3]);
+  }
+}
+
+void ModelObject::make_array(){
+  this->vertices_array = (GLfloat*) malloc(sizeof(GLfloat) * vertices.size());
+  this->indice_array =  (GLubyte*) malloc(sizeof(GLubyte) * indices.size());
+  for (int i = 0; i < vertices.size(); ++i) {
+    vertices_array[i] = vertices[i];
+  }
+  for (int i = 0; i < indices.size(); ++i) {
+    indice_array[i] = indices[i];
+  }
 }
