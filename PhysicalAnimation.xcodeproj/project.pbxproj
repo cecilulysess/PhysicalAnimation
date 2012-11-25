@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B9284A90166271EA000D7D27 /* physical_object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9284A8E166271EA000D7D27 /* physical_object.cpp */; };
 		B9316D0E1653890B00827BC4 /* Quaternion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9316D0D1653890B00827BC4 /* Quaternion.cpp */; };
 		B94E7AE415F5AB0900BEEB53 /* Utility.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE015F5AB0800BEEB53 /* Utility.cpp */; };
 		B94E7AE515F5AB0900BEEB53 /* Vector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B94E7AE215F5AB0800BEEB53 /* Vector.cpp */; };
@@ -32,6 +33,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		B9284A8E166271EA000D7D27 /* physical_object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = physical_object.cpp; sourceTree = "<group>"; };
+		B9284A8F166271EA000D7D27 /* physical_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = physical_object.h; sourceTree = "<group>"; };
 		B9316D0C1653890B00827BC4 /* parameters */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = parameters; sourceTree = "<group>"; };
 		B9316D0D1653890B00827BC4 /* Quaternion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Quaternion.cpp; sourceTree = "<group>"; };
 		B9316D101653894900827BC4 /* Quaternion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Quaternion.h; sourceTree = "<group>"; };
@@ -104,6 +107,8 @@
 				B99F61A5160FB16100C0B64D /* Camera.h */,
 				B9D6F670164B052D00D2DBC8 /* ObjLoader.cpp */,
 				B9D6F671164B052D00D2DBC8 /* ObjLoader.h */,
+				B9284A8E166271EA000D7D27 /* physical_object.cpp */,
+				B9284A8F166271EA000D7D27 /* physical_object.h */,
 			);
 			path = PhysicalAnimation;
 			sourceTree = "<group>";
@@ -167,6 +172,7 @@
 				B9D3BEDC160FC876000FDC7B /* gauss.cpp in Sources */,
 				B9D6F672164B052D00D2DBC8 /* ObjLoader.cpp in Sources */,
 				B9316D0E1653890B00827BC4 /* Quaternion.cpp in Sources */,
+				B9284A90166271EA000D7D27 /* physical_object.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

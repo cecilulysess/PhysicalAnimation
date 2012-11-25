@@ -31,6 +31,7 @@
 //  Definitions and namespace
 
 #include "ObjLoader.h"
+#include "physical_object.h"
 #include<stdlib.h>
 using namespace std;
 
@@ -41,6 +42,64 @@ Camera *camera;
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
+physical_objects::BouncingMesh* bouncing_mesh;
+
+void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
+//  glColor4f(1, 1, 1, 0.9);
+  glClear(GL_DEPTH_BUFFER_BIT);
+  glPushMatrix();
+  
+  for ( int i = 0 ; i < mesh.mesh_particles().size() ; ++i ) {
+    glColor4f(1 - (1.0 / mesh.mesh_particles().size()) * i,
+              1 - (1.0 / mesh.mesh_particles().size()) * i,
+              1 - (1.0 / mesh.mesh_particles().size()) * i, 1);
+    const physical_objects::Particle& p = mesh.mesh_particles().at(i);
+    glLoadIdentity();
+    glTranslatef(p.x.x, p.x.y, p.x.z);
+    if (p.is_pivot)
+      glColor4f(0, 0, 0, 1 - (1.0 / mesh.mesh_particles().size()) * i);
+    glutSolidSphere(0.2, 5, 5);
+    
+    glVertex3f(p.x.x, p.x.y, p.x.z);
+    if (p.is_pivot)
+      glColor4f(1 - (1.0 / mesh.mesh_particles().size()) * i,
+                1 - (1.0 / mesh.mesh_particles().size()) * i,
+                1 - (1.0 / mesh.mesh_particles().size()) * i, 1);
+    
+    
+//    count++;
+  }
+  glLoadIdentity();
+  glBegin(GL_LINES);
+  glColor4f(0, 0, 1, 0.9);
+  for (int i = 0; i < mesh.mesh_particles().size(); ++i) {
+    glColor4f( 0.1 * i, 0, 1, 0.9);
+    const physical_objects::Particle& p = mesh.mesh_particles().at(i);
+
+    glTranslatef(p.x.x, p.x.y, p.x.z);
+    for (int i = 0; i < p.N; ++i) {
+      Vector3d& np = p.connected_particles[i]->x;
+      glVertex3d(p.x.x, p.x.y, p.x.z);
+      glVertex3d(np.x, np.y, np.z);
+    }
+
+  }
+  glColor4f(1,1,1, 0.9);
+  glEnd();
+//  float colorstep = 1.0/surfaceObj.struts.size();
+//  glLoadIdentity();
+//  glColor4f(0.0, 0.0, 0.8, 0.9);
+//  for ( int i = 0 ; i < surfaceObj.struts.size(); ++i ) {
+//    physical_objects::Strut& str = surfaceObj.struts[i];
+//    //    glColor4f(colorstep*i, colorstep*i,colorstep*i, 1.0);
+//    glBegin(GL_LINES);
+//    Vector3d& a = str.vertices_pair.first->location,
+//    b = str.vertices_pair.second->location;
+//    glVertex3f(a.x, a.y, a.z);
+//    glVertex3f(b.x, b.y, b.z);
+//    glEnd();
+//  }  glPopMatrix();
+}
 //===============================================================
 
 bool showGrid = true;
@@ -169,25 +228,16 @@ void rigid_object_simulation(){
 
 //// simulation function that called in glIdle loop
 void Simulate(){
-  rigid_object_simulation();
+//  rigid_object_simulation();
   glutPostRedisplay();
   usleep(130000);
 }
 
+void RenderBouncingMesh(){
+  draw_bouncing_mesh(*bouncing_mesh);
+}
 
-/*
- On Redraw request, erase the window and redraw everything
- */
-void RenderScene(){
-  
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  camera->PerspectiveDisplay(WIDTH, HEIGHT);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  if (showGrid)
-    makeGrid();
-
+void RenderRigidBody(){
   glColor3f(0.0, 1.0, 1.0);
   
   ModelObject *obj;
@@ -201,8 +251,26 @@ void RenderScene(){
                    (int)obj->indices.size(),
                    GL_UNSIGNED_BYTE,
                    obj->indice_array);
-
+    
   }
+
+}
+
+/*
+ On Redraw request, erase the window and redraw everything
+ */
+void RenderScene(){
+  
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  camera->PerspectiveDisplay(WIDTH, HEIGHT);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  if (showGrid)
+    makeGrid();
+  
+  RenderBouncingMesh();
+//  RenderRigidBody();
   glutSwapBuffers();
   
 }
@@ -225,9 +293,15 @@ void init_rigid_object_world(char argc, char **argv){
                                               0.0, 0.0, 1.0);
 }
 
+void init_bouncing_mesh(){
+  bouncing_mesh = new physical_objects::BouncingMesh(-4, 0, 4,
+                                                     8, 8, 3, 0.1);
+}
+
 // set up something in the world
 void init_the_world(char argc, char **argv) {
-  init_rigid_object_world(argc, argv);
+  init_bouncing_mesh();
+//  init_rigid_object_world(argc, argv);
   
 }
 
