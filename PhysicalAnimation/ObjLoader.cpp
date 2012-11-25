@@ -12,6 +12,7 @@
 #include "Matrix.h"
 std::vector<ModelObject*> ObjLoader::objects;
 #define KMASS 0.1
+#define pho 0.5
 
 ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
   FILE *file ;
@@ -175,7 +176,7 @@ void ModelObject::update_object() {
   this->center_ = newC;
   Vector3d omega = this->rigid_body.omega;
   Quaternion q = this->rigid_body.q;//(omega.norm(), omega.x, omega.y, omega.z);
-  printf("\tOmega: %f %f, %f\n", omega.x, omega.y, omega.z);
+//  printf("\tOmega: %f %f, %f\n", omega.x, omega.y, omega.z);
   for (int i = 0; i < vertices.size(); i+=3) {
     Vector3d v(vertices[i], vertices[i+1], vertices[i+2]);
     Quaternion qout = q * Quaternion(v) * q.inv();
@@ -202,15 +203,26 @@ void ODE(StateVector& y0, StateVector& yend,
   StateVector K1(y0), K2(y0), K3(y0), K4(y0);
   
   (controller.*dydt)(t0, y0, K1);
-  printf("K1:\n");
-  K1.print();
+  
   K1 = K1 * dt;
-  printf("K1 after:\n");
-  K1.print();
+  StateVector sv = y0 + 0.5 * K1;
+  (controller.*dydt)(t0 + dt * 0.5, sv, K2);
+  
+  K2 = K2 * dt;
+  
+  sv = y0 + 0.5 * K2;
+  (controller.*dydt)(t0 + dt * 0.5, sv, K3);
+  K3 = K3 * dt;
+  
+  sv = y0 + K3;
+  (controller.*dydt)(t0 + dt, sv, K4);
+  
 //  K2 = calculate_dynamics(X + K1 * 0.5, t + 0.5 * dt) * dt;
 //  K3 = calculate_dynamics(X + K2 * 0.5, t + 0.5 * dt) * dt;
 //  K4 = calculate_dynamics(X + K3, t + dt) * dt;
-  yend = y0 + K1;//res = X + (K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
+  yend = y0 +(K1 + K2 * 2 + K3 * 2 + K4) * (1.0 / 6.0);
+  
+  
   
 }
 
@@ -218,15 +230,28 @@ void ODE(StateVector& y0, StateVector& yend,
 void MotionController::next_step() {
   
   StateVector& y0 = StateVector::RigidBody_State_to_Array(*object);
-  printf("Y0:\n");
-  y0.print();
+//  printf("Y0:\n");
+//  y0.print();
   // create a tmp statevector to receive the result
   StateVector yend = StateVector(y0);
   
   // calculate the result by ode
   ODE(y0, yend, current_time, dt, *this, &MotionController::dydt);
-  printf("Yend:\n");
-  yend.print();
+//  if (is_collide ){
+//    Vector3d norm(0, 1.0f, 0);
+//    Vector3d P = collide_pt;
+//    printf("\tFind min pt %f, %f, %f\n",P.x, P.y, P.z);
+//    Vector3d R = P - object->center(), r0 = R.normalize();
+//    double Vreln = P * norm, numerator = Vreln * -(1 - pho);
+//    double denominator = ( norm * object->rigid_body.Iinv *
+//                          ((R%norm)%R ) + 1.0 / object->rigid_body.mass );
+//    Vector3d J = 1/ numerator *  denominator * norm;
+//    object->rigid_body.force = object->rigid_body.force + pho * J;
+//    ODE(y0, yend, current_time, dt, *this, &MotionController::dydt);
+//    is_collide = false;
+//  }
+//  printf("Yend:\n");
+//  yend.print();
   // re assign the state vector back to the original object
   StateVector::RigidBody_Array_to_state(*object, yend);
   // update the model's vertice so that it can showed in the scene
@@ -235,7 +260,7 @@ void MotionController::next_step() {
 }
 
 void MotionController::compute_force_and_torque(double t) {
-  object->rigid_body.force = Vector3d(0.0f, -0.98f, 0.0f);
+  object->rigid_body.force = Vector3d(0.0f, -0.098f, 0.0f);
   double min = 100000.0;
   int idx = 0;
   //find minimium y
@@ -245,10 +270,20 @@ void MotionController::compute_force_and_torque(double t) {
       idx = i/3;
     }
   }
-  Vector3d norm(0, 1.0f, 0);
-  Vector3d P(object->vertices[i*3],
-             object->vertices[i*3+1],
-             object->vertices[i*3+2]);
+  if (min < 0.1) {
+    is_collide = true;
+    collide_pt = Vector3d(object->vertices[idx*3],
+                          object->vertices[idx*3+1],
+                          object->vertices[idx*3+2]);
+    printf("Detected Collid: %f, %f, %f\n", collide_pt.x,
+           collide_pt.y,
+           collide_pt.z);
+  } 
+  if( is_collide ) {
+    object->rigid_body.force = Vector3d(0, 1, 0);
+    
+  }
+
   
 }
 
@@ -357,6 +392,22 @@ StateVector operator*(double s, const StateVector& v){
   StateVector r(v.N);
   for (int i = 0; i < v.N; ++i ) {
     r[i] = s * v.v[i];
+  }
+  return r;
+}
+
+StateVector operator*(const StateVector& v, double s) {
+  StateVector r(v.N);
+  for (int i = 0; i < v.N; ++i ) {
+    r[i] = s * v.v[i];
+  }
+  return r;
+}
+
+StateVector operator+(const StateVector& v1, const StateVector& v2){
+  StateVector r(v1.N);
+  for (int i = 0; i < v2.N; ++i ) {
+    r[i] = v1.v[i] + v2.v[i];
   }
   return r;
 }

@@ -84,7 +84,8 @@ public:
     return (StateVector&) Vector::operator=(v2);
   }
   friend StateVector operator*(double s, const StateVector& v);
-  
+  friend StateVector operator*(const StateVector& v, double s);
+  friend StateVector operator+(const StateVector& v1, const StateVector& v2);
   void print(){
     
     for(int i = 0; i < this->N; ++i ) {
@@ -126,11 +127,14 @@ class MotionController{
 public:
   double current_time;
   double dt;
+  bool is_collide;
+  Vector3d collide_pt;
   ModelObject *object;
   MotionController(ModelObject* object_, double begin_time, double timestep) {
     current_time = begin_time;
     dt = timestep;
     object = object_;
+    is_collide = false;
   }
 
   void next_step();

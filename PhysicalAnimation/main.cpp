@@ -171,7 +171,7 @@ void rigid_object_simulation(){
 void Simulate(){
   rigid_object_simulation();
   glutPostRedisplay();
-  usleep(30000);
+  usleep(130000);
 }
 
 
@@ -217,8 +217,8 @@ void init_rigid_object_world(char argc, char **argv){
 //  ObjLoader::objects[0]->rotate(90, 0, 0, 0);
   rigid_objects = ObjLoader::objects[0];
   
-  controller = new MotionController(rigid_objects, 0.0, 0.1);
-//  rigid_objects->rigid_body.omega = Vector3d(0.0, 0.0, 0.0);
+  controller = new MotionController(rigid_objects, 0.0, 0.01);
+  rigid_objects->rigid_body.omega = Vector3d(0.1, 0.01, 0.01);
   
   rigid_objects->rigid_body.Ibody = Matrix3x3(1.0, 0.0, 0.0,
                                               0.0, 1.0, 0.0,
