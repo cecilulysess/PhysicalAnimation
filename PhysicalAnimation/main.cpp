@@ -43,11 +43,10 @@ Camera *camera;
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
+float current_time = 0.0, deltaT = 0.1;
 
 void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
-//  glColor4f(1, 1, 1, 0.9);
   glClear(GL_DEPTH_BUFFER_BIT);
-  glPushMatrix();
   
   for ( int i = 0 ; i < mesh.mesh_particles().size() ; ++i ) {
     glColor4f(1 - (1.0 / mesh.mesh_particles().size()) * i,
@@ -58,7 +57,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
     glTranslatef(p.x.x, p.x.y, p.x.z);
     if (p.is_pivot)
       glColor4f(0, 0, 0, 1 - (1.0 / mesh.mesh_particles().size()) * i);
-    glutSolidSphere(0.2, 5, 5);
+    glutSolidSphere(0.05, 5, 5);
     
     glVertex3f(p.x.x, p.x.y, p.x.z);
     if (p.is_pivot)
@@ -66,39 +65,52 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
                 1 - (1.0 / mesh.mesh_particles().size()) * i,
                 1 - (1.0 / mesh.mesh_particles().size()) * i, 1);
     
-    
-//    count++;
   }
   glLoadIdentity();
   glBegin(GL_LINES);
-  glColor4f(0, 0, 1, 0.9);
-  for (int i = 0; i < mesh.mesh_particles().size(); ++i) {
-    glColor4f( 0.1 * i, 0, 1, 0.9);
-    const physical_objects::Particle& p = mesh.mesh_particles().at(i);
-
-    glTranslatef(p.x.x, p.x.y, p.x.z);
-    for (int i = 0; i < p.N; ++i) {
-      Vector3d& np = p.connected_particles[i]->x;
-      glVertex3d(p.x.x, p.x.y, p.x.z);
-      glVertex3d(np.x, np.y, np.z);
-    }
-
+  for (int i = 0; i < mesh.struts().size(); ++i) {
+    glColor4f( (1.0/mesh.struts().size())* i, 0.25, 0.5, 0.9);
+    const physical_objects::Particle& pa = *mesh.struts()[i].first;
+    const physical_objects::Particle& pb = *mesh.struts()[i].second;
+    
+    glTranslatef(pa.x.x, pa.x.y, pa.x.z);
+    
+    glVertex3d(pa.x.x, pa.x.y, pa.x.z);
+    glVertex3d(pb.x.x, pb.x.y, pb.x.z);
   }
+//  printf("Draw struts: %d\n", mesh.struts().size());
   glColor4f(1,1,1, 0.9);
   glEnd();
-//  float colorstep = 1.0/surfaceObj.struts.size();
-//  glLoadIdentity();
-//  glColor4f(0.0, 0.0, 0.8, 0.9);
-//  for ( int i = 0 ; i < surfaceObj.struts.size(); ++i ) {
-//    physical_objects::Strut& str = surfaceObj.struts[i];
-//    //    glColor4f(colorstep*i, colorstep*i,colorstep*i, 1.0);
-//    glBegin(GL_LINES);
-//    Vector3d& a = str.vertices_pair.first->location,
-//    b = str.vertices_pair.second->location;
-//    glVertex3f(a.x, a.y, a.z);
-//    glVertex3f(b.x, b.y, b.z);
-//    glEnd();
-//  }  glPopMatrix();
+  
+//  glTranslatef(0, 1, -4);
+//  glutSolidSphere(0.5, 5, 5);
+  
+  // draw face normal
+
+  for (int i = 0; i < mesh.struts().size(); i += 2) {
+    if ( i + 1 >= mesh.struts().size() ) break;
+//    printf("\ti: %d\n", i);
+    glColor4f(0.25, 0.75, 1, 1);
+    const physical_objects::Particle& pa = *mesh.struts()[i].first;
+    const physical_objects::Particle& pb = *mesh.struts()[i].second;
+    const physical_objects::Particle& pc = *mesh.struts()[i + 1].second;
+//    printf("Pa:(%f, %f, %f), Pb:(%f, %f, %f), Pc(%f, %f, %f)\n", pa.x.x, pa.x.y, pa.x.z,
+//           pb.x.x, pb.x.y, pb.x.z, pc.x.x, pc.x.y, pc.x.z);
+    if ( mesh.struts()[i].first != mesh.struts()[i+1].first ){
+      i -= 1;
+      continue;
+    }
+    
+    Vector3d n = ((pb.x - pa.x) % (pc.x - pa.x)).normalize();
+    Vector3d ctr = (((pb.x - pa.x) + (pc.x - pa.x)) * 0.5) + pa.x;
+//    printf("\tGet Normal: (%f,%f,%f) in ctr: (%f, %f, %f)\n",
+//           n.x, n.y, n.z,
+//           ctr.x, ctr.y, ctr.z );
+    glBegin(GL_LINES);
+    glVertex3d(ctr.x, ctr.y, ctr.z);
+    glVertex3d(ctr.x + n.x, ctr.y + n.y, ctr.z + n.z);
+    glEnd();
+  }
 }
 //===============================================================
 
@@ -226,9 +238,20 @@ void rigid_object_simulation(){
   controller->next_step();
 }
 
+void bouncing_mesh_simulation(){
+  physical_objects::StateVector state =
+    physical_objects::NumericalIntegrator::RK4Integrate(
+          *bouncing_mesh, current_time, deltaT);
+  bouncing_mesh->update_particles(state);
+  
+}
+
+int cnt = 1;
 //// simulation function that called in glIdle loop
 void Simulate(){
+  printf("Frame: %d\n", cnt++);
 //  rigid_object_simulation();
+  bouncing_mesh_simulation();
   glutPostRedisplay();
   usleep(130000);
 }
@@ -294,7 +317,7 @@ void init_rigid_object_world(char argc, char **argv){
 }
 
 void init_bouncing_mesh(){
-  bouncing_mesh = new physical_objects::BouncingMesh(-4, 0, 4,
+  bouncing_mesh = new physical_objects::BouncingMesh(-4, 0, -4,
                                                      8, 8, 3, 0.1);
 }
 

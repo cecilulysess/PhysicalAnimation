@@ -10,6 +10,7 @@
 #define __PhysicalAnimation__physical_object__
 
 #include <vector>
+#include <utility>
 #include "Vector.h"
 
 
@@ -17,10 +18,47 @@ namespace physical_objects{
   
   // StateVector store value as Vector3d or 4d in its own terms.
   // This is collaboration with the NumericalIntegrator
-  class StateVector {
+  typedef struct StateVector {
+  public:
+    explicit StateVector(int size);
+    ~StateVector();
     
+    std::vector<Vector3d> state;
+    int size;
+//    StateVector operator*(double s) const{
+//      StateVector res(size);
+//      for (int i = 0 ; i < 2 * size; ++i ) {
+//        res.state[i] = this->state[i] * s;
+//      }
+//      return res;
+//    }
     
-  };
+    friend StateVector operator*(double l, const StateVector& r);
+    friend StateVector operator*(const StateVector& l, double r);
+    
+    const StateVector& operator=(const StateVector& v2) {
+      for ( int i = 0 ; i < size; ++i ) {
+        this->state[i] = v2.state[i];
+      }
+      return *this;
+    }
+    
+    StateVector operator+(const StateVector& v2) {
+      StateVector res(size);
+      for (int i = 0 ; i < size; ++i ) {
+        res.state[i] = (this->state[i] + v2.state[i]);
+      }
+      return res;
+    }
+    
+  void print(){
+    for (int i = 0; i < this->size; ++i ){
+      printf("\tStateV: (%f, %f, %f)\n",
+             this->state[i].x, this->state[i].y, this->state[i].z);
+    }
+    printf("============END============\n");
+  }
+  }StateVector;
 
   // a particle in the particle system
   typedef struct Particle {
@@ -63,19 +101,33 @@ namespace physical_objects{
                  float mass);
     ~BouncingMesh();
     
-    // clear the force for all particle
-    void clear_force();
+    // compute force to each particle with state X and at time t
+    void compute_force(StateVector& X, float t);
+    
+    // X' = dynamic(X, t);
+    StateVector dynamic(StateVector X, float t);
     
     //get the state vector of this object
     StateVector& state_vector();
+    // update the location and velocity of particles by given state
+    void update_particles(StateVector& state);
     
     const std::vector<Particle>& mesh_particles();
+    const std::vector<std::pair<Particle*, Particle*>> struts();
     
   private:
+    
+    // clear the force for all particle
+    void clear_force();
+    
+    
     //create springs when get all particle setted
     void create_springs();
+    
     StateVector state_vector_;
+    
     std::vector<Particle> mesh_particles_;
+    std::vector<std::pair<Particle*, Particle*>> struts_;
     // number of particles
     int N;
     // array_width
@@ -85,7 +137,12 @@ namespace physical_objects{
   
   class NumericalIntegrator {
   public:
-    void Integrate(StateVector& sv, float deltaT);
+    // RK4 integrate solve the differential equation
+    // X' = sv->dynamic(X, t) using timestep deltaT
+    // X_{t+deltaT} = X_{t} + deltaT * (K1 + 2K2 + 2K3 + K4)/ 6
+    // this function return the state vector of X_t+deltaT
+    static StateVector RK4Integrate(BouncingMesh& sv, float t,
+                                     float deltaT);
   };
 
 }//ns physical_objects
