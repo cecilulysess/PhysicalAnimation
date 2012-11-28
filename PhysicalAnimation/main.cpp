@@ -43,7 +43,7 @@ Camera *camera;
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
-float current_time = 0.0, deltaT = 0.1;
+float current_time = 0.0, deltaT = 0.05;
 
 void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -57,7 +57,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
     glTranslatef(p.x.x, p.x.y, p.x.z);
     if (p.is_pivot)
       glColor4f(0, 0, 0, 1 - (1.0 / mesh.mesh_particles().size()) * i);
-    glutSolidSphere(0.05, 5, 5);
+    glutSolidSphere(0.1, 5, 5);
     
     glVertex3f(p.x.x, p.x.y, p.x.z);
     if (p.is_pivot)
@@ -70,8 +70,8 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   glBegin(GL_LINES);
   for (int i = 0; i < mesh.struts().size(); ++i) {
     glColor4f( (1.0/mesh.struts().size())* i, 0.25, 0.5, 0.9);
-    const physical_objects::Particle& pa = *mesh.struts()[i].first;
-    const physical_objects::Particle& pb = *mesh.struts()[i].second;
+    const physical_objects::Particle& pa = *mesh.struts()[i].vertice_pair.first;
+    const physical_objects::Particle& pb = *mesh.struts()[i].vertice_pair.second;
     
     glTranslatef(pa.x.x, pa.x.y, pa.x.z);
     
@@ -91,12 +91,14 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
     if ( i + 1 >= mesh.struts().size() ) break;
 //    printf("\ti: %d\n", i);
     glColor4f(0.25, 0.75, 1, 1);
-    const physical_objects::Particle& pa = *mesh.struts()[i].first;
-    const physical_objects::Particle& pb = *mesh.struts()[i].second;
-    const physical_objects::Particle& pc = *mesh.struts()[i + 1].second;
+    const physical_objects::Particle& pa = *mesh.struts()[i].vertice_pair.first;
+    const physical_objects::Particle& pb = *mesh.struts()[i].vertice_pair.second;
+    const physical_objects::Particle& pc =
+      *mesh.struts()[i + 1].vertice_pair.second;
 //    printf("Pa:(%f, %f, %f), Pb:(%f, %f, %f), Pc(%f, %f, %f)\n", pa.x.x, pa.x.y, pa.x.z,
 //           pb.x.x, pb.x.y, pb.x.z, pc.x.x, pc.x.y, pc.x.z);
-    if ( mesh.struts()[i].first != mesh.struts()[i+1].first ){
+    if ( mesh.struts()[i].vertice_pair.first !=
+          mesh.struts()[i+1].vertice_pair.first ){
       i -= 1;
       continue;
     }
@@ -114,7 +116,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
 }
 //===============================================================
 
-bool showGrid = true;
+bool showGrid = false;
 
 // draws a simple grid
 void makeGrid() {
@@ -249,11 +251,11 @@ void bouncing_mesh_simulation(){
 int cnt = 1;
 //// simulation function that called in glIdle loop
 void Simulate(){
-  printf("Frame: %d\n", cnt++);
+//  printf("Frame: %d\n", cnt++);
 //  rigid_object_simulation();
   bouncing_mesh_simulation();
   glutPostRedisplay();
-  usleep(130000);
+//  usleep(13000);
 }
 
 void RenderBouncingMesh(){
@@ -317,8 +319,9 @@ void init_rigid_object_world(char argc, char **argv){
 }
 
 void init_bouncing_mesh(){
-  bouncing_mesh = new physical_objects::BouncingMesh(-4, 0, -4,
-                                                     8, 8, 3, 0.1);
+  bouncing_mesh = new physical_objects::BouncingMesh(-20, 0, -20,
+                                                     40, 40, 10, 0.15,
+                                                     1, 0.7 ); //spring and d
 }
 
 // set up something in the world

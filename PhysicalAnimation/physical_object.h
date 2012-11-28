@@ -53,8 +53,8 @@ namespace physical_objects{
     
   void print(){
     for (int i = 0; i < this->size; ++i ){
-      printf("\tStateV: (%f, %f, %f)\n",
-             this->state[i].x, this->state[i].y, this->state[i].z);
+      printf("\tStateV, %d: (%f, %f, %f)\n",
+             i, this->state[i].x, this->state[i].y, this->state[i].z);
     }
     printf("============END============\n");
   }
@@ -91,6 +91,19 @@ namespace physical_objects{
     
   } Particle;
   
+  // a strut contains the information of the spring
+  typedef struct Strut {
+  public:
+    Strut(float spring, float damper, float original_len,
+          Particle* a, Particle* b): K(spring), D(damper), L0(original_len){
+      this->vertice_pair = std::make_pair(a, b);
+    }
+    
+    
+    float K, D, L0; //spring, damper, L_0
+    std::pair<Particle*, Particle*> vertice_pair;
+  }Strut;
+  
   // BouncingMesh is a bouncing object that bounce everything from its surface
   class BouncingMesh {
   public:
@@ -98,7 +111,7 @@ namespace physical_objects{
     // normal as (0, 1, 0);
     BouncingMesh(float x, float y, float z,
                  float width, float height, int division,
-                 float mass);
+                 float mass, float strut_spring, float strut_damp);
     ~BouncingMesh();
     
     // compute force to each particle with state X and at time t
@@ -113,26 +126,25 @@ namespace physical_objects{
     void update_particles(StateVector& state);
     
     const std::vector<Particle>& mesh_particles();
-    const std::vector<std::pair<Particle*, Particle*>> struts();
+    const std::vector<Strut> struts();
     
   private:
     
     // clear the force for all particle
     void clear_force();
     
-    
-    //create springs when get all particle setted
-    void create_springs();
+    // create springs when get all particle setted, with spring and damping
+    // coefficient
+    void create_springs(float spring, float damping);
     
     StateVector state_vector_;
     
     std::vector<Particle> mesh_particles_;
-    std::vector<std::pair<Particle*, Particle*>> struts_;
+    std::vector<Strut> struts_;
     // number of particles
     int N;
     // array_width
     int array_width;
-    
   };
   
   class NumericalIntegrator {
@@ -140,7 +152,7 @@ namespace physical_objects{
     // RK4 integrate solve the differential equation
     // X' = sv->dynamic(X, t) using timestep deltaT
     // X_{t+deltaT} = X_{t} + deltaT * (K1 + 2K2 + 2K3 + K4)/ 6
-    // this function return the state vector of X_t+deltaT
+    // this function return the state vector of X_t + deltaT
     static StateVector RK4Integrate(BouncingMesh& sv, float t,
                                      float deltaT);
   };
