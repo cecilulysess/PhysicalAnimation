@@ -68,6 +68,17 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
                 1 - (1.0 / mesh.mesh_particles().size()) * i, 1);
     
   }
+  for ( int i = 0; i < mesh.faces().size(); ++i) {
+    for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
+      glColor4f(0, 0, 1, 1);
+      const physical_objects::ParticleStrutPair* psp =
+        &mesh.faces()[i].temporary_vertices[j];
+      glLoadIdentity();
+      glTranslatef(psp->p->x.x, psp->p->x.y, psp->p->x.z);
+      glutSolidSphere(0.3, 5, 5);
+      glVertex3f(psp->p->x.x, psp->p->x.y, psp->p->x.z);
+    }
+  }
   glLoadIdentity();
   glBegin(GL_LINES);
   for (int i = 0; i < mesh.struts().size(); ++i) {
@@ -81,6 +92,23 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
     glVertex3d(pb.x.x, pb.x.y, pb.x.z);
   }
 //  printf("Draw struts: %d\n", mesh.struts().size());
+  
+  
+  glColor4f(0,0,1, 0.8);
+  for ( int i = 0; i < mesh.faces().size(); ++i) {
+    for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
+      for (int k = 0; k < 3; ++k){
+      const physical_objects::Particle& pa =
+        *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.first;
+      const physical_objects::Particle& pb =
+        *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.second;
+        glTranslatef(pa.x.x, pa.x.y, pa.x.z);
+        
+        glVertex3d(pa.x.x, pa.x.y, pa.x.z);
+        glVertex3d(pb.x.x, pb.x.y, pb.x.z);
+      }
+    }
+  }
   glColor4f(1,1,1, 0.9);
   glEnd();
   
@@ -181,8 +209,8 @@ void motionEventHandler(int x, int y) {
 
 void push(){
   printf("push\n");
-  Vector3d f = Vector3d(0, -9.8, 0);
-  bouncing_mesh->push(5, 5, f);
+  Vector3d loc(2.2, 0, 2.2), vol(0, -3, 0);
+  bouncing_mesh->add_temp_spring(loc, vol, 0.8, 0.5, 1);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {

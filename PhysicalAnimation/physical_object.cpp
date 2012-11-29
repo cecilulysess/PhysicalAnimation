@@ -14,6 +14,8 @@
 #define ISDIAGONAL 
 
 namespace physical_objects {
+  
+  //============================State Vector============================
   StateVector::StateVector(int size){
     
     this->size = size;
@@ -41,7 +43,10 @@ namespace physical_objects {
     }
     return res;
   }
+  //============================State Vector============================
   
+  
+  //============================BouncingMesh============================
   void BouncingMesh::compute_force(StateVector& X, float t){
     Vector3d g(0, -0.98, 0);
     clear_force();
@@ -267,21 +272,64 @@ namespace physical_objects {
     }
   }
   
+  
+  
+  const std::vector<Face> BouncingMesh::faces(){
+    return this->faces_;
+  }
+  
+  const std::vector<Particle>& BouncingMesh::mesh_particles(){
+    return this->mesh_particles_;
+  }
+  
+  const std::vector<Strut> BouncingMesh::struts(){
+    return this->struts_;
+  }
+  
+  StateVector BouncingMesh::dynamic(StateVector X, float t){
+    this->compute_force(X, t);
+    int N = (int) this->mesh_particles_.size();
+    StateVector Xp(X.size);
+    for (int i = 0; i < N; ++i) {
+      //      Xp.state[i].x = X.state[i].x;
+      //      Xp.state[i].y = X.state[i].y;
+      //      Xp.state[i].z = X.state[i].z;
+      Xp.state[i] = X.state[i + N];
+      Xp.state[i + N] = this->mesh_particles_[i].f / this->mesh_particles_[i].m;
+    }
+    //    Xp.print();
+    return Xp;
+  }
+
+  
+  ParticleStrutPair* BouncingMesh::add_temp_spring(Vector3d location,
+                                     Vector3d velocity,
+                                     float spring, float damping,
+                                     float mass){
+    int faceIdx = 35;
+    this->faces_[faceIdx].add_tmp_vertices(location, velocity, mass, spring, damping);
+    return &this->faces_[faceIdx].
+          temporary_vertices[this->faces_[faceIdx].temporary_vertices.size() - 1];
+  }
+  //============================BouncingMesh============================
+  
+  
+  //=================================Strut==============================  
   ParticleStrutPair::ParticleStrutPair(Particle *p,
-                                       Strut* a, Strut* b, Strut* c, Strut* d){
+                                       Strut* a, Strut* b, Strut* c){
     
     this->p = p;
     this->struts[0] = a;
     this->struts[1] = b;
     this->struts[2] = c;
-    this->struts[3] = d;
   }
   
-  ParticleStrutPair::~ParticleStrutPair(){
-    for (int i = 0; i < 4; ++i ) {
-      delete struts[i];
-    }
-  }
+//  ParticleStrutPair::~ParticleStrutPair(){
+////    for (int i = 0; i < 3; ++i ) {
+////      delete struts[i];
+////    }
+//    delete[] struts;
+//  }
   
   
   void BouncingMesh::create_faces(){
@@ -300,21 +348,10 @@ namespace physical_objects {
     }
   }
   
-  const std::vector<Face> BouncingMesh::faces(){
-    return this->faces_;
-  }
-  
-  const std::vector<Particle>& BouncingMesh::mesh_particles(){
-    return this->mesh_particles_;
-  }
-  
-  const std::vector<Strut> BouncingMesh::struts(){
-    return this->struts_;
-  }
+  //=================================Strut==============================
   
   
-  
-  
+  //=================================Face===============================
   Face::Face(Particle *a, Particle *b, Particle *c){
     this->a = a;
     this->b = b;
@@ -329,21 +366,28 @@ namespace physical_objects {
     
   }
   
-  StateVector BouncingMesh::dynamic(StateVector X, float t){
-    this->compute_force(X, t);
-    int N = (int) this->mesh_particles_.size();
-    StateVector Xp(X.size);
-    for (int i = 0; i < N; ++i) {
-//      Xp.state[i].x = X.state[i].x;
-//      Xp.state[i].y = X.state[i].y;
-//      Xp.state[i].z = X.state[i].z;
-      Xp.state[i] = X.state[i + N];
-      Xp.state[i + N] = this->mesh_particles_[i].f / this->mesh_particles_[i].m;
-    }
-//    Xp.print();
-    return Xp;
+  ParticleStrutPair* Face::add_tmp_vertices(Vector3d& loc,
+                                            Vector3d& velocity,
+                                            float mass,
+                                            float spring,
+                                            float damping){
+    Particle* p = new Particle(loc.x, loc.y, loc.z,
+                               velocity.x, velocity.y, velocity.z,
+                               mass, false);
+    Strut* a = new Strut(spring, damping,
+                         (p->x - this->a->x).norm(), p, this->a);
+    Strut* b = new Strut(spring, damping,
+                         (p->x - this->b->x).norm(), p, this->b);
+    Strut* c = new Strut(spring, damping,
+                         (p->x - this->c->x).norm(), p, this->c);
+    ParticleStrutPair* pair = new ParticleStrutPair(p, a, b, c);
+    this->temporary_vertices.push_back(*pair);
+    return pair;
   }
   
+  //=================================Face===============================
+  
+    
   StateVector NumericalIntegrator::RK4Integrate(BouncingMesh& sv, float t,
                                                  float deltaT){
     StateVector& x = sv.state_vector();

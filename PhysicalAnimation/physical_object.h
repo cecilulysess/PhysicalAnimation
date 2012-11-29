@@ -16,6 +16,8 @@
 
 namespace physical_objects{
   
+  
+  //=========================State Vector===============================
   // StateVector store value as Vector3d or 4d in its own terms.
   // This is collaboration with the NumericalIntegrator
   typedef struct StateVector {
@@ -59,7 +61,11 @@ namespace physical_objects{
     printf("============END============\n");
   }
   }StateVector;
+  
+  //============================State Vector============================
 
+  
+  //===============================Particle=============================
   // a particle in the particle system
   typedef struct Particle {
     Particle(float x, float y, float z,
@@ -91,6 +97,10 @@ namespace physical_objects{
     
   } Particle;
   
+  //===============================Particle=============================
+  
+  
+  //=================================Strut==============================
   // a strut contains the information of the spring
   typedef struct Strut {
   public:
@@ -105,17 +115,20 @@ namespace physical_objects{
   }Strut;
   
   // a 4 adjancent particle-structs pair
-  // it stores the struts as counter clock order that start frome right down
+  // it stores the struts as counter clock order that start frome upperleft
   typedef struct ParticleStrutPair{
-    ParticleStrutPair(Particle *p, Strut *a, Strut *b, Strut *c, Strut *d);
-    ~ParticleStrutPair();
+    ParticleStrutPair(Particle *p, Strut *a, Strut *b, Strut *c);
+//    ~ParticleStrutPair();
     
-    Strut *struts[4];
+    Strut *struts[3];
     Particle* p;
     
     
   }ParticleStrutPair;
+  //=================================Strut==============================
   
+  
+  //=================================Face===============================
   // a face of triangle
   typedef struct Face {
     // particle sequence counterclock-wise
@@ -134,19 +147,28 @@ namespace physical_objects{
     // normal of face
     Vector3d normal;
     // three vertices of triangle, consisted as
+    // a     or    a-c
+    // | \          \|
+    // b--c          b
     Particle *a, *b, *c;
     // a temporary vertices list
     std::vector<ParticleStrutPair> temporary_vertices;
     
     // add a new verticle with specific parameters
-    ParticleStrutPair& add_tmp_vertices(Vector3d& loc,
-                                                   Vector3d& velocity,
-                                                   Vector3d& mass,
-                                                   float spring,
+    ParticleStrutPair *add_tmp_vertices(Vector3d& loc,
+                                        Vector3d& velocity,
+                                        float mass,
+                                        float spring,
                                         float damping);
       
     
   }Face;
+  
+  //=================================Face===============================
+  
+  
+  
+  //============================BouncingMesh============================
   
   // BouncingMesh is a bouncing object that bounce everything from its surface
   class BouncingMesh {
@@ -157,6 +179,11 @@ namespace physical_objects{
                  float width, float height, int division,
                  float mass, float strut_spring, float strut_damp);
     ~BouncingMesh();
+    
+    ParticleStrutPair* add_temp_spring(Vector3d location,
+                                       Vector3d velocity,
+                                       float spring, float damping,
+                                       float mass);
     
     // compute force to each particle with state X and at time t
     void compute_force(StateVector& X, float t);
@@ -204,6 +231,9 @@ namespace physical_objects{
     // array_width
     int array_width;
   };
+  //============================BouncingMesh============================
+  
+  //=========================NumericalIntegrator========================
   
   class NumericalIntegrator {
   public:
@@ -214,6 +244,7 @@ namespace physical_objects{
     static StateVector RK4Integrate(BouncingMesh& sv, float t,
                                      float deltaT);
   };
+  //============================BouncingMesh============================
 
 }//ns physical_objects
 #endif /* defined(__PhysicalAnimation__physical_object__) */
