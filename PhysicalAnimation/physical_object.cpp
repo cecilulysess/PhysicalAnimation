@@ -267,9 +267,25 @@ namespace physical_objects {
     }
   }
   
+  ParticleStrutPair::ParticleStrutPair(Particle *p,
+                                       Strut* a, Strut* b, Strut* c, Strut* d){
+    
+    this->p = p;
+    this->struts[0] = a;
+    this->struts[1] = b;
+    this->struts[2] = c;
+    this->struts[3] = d;
+  }
+  
+  ParticleStrutPair::~ParticleStrutPair(){
+    for (int i = 0; i < 4; ++i ) {
+      delete struts[i];
+    }
+  }
+  
   
   void BouncingMesh::create_faces(){
-    int N = (this->array_width - 1) * (this->array_width - 1);
+//    int N = (this->array_width - 1) * (this->array_width - 1);
     this->faces_.clear();
     for (int i = 0; i < this->array_width - 1; ++i) { // no face in last row
       for (int j = 0; j < this->array_width - 1; ++j) { // no face in last col

@@ -104,6 +104,18 @@ namespace physical_objects{
     std::pair<Particle*, Particle*> vertice_pair;
   }Strut;
   
+  // a 4 adjancent particle-structs pair
+  // it stores the struts as counter clock order that start frome right down
+  typedef struct ParticleStrutPair{
+    ParticleStrutPair(Particle *p, Strut *a, Strut *b, Strut *c, Strut *d);
+    ~ParticleStrutPair();
+    
+    Strut *struts[4];
+    Particle* p;
+    
+    
+  }ParticleStrutPair;
+  
   // a face of triangle
   typedef struct Face {
     // particle sequence counterclock-wise
@@ -124,9 +136,15 @@ namespace physical_objects{
     // three vertices of triangle, consisted as
     Particle *a, *b, *c;
     // a temporary vertices list
-    std::vector<std::pair<Particle*, Strut>> temporary_vertices;
+    std::vector<ParticleStrutPair> temporary_vertices;
     
-    
+    // add a new verticle with specific parameters
+    ParticleStrutPair& add_tmp_vertices(Vector3d& loc,
+                                                   Vector3d& velocity,
+                                                   Vector3d& mass,
+                                                   float spring,
+                                        float damping);
+      
     
   }Face;
   

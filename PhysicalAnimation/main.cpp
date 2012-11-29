@@ -89,28 +89,6 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   
   // draw face normal
 
-//  for (int i = 0; i < mesh.struts().size(); i += 2) {
-//    if ( i + 1 >= mesh.struts().size() ) break;
-////    printf("\ti: %d\n", i);
-//    glColor4f(0.25, 0.75, 1, 1);
-//    const physical_objects::Particle& pa = *mesh.struts()[i].vertice_pair.first;
-//    const physical_objects::Particle& pb = *mesh.struts()[i].vertice_pair.second;
-//    const physical_objects::Particle& pc =
-//      *mesh.struts()[i + 1].vertice_pair.second;
-////    printf("Pa:(%f, %f, %f), Pb:(%f, %f, %f), Pc(%f, %f, %f)\n", pa.x.x, pa.x.y, pa.x.z,
-////           pb.x.x, pb.x.y, pb.x.z, pc.x.x, pc.x.y, pc.x.z);
-//    if ( mesh.struts()[i].vertice_pair.first !=
-//          mesh.struts()[i+1].vertice_pair.first ){
-//      i -= 1;
-//      continue;
-//    }
-//    
-//    Vector3d n = ((pb.x - pa.x) % (pc.x - pa.x)).normalize();
-//    Vector3d ctr = (((pb.x - pa.x) + (pc.x - pa.x)) * 0.5) + pa.x;
-//    printf("\tGet Normal: (%f,%f,%f) in ctr: (%f, %f, %f)\n",
-//           n.x, n.y, n.z,
-//           ctr.x, ctr.y, ctr.z );
-  
   for (int i = 0;  i < mesh.faces().size(); ++i){
     const physical_objects::Particle& pa = *mesh.faces()[i].a;
     const physical_objects::Particle& pb = *mesh.faces()[i].b;
