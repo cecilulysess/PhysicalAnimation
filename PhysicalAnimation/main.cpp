@@ -37,13 +37,15 @@ using namespace std;
 
 #define WIDTH	    1024	/* Window dimensions */
 #define HEIGHT		768
+#define TIMESTEP  0.01
 
 Camera *camera;
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
-float current_time = 0.0, deltaT = 0.05;
+float current_time = 0.0, deltaT = 0.005;
+
 
 void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -87,32 +89,41 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   
   // draw face normal
 
-  for (int i = 0; i < mesh.struts().size(); i += 2) {
-    if ( i + 1 >= mesh.struts().size() ) break;
-//    printf("\ti: %d\n", i);
-    glColor4f(0.25, 0.75, 1, 1);
-    const physical_objects::Particle& pa = *mesh.struts()[i].vertice_pair.first;
-    const physical_objects::Particle& pb = *mesh.struts()[i].vertice_pair.second;
-    const physical_objects::Particle& pc =
-      *mesh.struts()[i + 1].vertice_pair.second;
-//    printf("Pa:(%f, %f, %f), Pb:(%f, %f, %f), Pc(%f, %f, %f)\n", pa.x.x, pa.x.y, pa.x.z,
-//           pb.x.x, pb.x.y, pb.x.z, pc.x.x, pc.x.y, pc.x.z);
-    if ( mesh.struts()[i].vertice_pair.first !=
-          mesh.struts()[i+1].vertice_pair.first ){
-      i -= 1;
-      continue;
-    }
-    
-    Vector3d n = ((pb.x - pa.x) % (pc.x - pa.x)).normalize();
-    Vector3d ctr = (((pb.x - pa.x) + (pc.x - pa.x)) * 0.5) + pa.x;
+//  for (int i = 0; i < mesh.struts().size(); i += 2) {
+//    if ( i + 1 >= mesh.struts().size() ) break;
+////    printf("\ti: %d\n", i);
+//    glColor4f(0.25, 0.75, 1, 1);
+//    const physical_objects::Particle& pa = *mesh.struts()[i].vertice_pair.first;
+//    const physical_objects::Particle& pb = *mesh.struts()[i].vertice_pair.second;
+//    const physical_objects::Particle& pc =
+//      *mesh.struts()[i + 1].vertice_pair.second;
+////    printf("Pa:(%f, %f, %f), Pb:(%f, %f, %f), Pc(%f, %f, %f)\n", pa.x.x, pa.x.y, pa.x.z,
+////           pb.x.x, pb.x.y, pb.x.z, pc.x.x, pc.x.y, pc.x.z);
+//    if ( mesh.struts()[i].vertice_pair.first !=
+//          mesh.struts()[i+1].vertice_pair.first ){
+//      i -= 1;
+//      continue;
+//    }
+//    
+//    Vector3d n = ((pb.x - pa.x) % (pc.x - pa.x)).normalize();
+//    Vector3d ctr = (((pb.x - pa.x) + (pc.x - pa.x)) * 0.5) + pa.x;
 //    printf("\tGet Normal: (%f,%f,%f) in ctr: (%f, %f, %f)\n",
 //           n.x, n.y, n.z,
 //           ctr.x, ctr.y, ctr.z );
+  
+  for (int i = 0;  i < mesh.faces().size(); ++i){
+    const physical_objects::Particle& pa = *mesh.faces()[i].a;
+    const physical_objects::Particle& pb = *mesh.faces()[i].b;
+    const physical_objects::Particle& pc = *mesh.faces()[i].c;
+
+    Vector3d n = mesh.faces()[i].normal;
+    Vector3d ctr = ((pb.x - pa.x) + (pc.x - pb.x))/3 + pa.x;
     glBegin(GL_LINES);
     glVertex3d(ctr.x, ctr.y, ctr.z);
     glVertex3d(ctr.x + n.x, ctr.y + n.y, ctr.z + n.z);
     glEnd();
   }
+    
 }
 //===============================================================
 
@@ -190,6 +201,12 @@ void motionEventHandler(int x, int y) {
   glutPostRedisplay();
 }
 
+void push(){
+  printf("push\n");
+  Vector3d f = Vector3d(0, -9.8, 0);
+  bouncing_mesh->push(5, 5, f);
+}
+
 void keyboardEventHandler(unsigned char key, int x, int y) {
 //  float move_step = 0.15;
   switch (key) {
@@ -200,9 +217,9 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     case 'f': case 'F':
       camera->SetCenterOfFocus(Vector3d(0, 0, 0));
       break;
-    // case 'l': case 'L':
-    //   push();
-    //   break;
+     case 'l': case 'L':
+       push();
+       break;
     case 'g': case 'G':
       showGrid = !showGrid;
       break;
@@ -319,9 +336,9 @@ void init_rigid_object_world(char argc, char **argv){
 }
 
 void init_bouncing_mesh(){
-  bouncing_mesh = new physical_objects::BouncingMesh(-20, 0, -20,
-                                                     40, 40, 10, 0.15,
-                                                     1, 0.7 ); //spring and d
+  bouncing_mesh = new physical_objects::BouncingMesh(-10, 0, -10,
+                                                     20, 20, 6, 0.05,
+                                                     0.95, 0.7 ); //spring and d
 }
 
 // set up something in the world

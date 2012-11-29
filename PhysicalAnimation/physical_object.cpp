@@ -11,7 +11,7 @@
 #include "Utility.h"
 #include "physical_object.h"
 
-
+#define ISDIAGONAL 
 
 namespace physical_objects {
   StateVector::StateVector(int size){
@@ -48,6 +48,7 @@ namespace physical_objects {
     float mass = 0.0;
     // apply unary force to each particle with state X
     for (int i = 0; i < this->mesh_particles_.size(); ++i) {
+//      this->mesh_particles_[i].f = this->mesh_particles_[i].f + this->addition_force_[i];
       if ( this->mesh_particles_[i].is_pivot ) {
         this->mesh_particles_[i].f = Vector3d(0, 0, 0);
       } else {
@@ -85,6 +86,7 @@ namespace physical_objects {
   inline int idx(int i, int j, int width) {
     return i * width + j;
   }
+  
   BouncingMesh::BouncingMesh(float x, float y, float z,
                              float width, float height, int division,
                              float mass, float strut_spring, float strut_damp)
@@ -92,6 +94,9 @@ namespace physical_objects {
     
     this->mesh_particles_ = std::vector<Particle>();
     this->struts_ = std::vector<Strut>();
+//    //
+//    this->push(0, 0, Vector3d(0,0,0));
+    
     
     this->N = Sqr(2 + division);
     array_width = 2 + division;
@@ -116,6 +121,7 @@ namespace physical_objects {
       }
     }
     create_springs(strut_spring, strut_damp);
+    create_faces();
   }
   
   BouncingMesh::~BouncingMesh(){
@@ -140,44 +146,50 @@ namespace physical_objects {
           ref.push_back(&mesh_particles_[idx(i + 1, j, array_width)]);
           
         }
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i + 1 < array_width - 1 && j + 1 < array_width - 1) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i + 1, j + 1, array_width)]);
         }
         //==========================================================
+#endif
         if ( j + 1 < array_width - 1) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i, j + 1, array_width)]);
         }
-        
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i - 1 > 0 && j + 1 < array_width - 1 ) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i - 1, j + 1, array_width)]);
         }
+#endif
         // =========================================================
         if ( i - 1 > 0) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i - 1, j, array_width)]);
         }
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i - 1 > 0 && j - 1 > 0 ) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i - 1, j - 1, array_width)]);
         }
         // =========================================================
+#endif
         if ( j - 1 > 0 ) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i, j - 1, array_width)]);
         }
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i + 1 < array_width - 1 && j - 1 > 0 ) {
           mesh_particles_[idx(i, j, array_width)].N++;
           ref.push_back(&mesh_particles_[idx(i + 1, j - 1, array_width)]);
         }
         // =========================================================
-        
+#endif
         // ------------------ finished add adjencent particle------------
        
       }
@@ -193,7 +205,7 @@ namespace physical_objects {
           this->struts_.push_back(Strut(spring, damping,
                                         (ref.x - next.x).norm(), &ref, &next));
         }
-        
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i + 1 < array_width && j + 1 < array_width ) {
           Particle& next = mesh_particles_[idx(i + 1, j + 1, array_width)];
@@ -201,11 +213,13 @@ namespace physical_objects {
                                         (ref.x - next.x).norm(), &ref, &next));
         }
         // =========================================================
+#endif
         if ( j + 1 < array_width ) {
           Particle& next = mesh_particles_[idx(i, j + 1, array_width)];
           this->struts_.push_back(Strut(spring, damping,
                                         (ref.x - next.x).norm(), &ref, &next));
         }
+#ifdef ISDIAGONAL
         // add diagonal ============================================
         if ( i - 1 >= 0 && j + 1 < array_width ) {
           Particle& next = mesh_particles_[idx(i - 1, j + 1, array_width)];
@@ -213,6 +227,7 @@ namespace physical_objects {
                                         (ref.x - next.x).norm(), &ref, &next));
         }
         // =========================================================
+#endif
         
       }
     }
@@ -241,7 +256,36 @@ namespace physical_objects {
       this->mesh_particles_[i].v.y = state.state[i + N].y;
       this->mesh_particles_[i].v.z = state.state[i + N].z;
     }
+    update_faces();
+    
 //    printf("Updated %d particles\n", this->mesh_particles().size());
+  }
+  
+  void BouncingMesh::update_faces(){
+    for (int i = 0; i < this->faces_.size(); ++i) {
+      faces_[i].updateFace();
+    }
+  }
+  
+  
+  void BouncingMesh::create_faces(){
+    int N = (this->array_width - 1) * (this->array_width - 1);
+    this->faces_.clear();
+    for (int i = 0; i < this->array_width - 1; ++i) { // no face in last row
+      for (int j = 0; j < this->array_width - 1; ++j) { // no face in last col
+                                                        // update the vertice for first face
+        Particle *a = &this->mesh_particles_[idx(i, j, array_width)];
+        Particle *b = &this->mesh_particles_[idx(i + 1, j, array_width)];
+        Particle *c = &this->mesh_particles_[idx(i + 1, j + 1, array_width)];
+        Particle *d = &this->mesh_particles_[idx(i, j + 1, array_width)];
+        this->faces_.push_back(Face(a, b, c));
+        this->faces_.push_back(Face(c, d, a));
+      }
+    }
+  }
+  
+  const std::vector<Face> BouncingMesh::faces(){
+    return this->faces_;
   }
   
   const std::vector<Particle>& BouncingMesh::mesh_particles(){
@@ -252,6 +296,22 @@ namespace physical_objects {
     return this->struts_;
   }
   
+  
+  
+  
+  Face::Face(Particle *a, Particle *b, Particle *c){
+    this->a = a;
+    this->b = b;
+    this->c = c;
+    if (a != NULL && b != NULL && c != NULL)
+      this->normal = (b->x - a->x) % (c->x - a->x);
+    
+  }
+  
+  void Face::updateFace(){
+    this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
+    
+  }
   
   StateVector BouncingMesh::dynamic(StateVector X, float t){
     this->compute_force(X, t);

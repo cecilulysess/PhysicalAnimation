@@ -104,6 +104,32 @@ namespace physical_objects{
     std::pair<Particle*, Particle*> vertice_pair;
   }Strut;
   
+  // a face of triangle
+  typedef struct Face {
+    // particle sequence counterclock-wise
+    Face(Particle *a, Particle *b, Particle *c);
+    
+    // get the face index for the first triangle for vertice (i, j)
+    // width is the # of vertices per row
+    static inline int faceIdx(int i, int j, int width){
+      return i * 2 * (width - 1) + j * 2;
+    }
+    
+    // update the normal information of this face
+    void updateFace();
+    
+    
+    // normal of face
+    Vector3d normal;
+    // three vertices of triangle, consisted as
+    Particle *a, *b, *c;
+    // a temporary vertices list
+    std::vector<std::pair<Particle*, Strut>> temporary_vertices;
+    
+    
+    
+  }Face;
+  
   // BouncingMesh is a bouncing object that bounce everything from its surface
   class BouncingMesh {
   public:
@@ -127,9 +153,22 @@ namespace physical_objects{
     
     const std::vector<Particle>& mesh_particles();
     const std::vector<Strut> struts();
+    const std::vector<Face> faces();
+    
+    void push(int i, int j, Vector3d force) {
+      
+      for (int i = 0 ;i < this->mesh_particles().size(); ++i ) {
+        Vector3d f(0,0,0);
+        if (i == i * array_width + j) {
+          f = force;
+        }
+//        addition_force_.push_back(f);
+      }
+    }
     
   private:
-    
+    void create_faces();
+    void update_faces();
     // clear the force for all particle
     void clear_force();
     
@@ -141,6 +180,7 @@ namespace physical_objects{
     
     std::vector<Particle> mesh_particles_;
     std::vector<Strut> struts_;
+    std::vector<Face> faces_;
     // number of particles
     int N;
     // array_width
