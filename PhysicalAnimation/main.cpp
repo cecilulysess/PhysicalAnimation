@@ -93,8 +93,8 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   }
 //  printf("Draw struts: %d\n", mesh.struts().size());
   
+  // draw temporary vertices
   
-  glColor4f(0,0,1, 0.8);
   for ( int i = 0; i < mesh.faces().size(); ++i) {
     for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
       for (int k = 0; k < 3; ++k){
@@ -103,8 +103,9 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
       const physical_objects::Particle& pb =
         *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.second;
         glTranslatef(pa.x.x, pa.x.y, pa.x.z);
-        
+        glColor4f(0,0,0, 0.8);
         glVertex3d(pa.x.x, pa.x.y, pa.x.z);
+        glColor4f(1,1,1, 0.8);
         glVertex3d(pb.x.x, pb.x.y, pb.x.z);
       }
     }
@@ -123,7 +124,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
     const physical_objects::Particle& pc = *mesh.faces()[i].c;
 
     Vector3d n = mesh.faces()[i].normal;
-    Vector3d ctr = ((pb.x - pa.x) + (pc.x - pb.x))/3 + pa.x;
+    Vector3d ctr = ((pa.x - pb.x) + (pc.x - pb.x))/3 + pb.x;
     glBegin(GL_LINES);
     glVertex3d(ctr.x, ctr.y, ctr.z);
     glVertex3d(ctr.x + n.x, ctr.y + n.y, ctr.z + n.z);
@@ -209,8 +210,8 @@ void motionEventHandler(int x, int y) {
 
 void push(){
   printf("push\n");
-  Vector3d loc(2.2, 0, 2.2), vol(0, -3, 0);
-  bouncing_mesh->add_temp_spring(loc, vol, 0.8, 0.5, 1);
+  Vector3d loc(2.6, 0, 2.2), vol(0, -9, 0);
+  bouncing_mesh->add_temp_spring(loc, vol, 0.9, 0.01, 1);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
@@ -267,6 +268,7 @@ void bouncing_mesh_simulation(){
   physical_objects::StateVector state =
     physical_objects::NumericalIntegrator::RK4Integrate(
           *bouncing_mesh, current_time, deltaT);
+  
   bouncing_mesh->update_particles(state);
   
 }
@@ -345,6 +347,7 @@ void init_bouncing_mesh(){
   bouncing_mesh = new physical_objects::BouncingMesh(-10, 0, -10,
                                                      20, 20, 6, 0.05,
                                                      0.95, 0.7 ); //spring and d
+  push();
 }
 
 // set up something in the world

@@ -34,6 +34,9 @@ namespace physical_objects{
 //      }
 //      return res;
 //    }
+    void updateSize(){
+      this->size =  (int)state.size();
+    }
     
     friend StateVector operator*(double l, const StateVector& r);
     friend StateVector operator*(const StateVector& l, double r);
@@ -122,7 +125,7 @@ namespace physical_objects{
     
     Strut *struts[3];
     Particle* p;
-    
+    bool isDetached;
     
   }ParticleStrutPair;
   //=================================Strut==============================
@@ -160,8 +163,8 @@ namespace physical_objects{
                                         float mass,
                                         float spring,
                                         float damping);
-      
     
+    bool isAboveface(Particle* p);
   }Face;
   
   //=================================Face===============================
@@ -200,19 +203,10 @@ namespace physical_objects{
     const std::vector<Strut> struts();
     const std::vector<Face> faces();
     
-    void push(int i, int j, Vector3d force) {
-      
-      for (int i = 0 ;i < this->mesh_particles().size(); ++i ) {
-        Vector3d f(0,0,0);
-        if (i == i * array_width + j) {
-          f = force;
-        }
-//        addition_force_.push_back(f);
-      }
-    }
-    
+
   private:
     void create_faces();
+    // update face normal and detect whether need to detach temporary particles
     void update_faces();
     // clear the force for all particle
     void clear_force();
@@ -224,12 +218,17 @@ namespace physical_objects{
     StateVector state_vector_;
     
     std::vector<Particle> mesh_particles_;
+    // pointers to the temporary_particles, this will be updated
+    // each time state_vector() invoked
+    std::vector<ParticleStrutPair*> temporary_particles;
     std::vector<Strut> struts_;
     std::vector<Face> faces_;
     // number of particles
     int N;
     // array_width
     int array_width;
+    // number of temoprary vertices added into the state vector
+    int temporary_vertice_size;
   };
   //============================BouncingMesh============================
   

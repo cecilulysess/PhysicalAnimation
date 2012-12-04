@@ -7,6 +7,7 @@
 //
 
 #include <set>
+#include <assert.h>
 
 #include "Utility.h"
 #include "physical_object.h"
@@ -53,15 +54,15 @@ namespace physical_objects {
     float mass = 0.0;
     // apply unary force to each particle with state X
     for (int i = 0; i < this->mesh_particles_.size(); ++i) {
-//      this->mesh_particles_[i].f = this->mesh_particles_[i].f + this->addition_force_[i];
       if ( this->mesh_particles_[i].is_pivot ) {
         this->mesh_particles_[i].f = Vector3d(0, 0, 0);
       } else {
         mass = mesh_particles_[i].m;
-//        if ( i == this->mesh_particles().size() / 2) mass = 10 * mesh_particles_[i].m;
         this->mesh_particles_[i].f =  g * mass;
-//        if (mass > 0.2) this->mesh_particles_[i].f = g * mass;
       }
+    }
+    for (int i = 0; i < this->temporary_vertice_size; ++i) {
+//      this->temporary_particles[i]->p->f = g * this->temporary_particles[i]->p->m;
     }
     // apply nary force 
     for (int i = 0; i < this->struts().size(); ++i) {
@@ -70,20 +71,49 @@ namespace physical_objects {
       Vector3d L = a->x - b->x;
       Vector3d uab = L / L.norm();
       float delta_L = (L.norm() - this->struts_[i].L0);
-      //            printf("d_L(%d, %d) :%f\n", a->vertice_id, b->vertice_id, delta_L);
+      //       printf("d_L(%d, %d) :%f\n", a->vertice_id, b->vertice_id, delta_L);
       Vector3d fsab = - this->struts_[i].K * delta_L * uab;
       //            printf("%d: fsab: %f\n", i, fsab.norm());
       Vector3d fdab = this->struts_[i].D * (
                                             //Vb-Va
                                             (b->v - a->v) * uab * uab
                                             );
-      //      printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
-      //                         fdab.x, fdab.y, fdab.z);
+      //    printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
+      //               fdab.x, fdab.y, fdab.z);
       
       if (!a->is_pivot)
         a->f = a->f + (fsab + fdab);
       if (!b->is_pivot)
         b->f = b->f - (fsab + fdab);
+    }
+    
+    // apply temporary vertices force
+    for (int i = 0 ; i < this->temporary_particles.size(); ++ i) {
+//      printf("Detached? %d\n", temporary_particles[i]->isDetached);
+      if (temporary_particles[i]->isDetached) {
+        continue;
+      }
+      for(int j = 0; j < 3; ++j) {
+        Strut* st = this->temporary_particles[i]->struts[j];
+        Particle* a = st->vertice_pair.first;
+        Particle* b = st->vertice_pair.second;
+        Vector3d L = a->x - b->x;
+        Vector3d uab = L / L.norm();
+        float delta_L = (L.norm() - st->L0);
+        Vector3d fsab = - st->K * delta_L * uab;
+        Vector3d fdab = st->D * (
+                                              //Vb-Va
+                                              (b->v - a->v) * uab * uab
+                                              );
+        
+        if (!a->is_pivot)
+          a->f = a->f + (fsab + fdab);
+        if (!b->is_pivot)
+          b->f = b->f - (fsab + fdab);
+      }
+//      Particle* tp = this->temporary_particles[i]->p;
+//      printf("F_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
+//             tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
     }
 
   }
@@ -239,19 +269,47 @@ namespace physical_objects {
   }
   
   StateVector& BouncingMesh::state_vector(){
+    this->temporary_particles.clear();
+    temporary_vertice_size = 0;
     this->state_vector_.state.clear();
+    
+    // add mesh particles
     for (int i = 0; i < this->mesh_particles().size(); ++i) {
       this->state_vector_.state.push_back(this->mesh_particles()[i].x);
     }
+    
+    //=========Add temporary particles=============
+    for (int i = 0; i < this->faces_.size(); ++i) {
+      for (int j = 0; j < this->faces_[i].temporary_vertices.size(); ++j ) {
+        this->state_vector_.state.push_back(
+          this->faces_[i].temporary_vertices[j].p->x);
+        temporary_vertice_size ++;
+        this->temporary_particles.push_back(
+                    &(this->faces_[i].temporary_vertices[j])
+                                            );
+      }
+    }
+    //=============================================
+  
     for (int i = 0; i < this->mesh_particles().size(); ++i) {
       this->state_vector_.state.push_back(this->mesh_particles()[i].v);
     }
     
+    //=========Add temporary particles=============
+    for (int i = 0; i < this->faces_.size(); ++i) {
+      for (int j = 0; j < this->faces_[i].temporary_vertices.size(); ++j ) {
+        this->state_vector_.state.push_back(
+          this->faces_[i].temporary_vertices[j].p->v);
+      }
+    }
+    //=============================================
+
+    this->state_vector_.updateSize();
     return this->state_vector_;
   }
   
   void BouncingMesh::update_particles(physical_objects::StateVector &state){
-    int N = (int) this->mesh_particles_.size();
+    int N = (int) this->mesh_particles_.size() + temporary_vertice_size;
     for (int i = 0; i < this->mesh_particles().size(); ++i ) {
       this->mesh_particles_[i].x.x = state.state[i].x;
       this->mesh_particles_[i].x.y = state.state[i].y;
@@ -260,6 +318,22 @@ namespace physical_objects {
       this->mesh_particles_[i].v.x = state.state[i + N].x;
       this->mesh_particles_[i].v.y = state.state[i + N].y;
       this->mesh_particles_[i].v.z = state.state[i + N].z;
+    }
+    // update temp vertices
+    int offset = (int) this->mesh_particles_.size();
+    
+    for (int i = 0; i < this->temporary_vertice_size; ++i) {
+      
+      this->temporary_particles[i]->p->x.x = state.state[offset + i].x;
+      this->temporary_particles[i]->p->x.y = state.state[offset + i].y;
+      this->temporary_particles[i]->p->x.z = state.state[offset + i].z;
+//      state.state[offset + i + N].print();
+      this->temporary_particles[i]->p->v.x =
+        state.state[offset + i + N].x;
+      this->temporary_particles[i]->p->v.y =
+        state.state[offset + i + N].y;
+      this->temporary_particles[i]->p->v.z =
+        state.state[offset + i + N].z;
     }
     update_faces();
     
@@ -270,6 +344,7 @@ namespace physical_objects {
     for (int i = 0; i < this->faces_.size(); ++i) {
       faces_[i].updateFace();
     }
+    
   }
   
   
@@ -288,16 +363,23 @@ namespace physical_objects {
   
   StateVector BouncingMesh::dynamic(StateVector X, float t){
     this->compute_force(X, t);
-    int N = (int) this->mesh_particles_.size();
+    int N = (int) this->mesh_particles_.size() + temporary_vertice_size;
+//    printf("N:%d, X:%d\n", N, X.size);
+    assert( 2 * N == X.size);
     StateVector Xp(X.size);
-    for (int i = 0; i < N; ++i) {
-      //      Xp.state[i].x = X.state[i].x;
-      //      Xp.state[i].y = X.state[i].y;
-      //      Xp.state[i].z = X.state[i].z;
+    // from 0 to offset is the original particles
+    int offset = (int) this->mesh_particles_.size();
+    for (int i = 0; i < offset; ++i) {
       Xp.state[i] = X.state[i + N];
-      Xp.state[i + N] = this->mesh_particles_[i].f / this->mesh_particles_[i].m;
+      Xp.state[i + N] =
+        this->mesh_particles_[i].f / this->mesh_particles_[i].m;
     }
-    //    Xp.print();
+    
+    for (int i = 0; i < this->temporary_vertice_size; ++i) {
+      Xp.state[offset + i] = X.state[offset + i + N];
+      Xp.state[offset + i + N] =
+        this->temporary_particles[i]->p->f / this->temporary_particles[i]->p->m;
+    }
     return Xp;
   }
 
@@ -306,7 +388,7 @@ namespace physical_objects {
                                      Vector3d velocity,
                                      float spring, float damping,
                                      float mass){
-    int faceIdx = 35;
+    int faceIdx = 65;
     this->faces_[faceIdx].add_tmp_vertices(location, velocity, mass, spring, damping);
     return &this->faces_[faceIdx].
           temporary_vertices[this->faces_[faceIdx].temporary_vertices.size() - 1];
@@ -322,6 +404,7 @@ namespace physical_objects {
     this->struts[0] = a;
     this->struts[1] = b;
     this->struts[2] = c;
+    this->isDetached = false;
   }
   
 //  ParticleStrutPair::~ParticleStrutPair(){
@@ -343,7 +426,7 @@ namespace physical_objects {
         Particle *c = &this->mesh_particles_[idx(i + 1, j + 1, array_width)];
         Particle *d = &this->mesh_particles_[idx(i, j + 1, array_width)];
         this->faces_.push_back(Face(a, b, c));
-        this->faces_.push_back(Face(c, d, a));
+        this->faces_.push_back(Face(a, c, d));
       }
     }
   }
@@ -356,14 +439,25 @@ namespace physical_objects {
     this->a = a;
     this->b = b;
     this->c = c;
-    if (a != NULL && b != NULL && c != NULL)
-      this->normal = (b->x - a->x) % (c->x - a->x);
-    
+    if (a != NULL && b != NULL && c != NULL){
+      this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
+    }
+  }
+  
+  bool Face::isAboveface(Particle* p){
+//    p->x.print();
+//    this->normal.print();
+//    printf("Above face %f \n",(p->x * this->normal));
+    return (p->x * this->normal) > 0.0;
   }
   
   void Face::updateFace(){
     this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
-    
+    for (int i = 0; i < this->temporary_vertices.size(); ++i) {
+      if ( isAboveface(this->temporary_vertices[i].p) ) {
+        this->temporary_vertices[i].isDetached = true;
+      }
+    }
   }
   
   ParticleStrutPair* Face::add_tmp_vertices(Vector3d& loc,
@@ -374,6 +468,7 @@ namespace physical_objects {
     Particle* p = new Particle(loc.x, loc.y, loc.z,
                                velocity.x, velocity.y, velocity.z,
                                mass, false);
+//    float L0 = ??;
     Strut* a = new Strut(spring, damping,
                          (p->x - this->a->x).norm(), p, this->a);
     Strut* b = new Strut(spring, damping,
