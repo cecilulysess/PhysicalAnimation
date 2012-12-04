@@ -9,7 +9,7 @@
 #  Copyright (C) - Donald H. House. 2005
 #
 
-CC      = g++
+CC	= g++
 C	= cpp
 H	= h
 CFLAGS 	= -g
@@ -22,8 +22,8 @@ else
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} Quaternion.${H} ObjLoader.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Camera.o Quaternion.o ObjLoader.o
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} Quaternion.${H} ObjLoader.${H} physical_object.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Camera.o Quaternion.o ObjLoader.o physical_object.o
 PROJECT = main
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
@@ -49,6 +49,9 @@ Quaternion.o : Quaternion.${C} Quaternion.${H}
 
 ObjLoader.o : ObjLoader.${C} ObjLoader.${H}
 	${CC} $(CFLAGS) -c ObjLoader.${C}
+
+physical_object.o : physical_object.${C} physical_object.${H}
+	${CC} $(CFLAGS) -c physical_object.${C}
   
 debug:
 	make 'DFLAGS = /usr/lib/debug/malloc.o'

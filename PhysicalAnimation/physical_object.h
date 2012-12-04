@@ -9,6 +9,7 @@
 #ifndef __PhysicalAnimation__physical_object__
 #define __PhysicalAnimation__physical_object__
 
+#include <stdio.h>
 #include <vector>
 #include <utility>
 #include "Vector.h"

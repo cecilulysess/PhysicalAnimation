@@ -16,6 +16,7 @@
 #endif
 #define STATE_SIZE 18
 
+#include <stdio.h>
 #include <vector>
 #include "Quaternion.h"
 #include "Vector.h"

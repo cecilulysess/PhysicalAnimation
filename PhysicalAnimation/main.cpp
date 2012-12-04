@@ -210,8 +210,8 @@ void motionEventHandler(int x, int y) {
 
 void push(){
   printf("push\n");
-  Vector3d loc(2.6, 0, 2.2), vol(0, -9, 0);
-  bouncing_mesh->add_temp_spring(loc, vol, 0.9, 0.01, 1);
+  Vector3d loc(2.6, 0, 2.2), vol(0, -9.8, 0);
+  bouncing_mesh->add_temp_spring(loc, vol, 0.9, 0.5, 0.1);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {

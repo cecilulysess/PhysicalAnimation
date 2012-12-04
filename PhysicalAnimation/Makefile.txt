@@ -9,7 +9,7 @@
 #  Copyright (C) - Donald H. House. 2005
 #
 
-CC      = g++
+CC	= g++
 C	= cpp
 H	= h
 CFLAGS 	= -g
@@ -22,9 +22,9 @@ else
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} particle_manager.${H} object_drawer.${H} definitions.${H} object.${H} Quaternion.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Camera.o gauss.o object.o particle_manager.o Quaternion.o
-PROJECT = particlefall
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} Quaternion.${H} ObjLoader.${H} physical_object.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Camera.o Quaternion.o ObjLoader.o physical_object.o
+PROJECT = main
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
 	${CC} $(CFLAGS) -o ${PROJECT} ${PROJECT}.o $(OFILES) $(LDFLAGS)
@@ -43,18 +43,15 @@ Vector.o: Vector.${C} Vector.${H} Utility.${H}
 
 Utility.o: Utility.${C} Utility.${H}
 	${CC} $(CFLAGS) -c Utility.${C}
-
-gauss.o : gauss.${C} gauss.${H}
-	${CC} $(CFLAGS) -c gauss.${C}
-
-object.o : object.${C} object.${H}
-	${CC} $(CFLAGS) -c object.${C}
-
-particle_manager.o : particle_manager.${C} particle_manager.${H}
-	${CC} $(CFLAGS) -c particle_manager.${C}
   
 Quaternion.o : Quaternion.${C} Quaternion.${H}
 	${CC} $(CFLAGS) -c Quaternion.${C}
+
+ObjLoader.o : ObjLoader.${C} ObjLoader.${H}
+	${CC} $(CFLAGS) -c ObjLoader.${C}
+
+physical_object.o : physical_object.${C} physical_object.${H}
+	${CC} $(CFLAGS) -c physical_object.${C}
   
 debug:
 	make 'DFLAGS = /usr/lib/debug/malloc.o'

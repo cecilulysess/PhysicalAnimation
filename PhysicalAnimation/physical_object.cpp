@@ -49,7 +49,7 @@ namespace physical_objects {
   
   //============================BouncingMesh============================
   void BouncingMesh::compute_force(StateVector& X, float t){
-    Vector3d g(0, -0.98, 0);
+    Vector3d g(0, -9.8, 0);
     clear_force();
     float mass = 0.0;
     // apply unary force to each particle with state X
@@ -62,7 +62,12 @@ namespace physical_objects {
       }
     }
     for (int i = 0; i < this->temporary_vertice_size; ++i) {
-//      this->temporary_particles[i]->p->f = g * this->temporary_particles[i]->p->m;
+      // this->temporary_particles[i]->p->v.print(); printf("\n");
+      if ( this->temporary_particles[i]->isDetached) {
+        // printf("I have the gravity\n");
+        this->temporary_particles[i]->p->f = g * this->temporary_particles[i]->p->m;
+        
+      }
     }
     // apply nary force 
     for (int i = 0; i < this->struts().size(); ++i) {
@@ -91,6 +96,7 @@ namespace physical_objects {
     for (int i = 0 ; i < this->temporary_particles.size(); ++ i) {
 //      printf("Detached? %d\n", temporary_particles[i]->isDetached);
       if (temporary_particles[i]->isDetached) {
+        // printf("I don't bouncing\n");
         continue;
       }
       for(int j = 0; j < 3; ++j) {
@@ -111,9 +117,9 @@ namespace physical_objects {
         if (!b->is_pivot)
           b->f = b->f - (fsab + fdab);
       }
-//      Particle* tp = this->temporary_particles[i]->p;
-//      printf("F_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
-//             tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
+     // Particle* tp = this->temporary_particles[i]->p;
+     // printf("F_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
+     //        tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
     }
 
   }
@@ -455,7 +461,11 @@ namespace physical_objects {
     this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
     for (int i = 0; i < this->temporary_vertices.size(); ++i) {
       if ( isAboveface(this->temporary_vertices[i].p) ) {
+        printf("I detached\n");
         this->temporary_vertices[i].isDetached = true;
+      } else {
+        printf("I attached\n");
+        this->temporary_vertices[i].isDetached = false;
       }
     }
   }
