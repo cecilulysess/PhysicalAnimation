@@ -120,17 +120,30 @@ namespace physical_objects{
   
   // a 4 adjancent particle-structs pair
   // it stores the struts as counter clock order that start frome upperleft
+  // this used to manage the attached one
   typedef struct ParticleStrutPair{
-    ParticleStrutPair(Particle *p, Strut *a, Strut *b, Strut *c);
+    ParticleStrutPair(Particle *p, Strut *a, Strut *b, Strut *c, bool* isAttached);
 //    ~ParticleStrutPair();
     
     Strut *struts[3];
     Particle* p;
-    bool isDetached;
+    bool* isAttached;
     
   }ParticleStrutPair;
   //=================================Strut==============================
   
+  //===========================DropingObject============================
+  // A dropping object that has a status of whether it is attached to
+  // something
+  typedef struct DropingObject {
+    DropingObject(Particle* center, bool isAttached) {
+      this-> center = center;
+      this->isAttached = isAttached;
+    }
+    Particle* center;
+    bool isAttached;
+  }DropingObject;
+  //====================================================================
   
   //=================================Face===============================
   // a face of triangle
@@ -159,16 +172,18 @@ namespace physical_objects{
     std::vector<ParticleStrutPair> temporary_vertices;
     
     // add a new verticle with specific parameters
-    ParticleStrutPair *add_tmp_vertices(Vector3d& loc,
-                                        Vector3d& velocity,
-                                        float mass,
+    ParticleStrutPair *add_tmp_vertices(DropingObject* obj,
                                         float spring,
                                         float damping);
-    
+    // detecting whether p is above this face
     bool isAboveface(Particle* p);
+    // detecting whether p is colliding this face
+    bool isColliding(Particle* p);
   }Face;
   
   //=================================Face===============================
+  
+  
   
   
   
@@ -184,8 +199,13 @@ namespace physical_objects{
                  float mass, float strut_spring, float strut_damp);
     ~BouncingMesh();
     
-    ParticleStrutPair* add_temp_spring(Vector3d location,
-                                       Vector3d velocity,
+    // dropping a particle to the mesh, if it collide a face, it
+    // will attached to a new temporary vertices with specified
+    // spring and damping
+    bool droping_object(DropingObject* obj, float spring, float damping);
+    
+    ParticleStrutPair* add_temp_spring(Face *face,
+                                       DropingObject* obj,
                                        float spring, float damping,
                                        float mass);
     

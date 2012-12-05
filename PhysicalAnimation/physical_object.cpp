@@ -63,7 +63,7 @@ namespace physical_objects {
     }
     for (int i = 0; i < this->temporary_vertice_size; ++i) {
       // this->temporary_particles[i]->p->v.print(); printf("\n");
-      if ( this->temporary_particles[i]->isDetached) {
+      if ( ! *this->temporary_particles[i]->isAttached) {
         // printf("I have the gravity\n");
         this->temporary_particles[i]->p->f = g * this->temporary_particles[i]->p->m;
         
@@ -95,7 +95,7 @@ namespace physical_objects {
     // apply temporary vertices force
     for (int i = 0 ; i < this->temporary_particles.size(); ++ i) {
 //      printf("Detached? %d\n", temporary_particles[i]->isDetached);
-      if (temporary_particles[i]->isDetached) {
+      if ( ! *temporary_particles[i]->isAttached) {
         // printf("I don't bouncing\n");
         continue;
       }
@@ -394,27 +394,42 @@ namespace physical_objects {
   }
 
   
-  ParticleStrutPair* BouncingMesh::add_temp_spring(Vector3d location,
-                                     Vector3d velocity,
+  ParticleStrutPair* BouncingMesh::add_temp_spring(Face* face, DropingObject* obj,
                                      float spring, float damping,
                                      float mass){
-    int faceIdx = 65;
-    this->faces_[faceIdx].add_tmp_vertices(location, velocity, mass, spring, damping);
-    return &this->faces_[faceIdx].
-          temporary_vertices[this->faces_[faceIdx].temporary_vertices.size() - 1];
+    face->add_tmp_vertices(obj,
+                           spring, damping);
+    return &face->temporary_vertices[face->temporary_vertices.size() - 1];
   }
+  
+  
+  bool BouncingMesh::droping_object(DropingObject* obj, float spring, float damping){
+    if (obj->isAttached) return false;
+    Particle* p = obj->center;
+    for (int i = 0; i < this->faces_.size(); ++i) {
+      if (this->faces_[i].isColliding(p)) {
+        this->add_temp_spring(&faces_[i], obj, spring, damping, p->m);
+        
+      }
+    }
+    return true;
+  }
+  
   //============================BouncingMesh============================
   
   
-  //=================================Strut==============================  
+  //=================================Strut==============================
+  
   ParticleStrutPair::ParticleStrutPair(Particle *p,
-                                       Strut* a, Strut* b, Strut* c){
+                                       Strut* a, Strut* b, Strut* c,
+                                       bool* isAttaching){
     
     this->p = p;
     this->struts[0] = a;
     this->struts[1] = b;
     this->struts[2] = c;
-    this->isDetached = false;
+    this->isAttached = isAttaching;
+    *this->isAttached = true;
   }
   
 //  ParticleStrutPair::~ParticleStrutPair(){
@@ -465,37 +480,54 @@ namespace physical_objects {
     return ((p->x - this->a->x) * this->normal) > 0.0;
   }
   
+  // Barycentric coordinates
+  bool Face::isColliding(Particle *p) {
+    if ( ! isAboveface(p) ) {
+//      if ( Abs((p->x - this->a->x) * this->normal) < 0.05 ) {
+      //detecting whether is in a tolerance area
+      
+        Vector3d x(p->x.x, 0, p->x.z);
+        Vector3d a(this->a->x.x, 0, this->a->x.z);
+        Vector3d b(this->b->x.x, 0, this->b->x.z);
+        Vector3d c(this->c->x.x, 0, this->c->x.z);
+        Vector3d n(0, 1, 0);
+        double Adouble = (b-a)%(c-a)*n;
+        double Au = (c-b)%(x-b)*n;
+        double Av = (x-a)%(c-a)*n;
+        double u = Au/Adouble, v = Av/Adouble;
+        return u > 0 && v > 0 && u + v <= 1.0;
+//      }
+    }
+    return false;
+  }
+
   void Face::updateFace(){
     this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
-//    this->normal.print();printf("\n");
-    for (int i = 0; i < this->temporary_vertices.size(); ++i) {
-      if ( isAboveface(this->temporary_vertices[i].p) ) {
-//        printf("I detached\n");
-        this->temporary_vertices[i].isDetached = true;
+    for (std::vector<ParticleStrutPair>::iterator it =
+         this->temporary_vertices.begin();
+         it != this->temporary_vertices.end();) {
+      if ( isAboveface(it->p) ) {
+        // when move above the face, just remove the temoprary vertice
+        it = this->temporary_vertices.erase(it);
       } else {
-//        printf("I attached\n");
-        this->temporary_vertices[i].isDetached = false;
+        it++;
       }
     }
-
   }
   
-  ParticleStrutPair* Face::add_tmp_vertices(Vector3d& loc,
-                                            Vector3d& velocity,
-                                            float mass,
-                                            float spring,
-                                            float damping){
-    Particle* p = new Particle(loc.x, loc.y, loc.z,
-                               velocity.x, velocity.y, velocity.z,
-                               mass, false);
-//    float L0 = ??;
+  ParticleStrutPair * Face::add_tmp_vertices(DropingObject* obj,
+                                      float spring,
+                                      float damping){
+    Particle* p = obj->center;
+    //    float L0 = ??;
     Strut* a = new Strut(spring, damping,
                          (p->x - this->a->x).norm(), p, this->a);
     Strut* b = new Strut(spring, damping,
                          (p->x - this->b->x).norm(), p, this->b);
     Strut* c = new Strut(spring, damping,
                          (p->x - this->c->x).norm(), p, this->c);
-    ParticleStrutPair* pair = new ParticleStrutPair(p, a, b, c);
+    ParticleStrutPair* pair = new ParticleStrutPair(p, a, b, c,
+                                                    &obj->isAttached);
     this->temporary_vertices.push_back(*pair);
     return pair;
   }

@@ -50,6 +50,7 @@ Camera *camera;
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
+physical_objects::DropingObject* dropping_obj;
 float current_time = 0.0, deltaT = 0.05;
 long framecnt = 0;
 bool drawFaceNormal = false;
@@ -78,12 +79,12 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   // draw temporary vertice as a ball
   for ( int i = 0; i < mesh.faces().size(); ++i) {
     for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
-      glColor4f(0, 0, 1, 1);
+      glColor4f(0, 1, 1, 1);
       const physical_objects::ParticleStrutPair* psp =
         &mesh.faces()[i].temporary_vertices[j];
       glLoadIdentity();
       glTranslatef(psp->p->x.x, psp->p->x.y, psp->p->x.z);
-      glutSolidSphere(0.3, 5, 5);
+      glutSolidSphere(0.1, 5, 5);
       glVertex3f(psp->p->x.x, psp->p->x.y, psp->p->x.z);
     }
   }
@@ -105,7 +106,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   
   for ( int i = 0; i < mesh.faces().size(); ++i) {
     for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
-      if  (! mesh.faces()[i].temporary_vertices[j].isDetached) {
+      if  (*mesh.faces()[i].temporary_vertices[j].isAttached) {
         
         for (int k = 0; k < 3; ++k){
         const physical_objects::Particle& pa =
@@ -113,7 +114,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
         const physical_objects::Particle& pb =
           *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.second;
           glTranslatef(pa.x.x, pa.x.y, pa.x.z);
-          glColor4f(0,0,0, 0.8);
+          glColor4f(0, 0, 0, 0.8);
           glVertex3d(pa.x.x, pa.x.y, pa.x.z);
           glColor4f(1,1,1, 0.8);
           glVertex3d(pb.x.x, pb.x.y, pb.x.z);
@@ -145,7 +146,17 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   
 }
 //===============================================================
+void draw_rigid_body(physical_objects::DropingObject* objs) {
+//  printf("F_p:(%f, %f, %f)\n", objs->f.x,objs->f.y,objs->f.z);
+  glLoadIdentity();
+  glColor4f(0, 0, 1, 1);
+  glTranslatef(objs->center->x.x, objs->center->x.y, objs->center->x.z);
+  
+  glutSolidSphere(0.3, 5, 5);
+  
+//  glVertex3f(p.x.x, p.x.y, p.x.z);
 
+}
 bool showGrid = false;
 
 // draws a simple grid
@@ -221,9 +232,11 @@ void motionEventHandler(int x, int y) {
 }
 
 void push(){
-  printf("push\n");
+  printf("Dropping\n");
   Vector3d loc(2.6, 0, 2.2), vol(0, -9.8, 0);
-  bouncing_mesh->add_temp_spring(loc, vol, obj_spring, obj_damping, obj_mass);
+  
+  bouncing_mesh->droping_object(dropping_obj, obj_spring, obj_mass);
+//  bouncing_mesh->add_temp_spring(loc, vol, obj_spring, obj_damping, obj_mass);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
@@ -276,7 +289,10 @@ void rigid_object_simulation(){
 //  rigid_objects->rotate(get_rand(0, 10), get_rand(-2.0, 2.0),
 //                        get_rand(-2.0, 2.0),
 //                        get_rand(-2.0, 2.0));
-  controller->next_step();
+//  controller->next_step();
+  if ( !dropping_obj ->isAttached ) {
+    dropping_obj->center->x.y = dropping_obj->center->x.y - 0.2;
+  }
 }
 
 void bouncing_mesh_simulation(){
@@ -285,6 +301,7 @@ void bouncing_mesh_simulation(){
           *bouncing_mesh, current_time, deltaT);
   
   bouncing_mesh->update_particles(state);
+  bouncing_mesh->droping_object(dropping_obj, obj_spring, obj_damping);
   framecnt ++;
   printf("%fs\n", framecnt / 200.0);
   
@@ -294,7 +311,7 @@ int cnt = 1;
 //// simulation function that called in glIdle loop
 void Simulate(){
 //  printf("Frame: %d\n", cnt++);
-//  rigid_object_simulation();
+  rigid_object_simulation();
   bouncing_mesh_simulation();
   glutPostRedisplay();
 //  usleep(13000);
@@ -337,6 +354,7 @@ void RenderScene(){
     makeGrid();
   
   RenderBouncingMesh();
+  draw_rigid_body(dropping_obj);
 //  RenderRigidBody();
   glutSwapBuffers();
   
@@ -369,8 +387,12 @@ void init_bouncing_mesh(){
 
 // set up something in the world
 void init_the_world(char argc, char **argv) {
+  physical_objects::Particle * p = new physical_objects::Particle( 2.6, 1.0, 2.2, //x
+                                                0.0, -9.8, 0.0, //v
+                                                obj_mass, false);
+  dropping_obj = new physical_objects::DropingObject(p, false);
   init_bouncing_mesh();
-//  init_rigid_object_world(argc, argv);
+  //  init_rigid_object_world(argc, argv);
   
 }
 
