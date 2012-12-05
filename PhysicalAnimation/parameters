@@ -1,2 +1,2 @@
-9     0    0 0       10           0.5        1          1      10     0	10
-Mass, V0x, V0y, V0z, Viscosity, CRestitution, TimeStep, DispTime, Windx, Windy, Windz
+10.95 0.7 0.02 1.0 100.9 0.1 0.005
+spring, damping, mass_of_vertice, droping object_mass, droping object spring, droping object damping, timestep

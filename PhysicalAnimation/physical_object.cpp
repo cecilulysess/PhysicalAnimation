@@ -83,8 +83,8 @@ namespace physical_objects {
                                             //Vb-Va
                                             (b->v - a->v) * uab * uab
                                             );
-      //    printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
-      //               fdab.x, fdab.y, fdab.z);
+//    printf("%d: fs: (%f,%f,%f), fd: (%f,%f,%f)\n", i, fsab.x, fsab.y, fsab.z,
+//               fdab.x, fdab.y, fdab.z);
       
       if (!a->is_pivot)
         a->f = a->f + (fsab + fdab);
@@ -104,6 +104,7 @@ namespace physical_objects {
         Particle* a = st->vertice_pair.first;
         Particle* b = st->vertice_pair.second;
         Vector3d L = a->x - b->x;
+//        L.print();printf("L\t");
         Vector3d uab = L / L.norm();
         float delta_L = (L.norm() - st->L0);
         Vector3d fsab = - st->K * delta_L * uab;
@@ -117,9 +118,9 @@ namespace physical_objects {
         if (!b->is_pivot)
           b->f = b->f - (fsab + fdab);
       }
-     // Particle* tp = this->temporary_particles[i]->p;
-     // printf("F_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
-     //        tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
+       Particle* tp = this->temporary_particles[i]->p;
+       printf("\t\tF_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
+              tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
     }
 
   }
@@ -174,6 +175,9 @@ namespace physical_objects {
   void BouncingMesh::clear_force(){
     for (int i = 0; i < N; ++i) {
       mesh_particles_[i].f = Vector3d(0, 0, 0);
+    }
+    for (int i = 0; i < this->temporary_particles.size(); ++i) {
+      this->temporary_particles[i]->p->f = Vector3d(0, 0, 0);
     }
   }
   
@@ -453,22 +457,27 @@ namespace physical_objects {
   bool Face::isAboveface(Particle* p){
 //    p->x.print();
 //    this->normal.print();
+////    this->normal.normalize().print();
 //    printf("Above face %f \n",(p->x * this->normal));
-    return (p->x * this->normal) > 0.0;
+//    double res = (p->x * this->normal);
+//    if ( res < 0.0 && p->x.y > 0)
+//       res = (p->x * this->normal);
+    return ((p->x - this->a->x) * this->normal) > 0.0;
   }
   
   void Face::updateFace(){
     this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
-    for (std::vector<ParticleStrutPair>::iterator it =
-         this->temporary_vertices.begin();
-         it != this->temporary_vertices.end();) {
-      if ( isAboveface(it->p) ) {
-        // when move above the face, just remove the temoprary vertice
-        it = this->temporary_vertices.erase(it);
+//    this->normal.print();printf("\n");
+    for (int i = 0; i < this->temporary_vertices.size(); ++i) {
+      if ( isAboveface(this->temporary_vertices[i].p) ) {
+//        printf("I detached\n");
+        this->temporary_vertices[i].isDetached = true;
       } else {
-        it++;
+//        printf("I attached\n");
+        this->temporary_vertices[i].isDetached = false;
       }
     }
+
   }
   
   ParticleStrutPair* Face::add_tmp_vertices(Vector3d& loc,

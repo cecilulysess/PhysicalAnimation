@@ -38,14 +38,20 @@ using namespace std;
 #define WIDTH	    1024	/* Window dimensions */
 #define HEIGHT		768
 #define TIMESTEP  0.01
+//===================Global parameter============================
+double mesh_spring, mesh_damping, mesh_v_mass, obj_mess, obj_spring,
+obj_damping;
+//===============================================================
+
 
 Camera *camera;
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
-float current_time = 0.0, deltaT = 0.005;
-
+float current_time = 0.0, deltaT = 0.05;
+long framecnt = 0;
+bool drawFaceNormal = false;
 
 void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -117,20 +123,21 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
 //  glutSolidSphere(0.5, 5, 5);
   
   // draw face normal
+  if (drawFaceNormal) {
+    for (int i = 0;  i < mesh.faces().size(); ++i){
+      const physical_objects::Particle& pa = *mesh.faces()[i].a;
+      const physical_objects::Particle& pb = *mesh.faces()[i].b;
+      const physical_objects::Particle& pc = *mesh.faces()[i].c;
 
-  for (int i = 0;  i < mesh.faces().size(); ++i){
-    const physical_objects::Particle& pa = *mesh.faces()[i].a;
-    const physical_objects::Particle& pb = *mesh.faces()[i].b;
-    const physical_objects::Particle& pc = *mesh.faces()[i].c;
-
-    Vector3d n = mesh.faces()[i].normal;
-    Vector3d ctr = ((pa.x - pb.x) + (pc.x - pb.x))/3 + pb.x;
-    glBegin(GL_LINES);
-    glVertex3d(ctr.x, ctr.y, ctr.z);
-    glVertex3d(ctr.x + n.x, ctr.y + n.y, ctr.z + n.z);
-    glEnd();
+      Vector3d n = mesh.faces()[i].normal;
+      Vector3d ctr = ((pa.x - pb.x) + (pc.x - pb.x))/3 + pb.x;
+      glBegin(GL_LINES);
+      glVertex3d(ctr.x, ctr.y, ctr.z);
+      glVertex3d(ctr.x + n.x, ctr.y + n.y, ctr.z + n.z);
+      glEnd();
+    }
   }
-    
+  
 }
 //===============================================================
 
@@ -211,7 +218,7 @@ void motionEventHandler(int x, int y) {
 void push(){
   printf("push\n");
   Vector3d loc(2.6, 0, 2.2), vol(0, -9.8, 0);
-  bouncing_mesh->add_temp_spring(loc, vol, 0.9, 0.5, 0.1);
+  bouncing_mesh->add_temp_spring(loc, vol, 100.9, 0.1, 1);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
@@ -229,6 +236,9 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
        break;
     case 'g': case 'G':
       showGrid = !showGrid;
+      break;
+    case 'n': case 'N':
+      drawFaceNormal = ! drawFaceNormal;
       break;
     // case 'a': case 'A':
     //   obs2ctr.x -= move_step;
@@ -270,6 +280,8 @@ void bouncing_mesh_simulation(){
           *bouncing_mesh, current_time, deltaT);
   
   bouncing_mesh->update_particles(state);
+  framecnt ++;
+  printf("%fs\n", framecnt / 200.0);
   
 }
 
@@ -345,8 +357,8 @@ void init_rigid_object_world(char argc, char **argv){
 
 void init_bouncing_mesh(){
   bouncing_mesh = new physical_objects::BouncingMesh(-10, 0, -10,
-                                                     20, 20, 6, 0.05,
-                                                     0.95, 0.7 ); //spring and d
+                                                     20, 20, 6, 0.02,
+                                                     10.95, 0.7 ); //spring and d
   push();
 }
 
@@ -370,14 +382,14 @@ void LoadParameters(char *filename){
   }
   
 //  ParamFilename = filename;
-  double Mass, v0x, v0y, v0z, drag, elastic, time_step, vwx, vwy, vwz, disp_time;
-  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
-            &Mass, &v0x, &v0y, &v0z, &drag, &elastic,
-            &time_step, &disp_time, &vwx, &vwy, &vwz) != 11){
+  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %f",
+            &mesh_spring, &mesh_damping, &mesh_v_mass, &obj_mess, &obj_spring,
+            &obj_damping, &deltaT) != 7){
     fprintf(stderr, "error reading parameter file %s\n", filename);
     fclose(paramfile);
     exit(1);
   }
+//  deltaT = 0.005;
 }
 
 static char* parafile;
@@ -391,15 +403,15 @@ void Reset(){
  Main program to draw the square, change colors, and wait for quit
  */
 int main(int argc, char* argv[]){
-//  if(argc != 2){
-//    fprintf(stderr, "usage: bounce paramfile\n");
-//    exit(1);
-//  }
-//  LoadParameters(argv[1]);
-//  parafile = argv[1];
+  if(argc != 2){
+    fprintf(stderr, "usage: boucing paramfile\n");
+    exit(1);
+  }
+  LoadParameters(argv[1]);
+  parafile = argv[1];
   
   init_the_world(argc, argv);
-  printf("R reset camera\nG toggle grid\nPress L to rain\nQ quit\n");
+  printf("R reset camera\nG toggle grid\nPress S to drop ball\nPress N to draw face normal\nQ quit\n");
   
   // start up the glut utilities
   glutInit(&argc, argv);
