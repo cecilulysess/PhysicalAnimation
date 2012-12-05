@@ -15,6 +15,7 @@
 #define ISDIAGONAL 
 
 namespace physical_objects {
+  Vector3d gravity(0, -9.8, 0);
   
   //============================State Vector============================
   StateVector::StateVector(int size){
@@ -49,7 +50,7 @@ namespace physical_objects {
   
   //============================BouncingMesh============================
   void BouncingMesh::compute_force(StateVector& X, float t){
-    Vector3d g(0, -9.8, 0);
+    Vector3d& g = gravity;
     clear_force();
     float mass = 0.0;
     // apply unary force to each particle with state X
@@ -507,6 +508,8 @@ namespace physical_objects {
          this->temporary_vertices.begin();
          it != this->temporary_vertices.end();) {
       if ( isAboveface(it->p) ) {
+        // detach the particle
+        *it->isAttached = false;
         // when move above the face, just remove the temoprary vertice
         it = this->temporary_vertices.erase(it);
       } else {
@@ -534,7 +537,7 @@ namespace physical_objects {
   
   //=================================Face===============================
   
-    
+  
   StateVector NumericalIntegrator::RK4Integrate(BouncingMesh& sv, float t,
                                                  float deltaT){
     StateVector& x = sv.state_vector();
@@ -548,5 +551,18 @@ namespace physical_objects {
     return res;
   }
   
+  void DropingObject::next_step(DropingObject *obj,
+                                double current_time, double deltaT){
+    // if attached, let the mesh to do the calculation
+    if (obj ->isAttached ) {
+      return;
+    } else {
+      obj->center->f = gravity;
+      Vector3d a = obj->center->f / obj->center->m;
+      obj->center->v = obj->center->v + deltaT * a;
+      obj->center->x = obj->center->x + deltaT * obj->center->v;
+    }
+    
+  }
   
 }

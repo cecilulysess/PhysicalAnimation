@@ -142,6 +142,8 @@ namespace physical_objects{
     }
     Particle* center;
     bool isAttached;
+    // get the next time step of given object
+    static void next_step(DropingObject *obj, double current_time, double deltaT);
   }DropingObject;
   //====================================================================
   

@@ -38,6 +38,7 @@ using namespace std;
 #define WIDTH	    1024	/* Window dimensions */
 #define HEIGHT		768
 #define TIMESTEP  0.01
+
 //===================Global parameter============================
 double mesh_spring, mesh_damping, mesh_v_mass, obj_mass, obj_spring,
 obj_damping, mesh_ulx, mesh_uly;
@@ -291,7 +292,7 @@ void rigid_object_simulation(){
 //                        get_rand(-2.0, 2.0));
 //  controller->next_step();
   if ( !dropping_obj ->isAttached ) {
-    dropping_obj->center->x.y = dropping_obj->center->x.y - 0.2;
+    physical_objects::DropingObject::next_step(dropping_obj, current_time, deltaT);
   }
 }
 
@@ -303,7 +304,7 @@ void bouncing_mesh_simulation(){
   bouncing_mesh->update_particles(state);
   bouncing_mesh->droping_object(dropping_obj, obj_spring, obj_damping);
   framecnt ++;
-  printf("%fs\n", framecnt / 200.0);
+  printf("%fs\tFrames:%d\n", framecnt / 200.0, (int) framecnt);
   
 }
 
@@ -387,8 +388,8 @@ void init_bouncing_mesh(){
 
 // set up something in the world
 void init_the_world(char argc, char **argv) {
-  physical_objects::Particle * p = new physical_objects::Particle( 2.6, 1.0, 2.2, //x
-                                                0.0, -9.8, 0.0, //v
+  physical_objects::Particle * p = new physical_objects::Particle( 2.6, 10.0, 2.2, //x
+                                                0.0, 0, 0.0, //v
                                                 obj_mass, false);
   dropping_obj = new physical_objects::DropingObject(p, false);
   init_bouncing_mesh();
