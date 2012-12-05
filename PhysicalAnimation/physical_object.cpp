@@ -119,9 +119,9 @@ namespace physical_objects {
         if (!b->is_pivot)
           b->f = b->f - (fsab + fdab);
       }
-       Particle* tp = this->temporary_particles[i]->p;
-       printf("\t\tF_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
-              tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
+//       Particle* tp = this->temporary_particles[i]->p;
+//       printf("\t\tF_TP = (%f, %f, %f), V_TP = (%f, %f, %f)\n", tp->f.x,
+//              tp->f.y,tp->f.z, tp->v.x, tp->v.y, tp->v.z);
     }
 
   }

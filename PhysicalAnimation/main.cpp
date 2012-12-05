@@ -261,7 +261,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     case 'f': case 'F':
       camera->SetCenterOfFocus(Vector3d(0, 0, 0));
       break;
-     case 'l': case 'L':
+     case 's': case 'S':
        push();
        break;
     case 'g': case 'G':
@@ -399,7 +399,9 @@ void init_rigid_object_world(char argc, char **argv){
 
 void init_bouncing_mesh(){
   bouncing_mesh = new physical_objects::BouncingMesh(mesh_ulx, 0, mesh_uly,
-                                                     mesh_subdiv, mesh_subdiv, 6, mesh_v_mass,
+                                                     Abs(mesh_ulx*2),
+                                                     Abs(mesh_uly*2),
+                                                     mesh_subdiv, mesh_v_mass,
                                                      mesh_spring, mesh_damping ); //spring and d
 //  push();
 }

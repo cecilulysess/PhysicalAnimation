@@ -1,2 +1,2 @@
-10.95 0.99 0.02 1.0 100.9 0.1 0.005 -10.0 -10.0 20
+10.95 0.99 0.02 1.0 100.9 0.1 0.005 -15.0 -15.0 12
 spring, damping, mass_of_vertice, droping object_mass, droping object spring, droping object damping, timestep, mesh upper left vertice x, mesh upper left vertice y, subdivision
