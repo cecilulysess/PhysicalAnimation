@@ -459,13 +459,14 @@ namespace physical_objects {
   
   void Face::updateFace(){
     this->normal = ((b->x - a->x) % (c->x - a->x)).normalize();
-    for (int i = 0; i < this->temporary_vertices.size(); ++i) {
-      if ( isAboveface(this->temporary_vertices[i].p) ) {
-        printf("I detached\n");
-        this->temporary_vertices[i].isDetached = true;
+    for (std::vector<ParticleStrutPair>::iterator it =
+         this->temporary_vertices.begin();
+         it != this->temporary_vertices.end();) {
+      if ( isAboveface(it->p) ) {
+        // when move above the face, just remove the temoprary vertice
+        it = this->temporary_vertices.erase(it);
       } else {
-        printf("I attached\n");
-        this->temporary_vertices[i].isDetached = false;
+        it++;
       }
     }
   }

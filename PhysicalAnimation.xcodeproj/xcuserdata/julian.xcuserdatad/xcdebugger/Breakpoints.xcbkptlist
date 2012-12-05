@@ -629,12 +629,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
+         timestampString = "376366524.405403"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "490"
-         endingLineNumber = "490"
-         landmarkName = "NumericalIntegrator::RK4Integrate(BouncingMesh&amp; sv, float t, float deltaT)"
+         startingLineNumber = "491"
+         endingLineNumber = "491"
+         landmarkName = "Face::add_tmp_vertices(Vector3d&amp; loc, Vector3d&amp; velocity, float mass, float spring, float damping)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -642,12 +642,23 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
+         timestampString = "376366524.405403"
+         startingColumnNumber = "9223372036854775807"
+         endingColumnNumber = "9223372036854775807"
+         startingLineNumber = "493"
+         endingLineNumber = "493">
+      </FileBreakpoint>
+      <FileBreakpoint
+         shouldBeEnabled = "No"
+         ignoreCount = "0"
+         continueAfterRunningActions = "No"
+         filePath = "PhysicalAnimation/physical_object.cpp"
+         timestampString = "376366524.405403"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "492"
          endingLineNumber = "492"
-         landmarkName = "NumericalIntegrator::RK4Integrate(BouncingMesh&amp; sv, float t, float deltaT)"
+         landmarkName = "Face::add_tmp_vertices(Vector3d&amp; loc, Vector3d&amp; velocity, float mass, float spring, float damping)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -655,25 +666,12 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
+         timestampString = "376366524.405403"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "491"
-         endingLineNumber = "491"
-         landmarkName = "NumericalIntegrator::RK4Integrate(BouncingMesh&amp; sv, float t, float deltaT)"
-         landmarkType = "5">
-      </FileBreakpoint>
-      <FileBreakpoint
-         shouldBeEnabled = "No"
-         ignoreCount = "0"
-         continueAfterRunningActions = "No"
-         filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
-         startingColumnNumber = "9223372036854775807"
-         endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "491"
-         endingLineNumber = "491"
-         landmarkName = "NumericalIntegrator::RK4Integrate(BouncingMesh&amp; sv, float t, float deltaT)"
+         startingLineNumber = "492"
+         endingLineNumber = "492"
+         landmarkName = "Face::add_tmp_vertices(Vector3d&amp; loc, Vector3d&amp; velocity, float mass, float spring, float damping)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -716,11 +714,13 @@
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
+         timestampString = "376366524.405403"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "485"
-         endingLineNumber = "485">
+         startingLineNumber = "486"
+         endingLineNumber = "486"
+         landmarkName = "Face::add_tmp_vertices(Vector3d&amp; loc, Vector3d&amp; velocity, float mass, float spring, float damping)"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -731,20 +731,20 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "125"
-         endingLineNumber = "125">
+         endingLineNumber = "125"
+         landmarkName = "BouncingMesh::compute_force(StateVector&amp; X, float t)"
+         landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
          ignoreCount = "0"
          continueAfterRunningActions = "No"
          filePath = "PhysicalAnimation/physical_object.cpp"
-         timestampString = "376346200.813713"
+         timestampString = "376366524.405403"
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
-         startingLineNumber = "493"
-         endingLineNumber = "493"
-         landmarkName = "NumericalIntegrator::RK4Integrate(BouncingMesh&amp; sv, float t, float deltaT)"
-         landmarkType = "5">
+         startingLineNumber = "494"
+         endingLineNumber = "494">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -808,9 +808,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "403"
-         endingLineNumber = "403"
-         landmarkName = "ParticleStrutPair::ParticleStrutPair(Particle *p, Strut* a, Strut* b, Strut* c)"
-         landmarkType = "5">
+         endingLineNumber = "403">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
@@ -888,7 +886,7 @@
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "388"
          endingLineNumber = "388"
-         landmarkName = "BouncingMesh::add_temp_spring(Vector3d location, Vector3d velocity, float spring, float damping, float mass)"
+         landmarkName = "BouncingMesh::dynamic(StateVector X, float t)"
          landmarkType = "5">
       </FileBreakpoint>
       <FileBreakpoint
@@ -900,9 +898,7 @@
          startingColumnNumber = "9223372036854775807"
          endingColumnNumber = "9223372036854775807"
          startingLineNumber = "424"
-         endingLineNumber = "424"
-         landmarkName = "BouncingMesh::create_faces()"
-         landmarkType = "5">
+         endingLineNumber = "424">
       </FileBreakpoint>
       <FileBreakpoint
          shouldBeEnabled = "No"
