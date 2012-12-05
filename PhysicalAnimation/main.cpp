@@ -51,7 +51,7 @@ Camera *camera;
 ModelObject *rigid_objects;
 MotionController *controller;
 physical_objects::BouncingMesh* bouncing_mesh;
-physical_objects::DropingObject* dropping_obj;
+std::vector<physical_objects::DropingObject*> dropping_objs;
 float current_time = 0.0, deltaT = 0.05;
 long framecnt = 0;
 bool drawFaceNormal = false;
@@ -147,14 +147,19 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   
 }
 //===============================================================
-void draw_rigid_body(physical_objects::DropingObject* objs) {
+void draw_rigid_body(std::vector<physical_objects::DropingObject*> objs) {
 //  printf("F_p:(%f, %f, %f)\n", objs->f.x,objs->f.y,objs->f.z);
-  glLoadIdentity();
+
+  
   glColor4f(0, 0, 1, 1);
-  glTranslatef(objs->center->x.x, objs->center->x.y, objs->center->x.z);
-  
-  glutSolidSphere(0.3, 5, 5);
-  
+  for (int i = 0; i < objs.size(); ++i) {
+    glLoadIdentity();
+    glTranslatef(objs[i]->center->x.x, objs[i]->center->x.y, objs[i]->center->x.z);
+    
+    glutSolidSphere(0.3, 5, 5);
+
+  }
+    
 //  glVertex3f(p.x.x, p.x.y, p.x.z);
 
 }
@@ -233,10 +238,16 @@ void motionEventHandler(int x, int y) {
 }
 
 void push(){
-  printf("Dropping\n");
-  Vector3d loc(2.6, 0, 2.2), vol(0, -9.8, 0);
-  
-  bouncing_mesh->droping_object(dropping_obj, obj_spring, obj_mass);
+  double x = (rand() % 2000) /100.0 - 10.0, y = (rand() % 2000) / 100.0 - 10.0;
+  double vy = - (rand() % 1000) /100.0;
+  physical_objects::Particle * p = new physical_objects::Particle(x, 10.0, y, //x
+                                                                  0.0, vy, 0.0, //v
+                                                                  obj_mass, false);
+  physical_objects::DropingObject* dop =
+    new physical_objects::DropingObject(p, false);
+
+  dropping_objs.push_back(dop);
+  bouncing_mesh->droping_object(dop, obj_spring, obj_mass);
 //  bouncing_mesh->add_temp_spring(loc, vol, obj_spring, obj_damping, obj_mass);
 }
 
@@ -291,9 +302,13 @@ void rigid_object_simulation(){
 //                        get_rand(-2.0, 2.0),
 //                        get_rand(-2.0, 2.0));
 //  controller->next_step();
-  if ( !dropping_obj ->isAttached ) {
-    physical_objects::DropingObject::next_step(dropping_obj, current_time, deltaT);
+  for (int i = 0; i < dropping_objs.size(); ++i) {
+    if ( !dropping_objs[i] ->isAttached ) {
+      physical_objects::DropingObject::next_step(
+                                    dropping_objs[i], current_time, deltaT);
+    }
   }
+  
 }
 
 void bouncing_mesh_simulation(){
@@ -302,7 +317,10 @@ void bouncing_mesh_simulation(){
           *bouncing_mesh, current_time, deltaT);
   
   bouncing_mesh->update_particles(state);
-  bouncing_mesh->droping_object(dropping_obj, obj_spring, obj_damping);
+  for (int i = 0; i < dropping_objs.size(); ++i) {
+    bouncing_mesh->droping_object(dropping_objs[i], obj_spring, obj_damping);
+  }
+  
   framecnt ++;
   printf("%fs\tFrames:%d\n", framecnt / 200.0, (int) framecnt);
   
@@ -355,7 +373,7 @@ void RenderScene(){
     makeGrid();
   
   RenderBouncingMesh();
-  draw_rigid_body(dropping_obj);
+  draw_rigid_body(dropping_objs);
 //  RenderRigidBody();
   glutSwapBuffers();
   
@@ -383,15 +401,11 @@ void init_bouncing_mesh(){
   bouncing_mesh = new physical_objects::BouncingMesh(mesh_ulx, 0, mesh_uly,
                                                      mesh_subdiv, mesh_subdiv, 6, mesh_v_mass,
                                                      mesh_spring, mesh_damping ); //spring and d
-  push();
+//  push();
 }
 
 // set up something in the world
 void init_the_world(char argc, char **argv) {
-  physical_objects::Particle * p = new physical_objects::Particle( 2.6, 10.0, 2.2, //x
-                                                0.0, 0, 0.0, //v
-                                                obj_mass, false);
-  dropping_obj = new physical_objects::DropingObject(p, false);
   init_bouncing_mesh();
   //  init_rigid_object_world(argc, argv);
   
