@@ -39,8 +39,9 @@ using namespace std;
 #define HEIGHT		768
 #define TIMESTEP  0.01
 //===================Global parameter============================
-double mesh_spring, mesh_damping, mesh_v_mass, obj_mess, obj_spring,
-obj_damping;
+double mesh_spring, mesh_damping, mesh_v_mass, obj_mass, obj_spring,
+obj_damping, mesh_ulx, mesh_uly;
+int mesh_subdiv;
 //===============================================================
 
 
@@ -74,6 +75,7 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
                 1 - (1.0 / mesh.mesh_particles().size()) * i, 1);
     
   }
+  // draw temporary vertice as a ball
   for ( int i = 0; i < mesh.faces().size(); ++i) {
     for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
       glColor4f(0, 0, 1, 1);
@@ -99,20 +101,23 @@ void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   }
 //  printf("Draw struts: %d\n", mesh.struts().size());
   
-  // draw temporary vertices
+  // draw temporary vertices strut
   
   for ( int i = 0; i < mesh.faces().size(); ++i) {
     for (int j = 0; j < mesh.faces()[i].temporary_vertices.size(); ++j){
-      for (int k = 0; k < 3; ++k){
-      const physical_objects::Particle& pa =
-        *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.first;
-      const physical_objects::Particle& pb =
-        *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.second;
-        glTranslatef(pa.x.x, pa.x.y, pa.x.z);
-        glColor4f(0,0,0, 0.8);
-        glVertex3d(pa.x.x, pa.x.y, pa.x.z);
-        glColor4f(1,1,1, 0.8);
-        glVertex3d(pb.x.x, pb.x.y, pb.x.z);
+      if  (! mesh.faces()[i].temporary_vertices[j].isDetached) {
+        
+        for (int k = 0; k < 3; ++k){
+        const physical_objects::Particle& pa =
+          *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.first;
+        const physical_objects::Particle& pb =
+          *mesh.faces()[i].temporary_vertices[j].struts[k]->vertice_pair.second;
+          glTranslatef(pa.x.x, pa.x.y, pa.x.z);
+          glColor4f(0,0,0, 0.8);
+          glVertex3d(pa.x.x, pa.x.y, pa.x.z);
+          glColor4f(1,1,1, 0.8);
+          glVertex3d(pb.x.x, pb.x.y, pb.x.z);
+        }
       }
     }
   }
@@ -218,7 +223,7 @@ void motionEventHandler(int x, int y) {
 void push(){
   printf("push\n");
   Vector3d loc(2.6, 0, 2.2), vol(0, -9.8, 0);
-  bouncing_mesh->add_temp_spring(loc, vol, 100.9, 0.1, 1);
+  bouncing_mesh->add_temp_spring(loc, vol, obj_spring, obj_damping, obj_mass);
 }
 
 void keyboardEventHandler(unsigned char key, int x, int y) {
@@ -356,9 +361,9 @@ void init_rigid_object_world(char argc, char **argv){
 }
 
 void init_bouncing_mesh(){
-  bouncing_mesh = new physical_objects::BouncingMesh(-10, 0, -10,
-                                                     20, 20, 6, 0.02,
-                                                     10.95, 0.7 ); //spring and d
+  bouncing_mesh = new physical_objects::BouncingMesh(mesh_ulx, 0, mesh_uly,
+                                                     mesh_subdiv, mesh_subdiv, 6, mesh_v_mass,
+                                                     mesh_spring, mesh_damping ); //spring and d
   push();
 }
 
@@ -382,9 +387,9 @@ void LoadParameters(char *filename){
   }
   
 //  ParamFilename = filename;
-  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %f",
-            &mesh_spring, &mesh_damping, &mesh_v_mass, &obj_mess, &obj_spring,
-            &obj_damping, &deltaT) != 7){
+  if(fscanf(paramfile, "%lf %lf %lf %lf %lf %lf %f %lf %lf %d",
+            &mesh_spring, &mesh_damping, &mesh_v_mass, &obj_mass, &obj_spring,
+            &obj_damping, &deltaT, &mesh_ulx, &mesh_uly, &mesh_subdiv) != 10){
     fprintf(stderr, "error reading parameter file %s\n", filename);
     fclose(paramfile);
     exit(1);
