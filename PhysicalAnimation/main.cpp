@@ -32,13 +32,19 @@
 
 #include "ObjLoader.h"
 #include "physical_object.h"
+#include <Magick++.h>
+#include "FrameGrabber.h"
 #include<stdlib.h>
 using namespace std;
 
-#define WIDTH	    1024	/* Window dimensions */
-#define HEIGHT		768
-#define TIMESTEP  0.01
+#define HDWIDTH       1920    // HD image dimensions
+#define HDHEIGHT      1080
+#define WIDTH       (HDWIDTH/2) // window dimensions = 1/2 HD
+#define HEIGHT        (HDHEIGHT/2)
+#define STARTFRAME    0     // first frame number for numbering image files
 
+static string MYPATH = "/home/yanxiaw/Programming/cs619/final/animation";
+static string MYFILENAME = "trampline";
 //===================Global parameter============================
 double mesh_spring, mesh_damping, mesh_v_mass, obj_mass, obj_spring,
 obj_damping, mesh_ulx, mesh_uly;
@@ -47,6 +53,8 @@ int mesh_subdiv;
 
 
 Camera *camera;
+
+FrameGrabber framegrabber(MYPATH, MYFILENAME, HDWIDTH, HDHEIGHT, STARTFRAME);
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
@@ -55,6 +63,12 @@ std::vector<physical_objects::DropingObject*> dropping_objs;
 float current_time = 0.0, deltaT = 0.05;
 long framecnt = 0;
 bool drawFaceNormal = false;
+bool Recording = false;
+
+using namespace Magick;
+
+
+
 
 void draw_bouncing_mesh(physical_objects::BouncingMesh& mesh){
   glClear(GL_DEPTH_BUFFER_BIT);
@@ -215,7 +229,7 @@ void init() {
   // parameters are eye point, aim point, up vector
   //  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
   //                      Vector3d(0, 1, 0));
-  camera = new Camera(Vector3d(0, 25, 18), Vector3d(0, 0, 0),
+  camera = new Camera(Vector3d(-8.5, 7, 28), Vector3d(0, 0, 0),
                                                 Vector3d(0, 1, 0));
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0);
@@ -234,6 +248,7 @@ void mouseEventHandler(int button, int state, int x, int y) {
 void motionEventHandler(int x, int y) {
   // let the camera handle some mouse motions if the camera is to be moved
   camera->HandleMouseMotion(x, y);
+  camera->Pos.print();
   glutPostRedisplay();
 }
 
@@ -254,7 +269,7 @@ void push(){
 void keyboardEventHandler(unsigned char key, int x, int y) {
 //  float move_step = 0.15;
   switch (key) {
-    case 'r': case 'R':
+    case 'c': case 'C':
       // reset the camera to its initial position
       camera->Reset();
       break;
@@ -288,6 +303,10 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     // case 'x': case 'X':
     //   obs2ctr.z -= move_step;
     //   break;
+    case 'r': case 'R':
+      Recording = !Recording;
+      glutPostRedisplay();
+      break;
     case 'q': case 'Q':	// q or esc - quit
     case 27:		// esc
       exit(0);
@@ -359,10 +378,12 @@ void RenderRigidBody(){
 
 }
 
+
+
 /*
  On Redraw request, erase the window and redraw everything
  */
-void RenderScene(){
+void drawEverything(){
   
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -379,6 +400,12 @@ void RenderScene(){
   
 }
 
+void RenderScene(){
+  drawEverything();
+  glutSwapBuffers();
+  if(Recording)
+    framegrabber.recordimage(drawEverything);
+}
 void init_rigid_object_world(char argc, char **argv){
   int obj_no = 0 ;
   ObjLoader::loadObject(argv[1], obj_no);

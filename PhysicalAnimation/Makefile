@@ -12,18 +12,24 @@
 CC	= g++
 C	= cpp
 H	= h
-CFLAGS 	= -g
+CFLAGS		= -g `Magick++-config --cppflags`
+MAGICKLIB       = `Magick++-config --ldflags` -lMagick++
 
 ifeq ("$(shell uname)", "Darwin")
-  LDFLAGS     = -framework Foundation -framework GLUT -framework OpenGL -lm
+  LDFLAGS     = -framework Foundation -framework GLUT -framework OpenGL -lm ${MAGICKLIB}
 else
   ifeq ("$(shell uname)", "Linux")
-    LDFLAGS     = -lglut -lGL -lGLU -lm
+    LDFLAGS     = -lglut -lGL -lGLU -lm ${MAGICKLIB}
   endif
 endif
 
-HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} Quaternion.${H} ObjLoader.${H} physical_object.${H}
-OFILES 	= Matrix.o Vector.o Utility.o Camera.o Quaternion.o ObjLoader.o physical_object.o
+
+HFILES 	= Matrix.${H} Vector.${H} Utility.${H} Camera.${H} gauss.${H} \
+			Quaternion.${H} ObjLoader.${H} physical_object.${H} FrameGrabber.${H}
+OFILES 	= Matrix.o Vector.o Utility.o Camera.o \
+	Quaternion.o ObjLoader.o physical_object.o \
+	FrameGrabber.o
+	
 PROJECT = main
 
 ${PROJECT}:	${PROJECT}.o $(OFILES)
@@ -52,7 +58,10 @@ ObjLoader.o : ObjLoader.${C} ObjLoader.${H}
 
 physical_object.o : physical_object.${C} physical_object.${H}
 	${CC} $(CFLAGS) -c physical_object.${C}
-  
+ 
+FrameGrabber.o:	FrameGrabber.${C} ${HFILES}
+	${CC} ${CFLAGS} -c FrameGrabber.${C} 
+
 debug:
 	make 'DFLAGS = /usr/lib/debug/malloc.o'
 
