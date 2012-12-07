@@ -59,8 +59,8 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/julian/Programming/cs619/PhysicalAnimation/parameters "
-            isEnabled = "NO">
+            argument = "/Users/julian/Programming/cs619/PhysicalAnimation/PhysicalAnimation/parameters "
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/flag.obj"
@@ -68,7 +68,7 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/rigid.obj"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "/Users/julian/Programming/cs619/PhysicalAnimation/model/test.obj"

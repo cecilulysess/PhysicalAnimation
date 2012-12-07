@@ -37,7 +37,7 @@ using namespace std;
 
 #define WIDTH	    1024	/* Window dimensions */
 #define HEIGHT		768
-#define TIMESTEP  0.01
+//#define TIMESTEP  0.01
 
 //===================Global parameter============================
 double mesh_spring, mesh_damping, mesh_v_mass, obj_mass, obj_spring,
@@ -322,7 +322,7 @@ void bouncing_mesh_simulation(){
   }
   
   framecnt ++;
-  printf("%fs\tFrames:%d\n", framecnt / 200.0, (int) framecnt);
+  printf("%fs\tFrames:%d\n", framecnt * deltaT, (int) framecnt);
   
 }
 
