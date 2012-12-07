@@ -32,17 +32,22 @@
 
 #include "ObjLoader.h"
 #include "physical_object.h"
-//#include <Magick++.h>
-//#include "FrameGrabber.h"
+#include <Magick++.h>
+#include "FrameGrabber.h"
 #include<stdlib.h>
 using namespace std;
 
+<<<<<<< HEAD
+#define WIDTH	    1024	/* Window dimensions */
+#define HEIGHT		768
+//#define TIMESTEP  0.01
+=======
 #define HDWIDTH       1920    // HD image dimensions
 #define HDHEIGHT      1080
 #define WIDTH       (HDWIDTH/2) // window dimensions = 1/2 HD
 #define HEIGHT        (HDHEIGHT/2)
 #define STARTFRAME    0     // first frame number for numbering image files
-
+>>>>>>> e2504753f6e7f1560e9eeeb4e306ecccb00829b7
 
 static string MYPATH = "/home/yanxiaw/Programming/cs619/final/animation";
 static string MYFILENAME = "trampline";
@@ -55,7 +60,7 @@ int mesh_subdiv;
 
 Camera *camera;
 
-//FrameGrabber framegrabber(MYPATH, MYFILENAME, HDWIDTH, HDHEIGHT, STARTFRAME);
+FrameGrabber framegrabber(MYPATH, MYFILENAME, HDWIDTH, HDHEIGHT, STARTFRAME);
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
@@ -66,7 +71,7 @@ long framecnt = 0;
 bool drawFaceNormal = false;
 bool Recording = false;
 
-//using namespace Magick;
+using namespace Magick;
 
 
 
@@ -404,8 +409,8 @@ void drawEverything(){
 void RenderScene(){
   drawEverything();
   glutSwapBuffers();
-//  if(Recording)
-//    framegrabber.recordimage(drawEverything);
+  if(Recording)
+    framegrabber.recordimage(drawEverything);
 }
 void init_rigid_object_world(char argc, char **argv){
   int obj_no = 0 ;
