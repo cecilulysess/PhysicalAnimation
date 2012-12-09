@@ -69,6 +69,7 @@ physical_objects::BouncingMesh* bouncing_mesh;
 std::vector<physical_objects::DropingObject*> dropping_objs;
 float current_time = 0.0, deltaT = 0.05;
 long framecnt = 0;
+long startframe = 0;
 bool drawFaceNormal = false;
 bool Recording = false;
 
@@ -222,7 +223,7 @@ void draw_rigid_body(std::vector<physical_objects::DropingObject*> objs) {
   for (int i = 0; i < objs.size(); ++i) {
     glColor4f(0, 1, 1, 1);
     glLoadIdentity();
-    glTranslatef(objs[i]->center->x.x, objs[i]->center->x.y + OBJRADIUS, objs[i]->center->x.z);
+    glTranslatef(objs[i]->center->x.x, objs[i]->center->x.y + OBJRADIUS * 1.5, objs[i]->center->x.z);
     
     glutSolidSphere(OBJRADIUS, 15, 15);
 
@@ -306,7 +307,7 @@ void motionEventHandler(int x, int y) {
 void push(){
   double x = (rand() % 2000) /100.0 - 10.0, y = (rand() % 2000) / 100.0 - 10.0;
   double vy = - (rand() % 1000) /100.0;
-  physical_objects::Particle * p = new physical_objects::Particle(x, 10.0, y, //x
+  physical_objects::Particle * p = new physical_objects::Particle(x, 20.0, y, //x
                                                                   0.0, vy, 0.0, //v
                                                                   obj_mass, false);
   assert(p != NULL);
@@ -320,6 +321,7 @@ void push(){
   //   dropping_objs[i]->center->x.print();
   // }
   // printf("\n");
+  startframe = framecnt;
   bouncing_mesh->droping_object(dop, obj_spring, obj_mass);
 //  bouncing_mesh->add_temp_spring(loc, vol, obj_spring, obj_damping, obj_mass);
 }
@@ -399,8 +401,8 @@ void bouncing_mesh_simulation(){
   }
   // printf("\tFinished dropping_objs\n");
   framecnt ++;
-  // printf("%fs\tFrames:%d\n", framecnt * deltaT, (int) framecnt);
-  
+  printf("%fs\tFrames:%d\n", framecnt * deltaT, (int) framecnt);
+  if( framecnt - startframe == 2000 ) exit(0);
 }
 
 int cnt = 1;
@@ -468,6 +470,13 @@ void drawEverything(){
     // glMaterialf(GL_FRONT, GL_SHININESS, shininess);
   
   // // Assign created components to GL_LIGHT0
+  float ambL1[] = { amb_factor * 0.5, amb_factor * 0.5, amb_factor* 0.5, 1.0f };
+  float difL1[] = { 0.5, 0.5, 0.5 , 1.0f };
+  float pos1[] = { -10, 10, 10, 0.0f };
+  glLightfv(GL_LIGHT1, GL_POSITION, pos1);
+  glLightfv(GL_LIGHT1, GL_AMBIENT, ambL1);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, difL1);
+
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
   glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
