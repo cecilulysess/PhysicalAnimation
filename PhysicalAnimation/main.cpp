@@ -32,8 +32,8 @@
 #include <assert.h>
 #include "ObjLoader.h"
 #include "physical_object.h"
-//#include <Magick++.h>
-//#include "FrameGrabber.h"
+#include <Magick++.h>
+#include "FrameGrabber.h"
 #include<stdlib.h>
 using namespace std;
 
@@ -61,7 +61,7 @@ int mesh_subdiv;
 
 Camera *camera;
 
-//FrameGrabber framegrabber(MYPATH, MYFILENAME, HDWIDTH, HDHEIGHT, STARTFRAME);
+FrameGrabber framegrabber(MYPATH, MYFILENAME, HDWIDTH, HDHEIGHT, STARTFRAME);
 //===================game objects definition=====================
 ModelObject *rigid_objects;
 MotionController *controller;
@@ -73,7 +73,7 @@ long startframe = 0;
 bool drawFaceNormal = false;
 bool Recording = false;
 
-//using namespace Magick;
+using namespace Magick;
 
 
 
@@ -284,11 +284,12 @@ void init() {
   // parameters are eye point, aim point, up vector
   //  camera = new Camera(Vector3d(0, 32, 27), Vector3d(0, 0, 0),
   //                      Vector3d(0, 1, 0));
-  camera = new Camera(Vector3d(-8.5, 7, 28), Vector3d(0, 0, 0),
+  camera = new Camera(Vector3d(-8.5, 13, 28), Vector3d(0, 0, 0),
                                                 Vector3d(0, 1, 0));
   // grey background for window
   glClearColor(0.62, 0.62, 0.62, 0.0);
   glDepthRange(0.0, 1.0);
+  // camera->SetFOV(80);
   
 }
 
@@ -364,6 +365,7 @@ void keyboardEventHandler(unsigned char key, int x, int y) {
     //   obs2ctr.z -= move_step;
     //   break;
     case 'r': case 'R':
+      printf("Start Recording at %f\n", framecnt * deltaT);
       Recording = !Recording;
       break;
     case 'q': case 'Q':	// q or esc - quit
@@ -457,7 +459,7 @@ void drawEverything(){
   // Create light components
   float amb_factor = 0.5f;
   float ambientLight[] = { amb_factor, amb_factor, amb_factor, 1.0f };
-  float diffuseLight[] = { 0.3f, 0.5, 2.0, 1.0f };
+  float diffuseLight[] = { 0.15f, 0.25f, 1,  1.0f };
   float specularLight[] = { 0.8f, 0.8f, 0.5f, 0.5f };
   float position[] = { 10.0f, 25.0f, 10.0f, 0.0f };
   float ambient_color[4] = {1.0, 1.0, 1.0, 1.0};
@@ -470,12 +472,19 @@ void drawEverything(){
     // glMaterialf(GL_FRONT, GL_SHININESS, shininess);
   
   // // Assign created components to GL_LIGHT0
-  float ambL1[] = { amb_factor * 0.5, amb_factor * 0.5, amb_factor* 0.5, 1.0f };
-  float difL1[] = { 0.5, 0.5, 0.5 , 1.0f };
-  float pos1[] = { -10, 10, 10, 0.0f };
+  float ambL1[] = { amb_factor, amb_factor, amb_factor, 1.0f };
+  float difL1[] = { 0.3, 0.5, 1 , 1.0f };
+  float pos1[] = { -10, 12, 5, 0.0f };
   glLightfv(GL_LIGHT1, GL_POSITION, pos1);
   glLightfv(GL_LIGHT1, GL_AMBIENT, ambL1);
   glLightfv(GL_LIGHT1, GL_DIFFUSE, difL1);
+
+  // float ambL2[] = { amb_factor * 0.4, amb_factor *.4, amb_factor * .4, 1.0f };
+  // float difL2[] = { 0.3, 0.5, 1.0 , 1.0f };
+  // float pos2[] = { 0, 20, 0, 0.0f };
+  // glLightfv(GL_LIGHT2, GL_POSITION, pos2);
+  // glLightfv(GL_LIGHT2, GL_AMBIENT, ambL2);
+  // glLightfv(GL_LIGHT2, GL_DIFFUSE, difL2);
 
   glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
   glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
@@ -487,6 +496,7 @@ void drawEverything(){
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
   glEnable(GL_LIGHT1);
+  // glEnable(GL_LIGHT2);
   glutPostRedisplay();
 
   if (showGrid)
@@ -510,8 +520,8 @@ void RenderScene(){
   drawEverything();
   glutSwapBuffers();
   glutPostRedisplay();
-//  if(Recording)
-//    framegrabber.recordimage(drawEverything);
+ if(Recording)
+   framegrabber.recordimage(drawEverything);
 }
 void init_rigid_object_world(char argc, char **argv){
   int obj_no = 0 ;
@@ -544,7 +554,19 @@ void init_bouncing_mesh(){
 void init_the_world(char argc, char **argv) {
   init_bouncing_mesh();
   //  init_rigid_object_world(argc, argv);
-  
+  push();
+  usleep(100000);
+  push();
+  usleep(100000);
+  push();
+  usleep(100000);
+  push();
+  usleep(100000);
+  push();
+  usleep(100000);
+  push();
+  usleep(100000);
+  push();
 }
 
 /*
