@@ -453,8 +453,9 @@ void drawEverything(){
   
   // glEnable(GL_COLOR_MATERIAL);
   // Create light components
-  float ambientLight[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-  float diffuseLight[] = { 0.15f, 0.25, 1.0, 1.0f };
+  float amb_factor = 0.5f;
+  float ambientLight[] = { amb_factor, amb_factor, amb_factor, 1.0f };
+  float diffuseLight[] = { 0.3f, 0.5, 2.0, 1.0f };
   float specularLight[] = { 0.8f, 0.8f, 0.5f, 0.5f };
   float position[] = { 10.0f, 25.0f, 10.0f, 0.0f };
   float ambient_color[4] = {1.0, 1.0, 1.0, 1.0};
