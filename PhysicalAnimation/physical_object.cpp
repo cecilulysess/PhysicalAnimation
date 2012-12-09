@@ -398,6 +398,7 @@ namespace physical_objects {
   ParticleStrutPair* BouncingMesh::add_temp_spring(Face* face, DropingObject* obj,
                                      float spring, float damping,
                                      float mass){
+
     face->add_tmp_vertices(obj,
                            spring, damping);
     return &face->temporary_vertices[face->temporary_vertices.size() - 1];
@@ -410,10 +411,10 @@ namespace physical_objects {
     for (int i = 0; i < this->faces_.size(); ++i) {
       if (this->faces_[i].isColliding(p)) {
         this->add_temp_spring(&faces_[i], obj, spring, damping, p->m);
-        
+        return true;
       }
     }
-    return true;
+    return false;
   }
   
   //============================BouncingMesh============================
@@ -508,10 +509,13 @@ namespace physical_objects {
          this->temporary_vertices.begin();
          it != this->temporary_vertices.end();) {
       if ( isAboveface(it->p) ) {
+        printf("delete vertice\n");
         // detach the particle
         *it->isAttached = false;
         // when move above the face, just remove the temoprary vertice
+        // printf("P in it %d", *it);
         it = this->temporary_vertices.erase(it);
+        // printf("P in it after erase %d", *it);
       } else {
         it++;
       }
@@ -522,7 +526,9 @@ namespace physical_objects {
                                       float spring,
                                       float damping){
     Particle* p = obj->center;
-    //    float L0 = ??;
+    // p->x.print();
+    printf("add vertices\n");
+
     Strut* a = new Strut(spring, damping,
                          (p->x - this->a->x).norm(), p, this->a);
     Strut* b = new Strut(spring, damping,
