@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include "Matrix.h"
 std::vector<ModelObject*> ObjLoader::objects;
-#define KMASS 0.1
+#define KMASS 0.01
 #define pho 0.5
 
 ModelObject* ObjLoader::loadObject(char const *path, int &obj_no){
@@ -191,6 +191,8 @@ void ModelObject::update_object() {
     this->vertices[i+1] += tran.y;
     this->vertices[i+2]  += tran.z;
   }
+  
+  
 
 }
 
@@ -257,37 +259,54 @@ void MotionController::next_step() {
   // update the model's vertice so that it can showed in the scene
   object->update_object();
   object->make_array();
-}
-
-void MotionController::compute_force_and_torque(double t) {
-  object->rigid_body.force = Vector3d(0.0f, -0.098f, 0.0f);
-  double min = 100000.0;
-  int idx = 0;
-  //find minimium y
-  for (int i = 1; i < object->vertices.size();  i+=3 ) {
-    if (object->vertices[i] < min) {
-      min = object->vertices[i];
-      idx = i/3;
-    }
-  }
-  if (min < 0.1) {
-    is_collide = true;
-    collide_pt = Vector3d(object->vertices[idx*3],
-                          object->vertices[idx*3+1],
-                          object->vertices[idx*3+2]);
-    printf("Detected Collid: %f, %f, %f\n", collide_pt.x,
-           collide_pt.y,
-           collide_pt.z);
-  } 
-  if( is_collide ) {
-    object->rigid_body.force = Vector3d(0, 1, 0);
-    
-  }
-
+  this->sprint_pt.x = object->vertices[3];
+  this->sprint_pt.y = object->vertices[4];
+  this->sprint_pt.z = object->vertices[5];
   
 }
 
+void MotionController::compute_force_and_torque(double t) {
+//  object->rigid_body.force = Vector3d(0.0f, -0.98f, 0.0f);
+//  double min = 100000.0;
+//  int idx = 0;
+//  //find minimium y
+//  for (int i = 1; i < object->vertices.size();  i+=3 ) {
+//    if (object->vertices[i] < min) {
+//      min = object->vertices[i];
+//      idx = i/3;
+//    }
+//  }
+//  if (min < 0.1) {
+//    is_collide = true;
+//    collide_pt = Vector3d(object->vertices[idx*3],
+//                          object->vertices[idx*3+1],
+//                          object->vertices[idx*3+2]);
+//    printf("Detected Collid: %f, %f, %f\n", collide_pt.x,
+//           collide_pt.y,
+//           collide_pt.z);
+//  } 
+//  if( is_collide ) {
+//    object->rigid_body.force = Vector3d(0, 1, 0);
+//    
+//  }
+  double k = 0.9, d = 0.3;
+  Vector3d sf = Vector3d(object->vertices[3], object->vertices[4], object->vertices[5]);
+  sf = (sf - this->fixed_pt);
+//  printf("SF:");
+//  sf.print();
+//  printf("\n");
+  Vector3d usf = sf.normalize();
+  Vector3d sfs = -k * (sf.norm() - this->original_length) * usf;
+//  printf(" SFS:");
+//  sfs.print();
+//  printf("\n");
+  object->rigid_body.torque = sf%sfs;
+//  object->rigid_body.force = object->rigid_body.force + (sfs * Vector3d(0,1,0) * Vector3d(0, 1, 0)) ;
+}
+
 void MotionController::dydt(double t, StateVector& y, StateVector& ydot) {
+  //clear force
+  object->rigid_body.force = Vector3d(0, 0, 0);
   //for each rigid body
   compute_force_and_torque(t);
   ddt_State_to_Array(ydot);

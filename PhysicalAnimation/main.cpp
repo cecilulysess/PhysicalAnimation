@@ -43,7 +43,7 @@ ModelObject *rigid_objects;
 MotionController *controller;
 //===============================================================
 
-bool showGrid = true;
+bool showGrid = false;
 
 // draws a simple grid
 void makeGrid() {
@@ -197,12 +197,21 @@ void RenderScene(){
     // activate and specify pointer to vertex array
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, obj->vertices_array);
-    glDrawElements(GL_POINT_BIT,
+    glDrawElements(GL_TRIANGLE_FAN,
                    (int)obj->indices.size(),
                    GL_UNSIGNED_BYTE,
                    obj->indice_array);
-
+    
   }
+  glBegin(GL_LINES);
+  glVertex3d(
+             controller->fixed_pt.x,
+             controller->fixed_pt.y,
+             controller->fixed_pt.z);
+  glVertex3d(controller->sprint_pt.x,
+             controller->sprint_pt.y,
+             controller->sprint_pt.z);
+  glEnd();
   glutSwapBuffers();
   
 }
@@ -213,7 +222,7 @@ void init_rigid_object_world(char argc, char **argv){
   if (obj_no < 1) {
     printf("Loading object from %s error, exit", argv[1]);
     exit(1);
-  }
+}
 //  ObjLoader::objects[0]->rotate(90, 0, 0, 0);
   rigid_objects = ObjLoader::objects[0];
   

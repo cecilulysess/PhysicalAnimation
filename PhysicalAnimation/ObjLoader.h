@@ -128,13 +128,20 @@ public:
   double current_time;
   double dt;
   bool is_collide;
+  Vector3d fixed_pt;
+  Vector3d sprint_pt;
   Vector3d collide_pt;
+  double original_length;
   ModelObject *object;
   MotionController(ModelObject* object_, double begin_time, double timestep) {
+    fixed_pt = Vector3d(0, 20, 0);
     current_time = begin_time;
     dt = timestep;
     object = object_;
     is_collide = false;
+    sprint_pt =
+      Vector3d(object_->vertices[3], object_->vertices[4], object_->vertices[5]);
+    original_length = (sprint_pt - fixed_pt).norm();
   }
 
   void next_step();
